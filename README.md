@@ -2,6 +2,10 @@
 
 A mobile-first contractor services website, recovered from an interrupted development session on 2026-09-17.
 
+## Public domain — verified 2026-09-17
+
+`https://ivanpineda.bottah.dev` is now the default Compose/Caddy address. DNS A resolves to this droplet; no AAAA record was returned. Caddy obtained a Let's Encrypt certificate for this hostname (current expiry 2026-12-16) and redirects HTTP to HTTPS with 308. HTTPS `/healthz` passed with normal certificate verification from this host. Logs: ignored `recovery/domain-caddy.log`. Caddy retains/renews certificates in its existing named volumes; no firewall or other host settings changed. Use explicit HTTPS URLs for tests until their defaults are updated in the content-refinement checkpoint. For a local HTTP-only preview, set `SITE_ADDRESS=:80` before `docker compose up -d`.
+
 ## Confirmed business details
 
 - Public business name supplied by owner: **Zip LLC Handyman Services**. Used in site header, page titles and footer. Rebuilt preview and reran HTTP smoke checks and all four browser tests successfully after branding change (2026-09-17).
