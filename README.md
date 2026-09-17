@@ -12,11 +12,14 @@ No GitHub repository or CI/CD yet; local Git checkpoints are for recovery.
 
 ## Verified runtime — 2026-09-17
 
-- Droplet upgraded by owner to 2 GB (1.9 GiB visible); no swap. No host configuration changes made during resume.
+- Droplet upgraded by owner to 2 GB (1.9 GiB visible); no swap. Chromium test libraries/fonts installed on the host using `cd tests/browser && npx playwright install-deps chromium`; installation log is in ignored `recovery/browser-system-deps.log`. No swap/firewall changes.
 - `docker compose config --quiet` and `docker compose up -d --build` passed. App is healthy and Caddy is running; `curl -fsS http://localhost/healthz` returns `{"status":"ok"}`.
 - Preview listens on host port 80: `http://<droplet-ip>/` (external firewall/reachability not yet tested). No domain or HTTPS verified.
-- Build log: ignored `recovery/resume-build.log`. Build reports one high npm advisory; investigate before production. Missing Buildx produces a harmless warning; Docker's fallback builder succeeded.
-- Browser and comprehensive HTTP checks are next. Business content remains placeholder.
+- Build logs: ignored `recovery/resume-build.log` and `recovery/rebuild.log`. Missing Buildx produces a harmless warning; Docker's fallback builder succeeded.
+- HTTP smoke checks pass for all six pages, health, greeting, JS/CSS, security header and 404s.
+- Four Chromium tests pass at desktop/mobile widths: greeting updates, Vue counter/remount/history interaction, boosted navigation without reload, titles/current links, overflow checks and keyboard skip link. Screenshots saved in ignored `recovery/`. This is not a full accessibility or cross-browser audit.
+- Fixed Vite library-mode output referencing Node's `process` in browser JavaScript. Updated Vite to 7.3.6; frontend npm audit reports zero vulnerabilities. Python dependency security review remains pending.
+- Business content remains placeholder. Repository-local Git identity is `Project Assistant <project-assistant@localhost>` because none was configured; no global identity or remote added.
 
 ## Recovery history (before successful resume)
 
@@ -69,11 +72,27 @@ docker compose down  # stop; preserves named volumes
 
 Avoid `down -v` unless intentionally deleting Caddy state/certificates. Local Python startup requires frontend assets first: `cd frontend && npm ci && npm run build` (Node 22 recommended); Docker handles this automatically. `app/static` is generated and not tracked.
 
+## Repeatable verification
+
+From the project root, with Compose running:
+
+```sh
+python3 tests/smoke.py  # optional argument: http://other-host
+cd tests/browser
+npm ci
+PLAYWRIGHT_BROWSERS_PATH=../../recovery/browsers npx playwright install chromium
+# On a fresh Linux host, install browser system libraries (requires root):
+npx playwright install-deps chromium
+npm test
+```
+
+Browser tests use one worker to limit memory. `BASE_URL=http://other-host npm test` targets another preview. Dependencies, browsers, traces and screenshots are ignored, not committed. Host Node 22 and Python 3 are needed for these tests; app builds require only Docker/Compose.
+
 ## Next steps
 
-1. Complete the Docker build and investigate any errors; keep logs inside ignored `recovery/`.
-2. Verify all pages, unknown-route 404, `/healthz`, `/hello`, and local JS/CSS through Caddy.
-3. Browser-test HTMX navigation/history, Vue mount/unmount, mobile layout, and keyboard access. Add repeatable smoke tests.
+1. Verify access from an external browser at `http://<droplet-ip>/`; localhost checks do not prove cloud firewall access.
+2. Supply a domain and configure DNS/HTTPS before production.
+3. Expand browser/accessibility coverage as real interactions are added.
 4. Confirm server-rendered vs truly static requirements. Obtain business name, service area, services, contact details, domain, and photo-source permissions.
 5. Implement real content, gallery/before-after interactions, and a properly handled contact form. Do not imply placeholder forms deliver messages.
 6. Review dependency/security updates and deployment readiness before public production use. Add GitHub/CI/CD only when requested.
