@@ -164,10 +164,10 @@
     },
     {
       "id": "p09",
-      "title": "Siding before painting",
+      "title": "Siding before finishing",
       "category": "Painting",
       "stage": "Before",
-      "caption": "Replacement boards in gray-blue and tan interrupt the light siding on this wall before it is painted.",
+      "caption": "A replaced section of siding is still unfinished on this wall.",
       "source": "photo_2026-09-17 12.59.05.jpeg",
       "sha256": "b8e5486146bb957466e704b5c5497612d2c8b80898adf9090d1b2b4e44ce8c5e"
     },
@@ -366,13 +366,13 @@
       "note": "Owner-confirmed before and after: worn asphalt with no visible bays, then fresh white parking lines."
     },
     {
-      "id": "exterior-painting",
-      "title": "Painting patched siding",
+      "id": "siding-repair",
+      "title": "Siding repair",
       "photos": [
         "p09",
         "p10"
       ],
-      "note": "Owner-confirmed before and after: replacement boards in mismatched colors, then the whole wall in one even finish."
+      "note": "Owner-confirmed before and after: a replaced section of siding, then the finished wall."
     }
   ],
   "portrait": {
