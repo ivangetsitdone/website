@@ -4,6 +4,7 @@
 recovery/
 node_modules/
 app/static/
+app/media/
 __pycache__/
 *.py[cod]
 .venv/

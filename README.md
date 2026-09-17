@@ -11,6 +11,10 @@ A mobile-first contractor services website, recovered from an interrupted develo
 - Confirmed public phone: **971-288-3488**. Owner confirmed calls and texts are welcome. Click-to-call and SMS links on home and contact pages. Rebuild, HTTP checks (including phone/SMS links), and four browser tests passed after SMS update. Actual telephone dialing and SMS handoff/delivery are not tested.
 - Still needed: optional public email, domain, and permission for any reused profile text/photos. Do not infer credentials or publish contact details without confirmation.
 
+## Portfolio work in progress
+
+Owner authorized use of the uploaded project photos. A first-pass catalog of 35 selected photos and three provisional sequences is now versioned with original source images. See `content/README.md` for visual interpretations, uncertain stages, provenance, and reconstruction. A Docker photo stage generates metadata-free WebP assets; gallery UI and verification are the next checkpoint. Original surname spelling needs confirmation (Pineda/Pidena); public attribution uses the business name.
+
 ## Mission
 
 First prove a working **Hello World** stack: FastAPI + Jinja server rendering, HTMX navigation/partial updates, Vue 3 single-file components only where useful, and locally bundled assets. Package it with Docker Compose and Caddy. Then iterate on services, about, contact, portfolio, and before/after pages using real business details and authorized photos.

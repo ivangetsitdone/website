@@ -1,0 +1,349 @@
+{
+  "photos": [
+    {
+      "id": "p12",
+      "title": "Wood & wire garden fence",
+      "category": "Fencing",
+      "stage": "Detail",
+      "caption": "Warm-toned wood rails frame wire panels beside a green lawn and gravel border.",
+      "source": "photo_2026-09-17 12.59.08.jpeg",
+      "sha256": "56409115d6bbd04f5917c7aee58ea0595787311dffaa7eef25b38b5ca20799b6"
+    },
+    {
+      "id": "p29",
+      "title": "Mosaic niches taking shape",
+      "category": "Showers & tile",
+      "stage": "In progress",
+      "caption": "Marble-look wall tiles surround two stacked mosaic niches. The tub edge and tools show this is still a work site.",
+      "source": "photo_2026-09-17 13.02.41.jpeg",
+      "sha256": "51a542fdc94a901f694014ba44fccbc2cc11b3ecb1304805f9a8fd6c2dcaea81"
+    },
+    {
+      "id": "p07",
+      "title": "Wood-look flooring through the room",
+      "category": "Interiors",
+      "stage": "Detail",
+      "caption": "Warm wood-look planks run through the room toward a bright doorway, with white trim at the edges.",
+      "source": "photo_2026-09-17 12.59.03.jpeg",
+      "sha256": "2883367d9e303000b9d54d3d194d6fbfc71ad48894f23dbbd543d14b96801a12"
+    },
+    {
+      "id": "p42",
+      "title": "Garden steps revealed",
+      "category": "Outdoor projects",
+      "stage": "After",
+      "caption": "A defined flight of garden steps leads toward the gate, with the surrounding soil still exposed.",
+      "source": "photo_2026-09-17 13.03.06.jpeg",
+      "sha256": "55c5c36350ffbdda7ed7edb8279c8773cb853af5403527a07741194ce6e10b9d"
+    },
+    {
+      "id": "p11",
+      "title": "Exterior with a blue entry",
+      "category": "Painting",
+      "stage": "Detail",
+      "caption": "Light-colored siding and trim frame a vivid blue front door beneath the tall roofline.",
+      "source": "photo_2026-09-17 12.59.07.jpeg",
+      "sha256": "753d41828bd15ab486151fe440cf8ced9e7e3f97514d799f9644bb47bbc70c5c"
+    },
+    {
+      "id": "p22",
+      "title": "Side yard after clearing",
+      "category": "Outdoor projects",
+      "stage": "After",
+      "caption": "The side passage is open again, revealing three raised planting beds along the chain-link fence.",
+      "source": "photo_2026-09-17 13.02.30.jpeg",
+      "sha256": "c9489db293b43b2d134ba6a5eace5f293a08346206dcb08f1ede5df2adc63a91"
+    },
+    {
+      "id": "p25",
+      "title": "Privacy fence from the inside",
+      "category": "Fencing",
+      "stage": "Detail",
+      "caption": "Vertical wood boards are supported by horizontal rails and dark posts along a narrow planted boundary.",
+      "source": "photo_2026-09-17 13.02.34.jpeg",
+      "sha256": "5f5617713c827c5f4696ac7b0b62ea7153c5f3e29990535d8e1c5e05ccb7a054"
+    },
+    {
+      "id": "p38",
+      "title": "Shower wall preparation",
+      "category": "Showers & tile",
+      "stage": "In progress",
+      "caption": "Red-coated wall boards and two recessed niches are visible before the tile goes on; the tub below is protected.",
+      "source": "photo_2026-09-17 13.03.00.jpeg",
+      "sha256": "b0391c96663c92797b3f7047c6384efcf767d22d72942f50274d60019d2bceac"
+    },
+    {
+      "id": "p36",
+      "title": "Tile installation underway",
+      "category": "Showers & tile",
+      "stage": "In progress",
+      "caption": "Marble-look tiles and a mosaic niche are being fitted, with tile spacers and red-coated wall areas still visible.",
+      "source": "photo_2026-09-17 13.02.57.jpeg",
+      "sha256": "28ade83704bc5cff56231e2ba8ade9d51e37a2e94840eac1707b51b6a00bb648"
+    },
+    {
+      "id": "p32",
+      "title": "Tub surround and mosaic band",
+      "category": "Showers & tile",
+      "stage": "In progress",
+      "caption": "A horizontal mosaic accent runs into the stacked niches above the tub. Masking tape remains along the ceiling edge.",
+      "source": "photo_2026-09-17 13.02.47.jpeg",
+      "sha256": "90e37822dee0756d77e28db81f92d4419897cbed4ab7c36cec52944d341ab790"
+    },
+    {
+      "id": "p15",
+      "title": "Recessed shower shelf",
+      "category": "Showers & tile",
+      "stage": "Detail",
+      "caption": "A mosaic-backed shelf is inset into a light tile shower wall, keeping bottles within reach.",
+      "source": "photo_2026-09-17 13.01.59.jpeg",
+      "sha256": "f62b7ff7a7f00db3a94463e019a3c144a6d914fd298fb28db9af79b064651e29"
+    },
+    {
+      "id": "p16",
+      "title": "Shower enclosure overview",
+      "category": "Showers & tile",
+      "stage": "Detail",
+      "caption": "A light-colored shower enclosure with a curtain rail, wall-mounted grab bar and recessed shelf.",
+      "source": "photo_2026-09-17 13.02.02.jpeg",
+      "sha256": "3382d05d98a56065a44d0e45c28b991b3bac3eac0484b4e9833720a461097b53"
+    },
+    {
+      "id": "p06",
+      "title": "Flooring at the doorway",
+      "category": "Interiors",
+      "stage": "Detail",
+      "caption": "Wood-look flooring meets white baseboards and a doorway, with blue masking tape still visible on the trim.",
+      "source": "photo_2026-09-17 12.59.02.jpeg",
+      "sha256": "6f32746791e170c1ad280781349311ecf1a41a308558257edabd828cf3b82e14"
+    },
+    {
+      "id": "p30",
+      "title": "Cool gray room palette",
+      "category": "Interiors",
+      "stage": "In progress",
+      "caption": "Gray walls, white baseboards and gray-brown plank flooring meet beneath a small window; supplies remain on the floor.",
+      "source": "photo_2026-09-17 13.02.42.jpeg",
+      "sha256": "2df5fe855412181eb8f7ff27ecbbeb46f2689a9f75021fb2e5d68042bb4fed77"
+    },
+    {
+      "id": "p31",
+      "title": "Room viewed from the hall",
+      "category": "Interiors",
+      "stage": "In progress",
+      "caption": "A doorway view shows the gray room, contrasting white trim and plank floor while cleanup is still underway.",
+      "source": "photo_2026-09-17 13.02.46.jpeg",
+      "sha256": "6745346e17fc18c89dac4a5c21b5e5701b7452f167f3769f288c60f106012209"
+    },
+    {
+      "id": "p47",
+      "title": "Open wall and insulation",
+      "category": "Interiors",
+      "stage": "In progress",
+      "caption": "Exposed wall studs and insulation show an interior room during the wall-preparation stage.",
+      "source": "photo_2026-09-17 13.03.14.jpeg",
+      "sha256": "6c257a0bc4dece4747c9c39c80b25bff6c51d243b6caa04a31cc9e857250dfb4"
+    },
+    {
+      "id": "p45",
+      "title": "Drywall seams in progress",
+      "category": "Interiors",
+      "stage": "In progress",
+      "caption": "Drywall panels have taped and coated seams, while tools and materials remain on the unfinished floor.",
+      "source": "photo_2026-09-17 13.03.11.jpeg",
+      "sha256": "c8b24af3285c089606e572c4e59163db2326c3b6013f281ae26893313e89479e"
+    },
+    {
+      "id": "p08",
+      "title": "A bold blue front door",
+      "category": "Painting",
+      "stage": "In progress",
+      "caption": "A paneled entry door has a bright blue finish, with masking tape and painting supplies still around the threshold.",
+      "source": "photo_2026-09-17 12.59.04.jpeg",
+      "sha256": "d31b2a8a7685c2daeb1881a227deda75e48fcf328468a0775c71bc025ae5219c"
+    },
+    {
+      "id": "p09",
+      "title": "Exterior siding during the work",
+      "category": "Painting",
+      "stage": "In progress",
+      "caption": "A horizontal gray-blue strip contrasts with light siding while the adjacent corner trim remains exposed.",
+      "source": "photo_2026-09-17 12.59.05.jpeg",
+      "sha256": "b8e5486146bb957466e704b5c5497612d2c8b80898adf9090d1b2b4e44ce8c5e"
+    },
+    {
+      "id": "p10",
+      "title": "Light siding and trim",
+      "category": "Painting",
+      "stage": "In progress",
+      "caption": "Light-colored horizontal siding fills the wall, with a paint can and supplies at ground level.",
+      "source": "photo_2026-09-17 12.59.06.jpeg",
+      "sha256": "e11a3e9629cca8df8be105cbc7bac74556bd8a2dfd047bf9a4b05b6f6b89dc27"
+    },
+    {
+      "id": "p13",
+      "title": "Fence following the lawn",
+      "category": "Fencing",
+      "stage": "Detail",
+      "caption": "Wood-and-wire fence panels follow the edge of a sloping lawn, with a gravel strip along the base.",
+      "source": "photo_2026-09-17 12.59.09.jpeg",
+      "sha256": "d5b5ead81c163310aa7d20c20866b9c2f26296ccc2781c208e40cdbcd8256909"
+    },
+    {
+      "id": "p14",
+      "title": "Added privacy above the fence",
+      "category": "Fencing",
+      "stage": "Detail",
+      "caption": "A row of taller warm-toned boards rises above an older weathered fence section.",
+      "source": "photo_2026-09-17 13.01.57.jpeg",
+      "sha256": "2985ca59775cec6f157251d2a7da16c31e5385df5fa037befb2db560eddaa039"
+    },
+    {
+      "id": "p26",
+      "title": "Fence framework underway",
+      "category": "Fencing",
+      "stage": "In progress",
+      "caption": "Dark posts and horizontal wood rails mark out a fence line beside the street before the infill is installed.",
+      "source": "photo_2026-09-17 13.02.36.jpeg",
+      "sha256": "ed76eee9c0c5e2e27bf556a05e5f0a2865ff254579b077de2ae38e51963d6702"
+    },
+    {
+      "id": "p04",
+      "title": "Wood privacy fence line",
+      "category": "Fencing",
+      "stage": "Detail",
+      "caption": "Close-set vertical wood boards form a continuous privacy fence along a narrow side passage.",
+      "source": "photo_2026-09-17 12.59.00.jpeg",
+      "sha256": "bef410f2803125d1b4878e7472852a4a3c63ad6cded1b61061755452ebf3c31c"
+    },
+    {
+      "id": "p02",
+      "title": "Fence-post hardware detail",
+      "category": "Fencing",
+      "stage": "Detail",
+      "caption": "A dark metal fence-post component sits beside an existing wood rail, showing the connection area up close.",
+      "source": "photo_2026-09-17 12.58.58.jpeg",
+      "sha256": "8429b7b6253d6ef39801e0501b5e54b81e9c20e3113e21b9dfb5ceb40dac7f20"
+    },
+    {
+      "id": "p18",
+      "title": "Side yard before clearing",
+      "category": "Outdoor projects",
+      "stage": "Before",
+      "caption": "Tall grass and dense weeds fill the narrow passage between the house and the chain-link fence.",
+      "source": "photo_2026-09-17 13.02.24.jpeg",
+      "sha256": "965e7c7cef23a113aeabb5434abd9f5ed2fe79d1a94f608752017188083eff88"
+    },
+    {
+      "id": "p21",
+      "title": "Cleared garden area",
+      "category": "Outdoor projects",
+      "stage": "Detail",
+      "caption": "An open garden area surrounds raised beds beneath a mature tree, with scattered clippings still on the ground.",
+      "source": "photo_2026-09-17 13.02.28.jpeg",
+      "sha256": "da611cd05bdc719f6768766d12bd266f87ac95ec778916b3e4e670125623f6c8"
+    },
+    {
+      "id": "p41",
+      "title": "Garden steps during excavation",
+      "category": "Outdoor projects",
+      "stage": "In progress",
+      "caption": "Grass and soil cover parts of the existing steps, while a dug-out lower section and shovel show work underway.",
+      "source": "photo_2026-09-17 13.03.05.jpeg",
+      "sha256": "c415408d772e47e97385a0556e25347527e3bd5ded0fe3ab1baa16b93c652535"
+    },
+    {
+      "id": "p40",
+      "title": "Paved garden landing",
+      "category": "Outdoor projects",
+      "stage": "Detail",
+      "caption": "Rectangular pavers form a small landing and path beside a planted border.",
+      "source": "photo_2026-09-17 13.03.04.jpeg",
+      "sha256": "d8d84da9cce1ff16840b9933f6592b8e48d57c644f9bee7e4a58cd0dca382a01"
+    },
+    {
+      "id": "p43",
+      "title": "Leaf-covered sidewalk edge",
+      "category": "Outdoor projects",
+      "stage": "Before",
+      "caption": "Fallen leaves blanket the strip between a wooded slope and the sidewalk. A matching final view is not confirmed.",
+      "source": "photo_2026-09-17 13.03.08.jpeg",
+      "sha256": "60ef754dc88c11726f6d1c12f5cc544a5ccbc0c1bb359926a6d9599a74379f5e"
+    },
+    {
+      "id": "p44",
+      "title": "Cleared sidewalk border",
+      "category": "Outdoor projects",
+      "stage": "Detail",
+      "caption": "The ground beside a wooded sidewalk has been cleared back, exposing soil around the tree trunks.",
+      "source": "photo_2026-09-17 13.03.10.jpeg",
+      "sha256": "05b9ae64156de1a0f474f7ad207dfa1010d037326326a1497636366a00393a56"
+    },
+    {
+      "id": "p23",
+      "title": "Parking area work underway",
+      "category": "Outdoor projects",
+      "stage": "In progress",
+      "caption": "A broad asphalt parking area with cones and people in the distance during site work.",
+      "source": "photo_2026-09-17 13.02.31.jpeg",
+      "sha256": "5eb37bf78fb9edbe49f726855cf3b96f1971fd0f124076c68e3c8c4a24a2d359"
+    },
+    {
+      "id": "p24",
+      "title": "Parking bay markings",
+      "category": "Outdoor projects",
+      "stage": "Detail",
+      "caption": "Bright white parking-space lines cross the asphalt, with cones still standing in the lot.",
+      "source": "photo_2026-09-17 13.02.33.jpeg",
+      "sha256": "f0d0eb73b7e801976947c0a84db5f3d80b868da511c55da6ef08b87369b52c69"
+    },
+    {
+      "id": "p01",
+      "title": "Asphalt patch detail",
+      "category": "Outdoor projects",
+      "stage": "Detail",
+      "caption": "A rectangular dark asphalt patch contrasts with the older pavement around it.",
+      "source": "photo_2026-09-17 12.57.00.jpeg",
+      "sha256": "19107652040b8e7592dad3be2372366759f14abcf9c461bbb3aebdcbd7cae7ec"
+    },
+    {
+      "id": "p54",
+      "title": "Landscape block course",
+      "category": "Outdoor projects",
+      "stage": "In progress",
+      "caption": "Textured landscape blocks form a low course against exposed soil, with the hollow block tops still visible.",
+      "source": "photo_2026-09-17 13.03.25.jpeg",
+      "sha256": "3319316854cdbbd49d1a076ccaa611546d25a9366fb95e2e0e28c88594cc5806"
+    }
+  ],
+  "pairs": [
+    {
+      "id": "side-yard",
+      "title": "Opening up a side yard",
+      "photos": [
+        "p18",
+        "p22"
+      ],
+      "note": "Likely before / after: the deck, satellite dish, neighboring wall and fence align in both views."
+    },
+    {
+      "id": "garden-steps",
+      "title": "Finding the steps again",
+      "photos": [
+        "p41",
+        "p42"
+      ],
+      "note": "Likely progress / after: the gate, silver-leaved planting and stair position match. The first photo already shows excavation underway."
+    },
+    {
+      "id": "shower-tile",
+      "title": "From wall preparation to tile",
+      "photos": [
+        "p38",
+        "p36",
+        "p29"
+      ],
+      "note": "Likely work sequence: two stacked niches and the same tub corner connect these views. These are progress photos, not a completed shower."
+    }
+  ]
+}

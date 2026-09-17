@@ -6,4 +6,5 @@ recovery
 **/__pycache__
 .venv
 app/static
+app/media
 *.log
