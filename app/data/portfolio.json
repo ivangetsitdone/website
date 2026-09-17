@@ -345,5 +345,14 @@
       ],
       "note": "Likely work sequence: two stacked niches and the same tub corner connect these views. These are progress photos, not a completed shower."
     }
-  ]
+  ],
+  "portrait": {
+    "id": "ivan-pineda",
+    "alt": "Ivan Pineda, the handyman behind Zip LLC Handyman Services.",
+    "caption": "Ivan Pineda \u00b7 Zip LLC Handyman Services",
+    "width": 450,
+    "height": 800,
+    "source": "ivan-headshot-download.jpeg",
+    "sha256": "f25ec49ad7ca69d924d26d3542231ac261f86602320d8e466fe3081b2048e972"
+  }
 }

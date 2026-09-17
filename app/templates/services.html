@@ -1,0 +1,7 @@
+<section class="services-grid section-space" aria-label="Services and project experience">
+  {% for name, copy in services %}
+  <article class="service-card"><span class="service-number">{{ '%02d'|format(loop.index) }}</span><h2>{{ name }}</h2><p>{{ copy }}</p></article>
+  {% endfor %}
+</section>
+<aside class="scope-note"><h2>Let’s check the scope together.</h2><p>These are areas of experience, not a promise that every job is a fit. Some plumbing, electrical, structural and other projects may require permits or a licensed specialist. Please call or text to discuss the details before making plans.</p></aside>
+<section class="contact-band section-space" aria-labelledby="service-contact-heading"><h2 id="service-contact-heading">Not sure where your project fits?</h2><p>Send a description and a few photos. I’m available evenings and weekends in Forest Grove and within a 30-mile radius.</p><a class="button-link" href="/contact">Tell me what you need →</a></section>

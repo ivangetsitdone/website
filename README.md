@@ -4,7 +4,27 @@ A mobile-first contractor services website, recovered from an interrupted develo
 
 ## Public domain — verified 2026-09-17
 
-`https://ivanpineda.bottah.dev` is now the default Compose/Caddy address. DNS A resolves to this droplet; no AAAA record was returned. Caddy obtained a Let's Encrypt certificate for this hostname (current expiry 2026-12-16) and redirects HTTP to HTTPS with 308. HTTPS `/healthz` passed with normal certificate verification from this host. Logs: ignored `recovery/domain-caddy.log`. Caddy retains/renews certificates in its existing named volumes; no firewall or other host settings changed. Use explicit HTTPS URLs for tests until their defaults are updated in the content-refinement checkpoint. For a local HTTP-only preview, set `SITE_ADDRESS=:80` before `docker compose up -d`.
+`https://ivanpineda.bottah.dev` is now the default Compose/Caddy address. DNS A resolves to this droplet; no AAAA record was returned. Caddy obtained a Let's Encrypt certificate for this hostname (current expiry 2026-12-16) and redirects HTTP to HTTPS with 308. HTTPS `/healthz` passed with normal certificate verification from this host. Logs: ignored `recovery/domain-caddy.log`. Caddy retains/renews certificates in its existing named volumes; no firewall or other host settings changed. Test defaults now point at this HTTPS hostname. For a local HTTP-only preview, set `SITE_ADDRESS=:80` before `docker compose up -d`.
+
+## Site content — replaced and verified, 2026-09-17
+
+The Hello World demonstration is gone from the public site. Home, services, about and contact now carry real business copy in dedicated templates (`app/templates/home.html`, `services.html`, `about.html`, `contact.html`) with a rebuilt stylesheet, a hero photo from the project album, a services list rendered from `SERVICES` in `app/main.py`, and a scope note stating that some work may need permits or a licensed specialist.
+
+- Removed with the demo: the `/hello` fragment route (now 404), `app/templates/hello.html`, `frontend/Hello.vue` and the Vue mounting/unmounting code in `frontend/main.js`. `vue` and `@vitejs/plugin-vue` stay installed and configured so a single-file component can be added where interaction needs one; no component is mounted today. HTMX still drives boosted navigation.
+- Each page emits its own `<meta name="description">` and `<link rel="canonical">` (`https://ivanpineda.bottah.dev/...`). Because boosted navigation swaps the body only, `frontend/main.js` copies both from `main[data-description]`/`main[data-canonical]` after every swap; browser tests assert head and body stay in sync.
+- The About page portrait is built from `content/portraits/ivan-pineda.jpg` through the same Pillow build stage as the album: hash-verified, resized to at most 900×900 and written as one metadata-free `/media/ivan-pineda.webp`. The original is never served. **Its authorization is unconfirmed — see `content/README.md` before promoting the site.**
+- Verified after the change: `docker compose up -d --build` (log: ignored `recovery/content-build.log`), HTTP smoke checks, catalog/asset checks (71 WebP assets, 8.36 MiB, source isolation including `/content/portraits/`), and 22 Chromium tests at desktop and mobile sizes. Axe WCAG A/AA checks now cover home, services, about and contact as well as the gallery, and report no violations; that is not a full accessibility audit, and no real device or Safari was tested. Desktop and mobile screenshots for home, about and contact were reviewed under ignored `recovery/`.
+- Test defaults now target `https://ivanpineda.bottah.dev` instead of `http://localhost`. Pass a base URL argument (or `BASE_URL`) to test a local HTTP-only preview.
+
+### Copy awaiting owner confirmation
+
+These statements are live on the site but are **not** recorded as confirmed anywhere in this repository; they came from the previous session's conversation, whose context was lost. Confirm each one with the owner:
+
+- “10+ years” of hands-on experience, and experience in general construction and sheetrock repairs.
+- Availability limited to evenings and weekends around a full-time job.
+- The personal note about supporting his family and saving for his daughter's college fund.
+- The surname spelling **Pineda** (used in copy, the footer and the domain) — `content/README.md` still records the Pineda/Pidena ambiguity.
+- Publishing the About page portrait.
 
 ## Confirmed business details
 
@@ -42,7 +62,7 @@ No GitHub repository or CI/CD yet; local Git checkpoints are for recovery.
 - HTTP smoke checks pass for all six pages, health, greeting, JS/CSS, security header and 404s.
 - Original stack checks still pass within the expanded 16-test Chromium suite: greeting updates, Vue counter/remount/history interaction, boosted navigation without reload, titles/current links, overflow checks and keyboard skip link. See portfolio verification above.
 - Fixed Vite library-mode output referencing Node's `process` in browser JavaScript. Updated Vite to 7.3.6; frontend npm audit reports zero vulnerabilities. Python dependency security review remains pending.
-- Business name, service area, service experience, call/text links and portfolio are populated; home still contains the stack demo and about remains placeholder. Repository-local Git identity is `Project Assistant <project-assistant@localhost>` because none was configured; no global identity or remote added.
+- Business name, service area, service experience, call/text links, portfolio and the written site content are populated; the stack demo and about placeholder were replaced (see above). Repository-local Git identity is `Project Assistant <project-assistant@localhost>` because none was configured; no global identity or remote added.
 
 ## Recovery history (before successful resume)
 
@@ -58,11 +78,12 @@ No GitHub repository or CI/CD yet; local Git checkpoints are for recovery.
 ## Layout
 
 ```text
-app/main.py             FastAPI routes and placeholder page data
-app/templates/          Jinja pages and greeting fragment
-frontend/               Vue SFC, HTMX entrypoint, gallery viewer/CSS, Vite config
+app/main.py             FastAPI routes, page copy and the services list
+app/templates/          Jinja layout plus home/services/about/contact/gallery sections
+frontend/               HTMX entrypoint, gallery viewer/CSS, site stylesheet, Vite config
 app/data/portfolio.json Editable captions, categories, stages, photo provenance/sequences
 content/photos/         Original curated JPEG sources (tracked, not served)
+content/portraits/      Original About-page portrait source (tracked, not served)
 scripts/build_photos.py Reproducible metadata-free WebP generation in Docker
 tests/                  HTTP, asset and desktop/mobile browser checks
 Dockerfile              Node asset build + Python runtime
@@ -114,16 +135,16 @@ npx playwright install-deps chromium
 npm test
 ```
 
-Browser tests use one worker to limit memory. `BASE_URL=http://other-host npm test` targets another preview. Dependencies, browsers, traces and screenshots are ignored, not committed. Host Node 22 and Python 3 are needed for these tests; app builds require only Docker/Compose.
+Browser tests use one worker to limit memory. All three suites default to `https://ivanpineda.bottah.dev`; pass a base URL argument to the Python checks, or `BASE_URL=http://localhost npm test`, to target a local HTTP-only preview instead. Dependencies, browsers, traces and screenshots are ignored, not committed. Host Node 22 and Python 3 are needed for these tests; app builds require only Docker/Compose.
 
 ## Next steps
 
-1. Verify access from an external browser at `http://<droplet-ip>/`; localhost checks do not prove cloud firewall access.
-2. Supply a domain and configure DNS/HTTPS before production.
-3. Expand browser/accessibility coverage as real interactions are added.
-4. Have owner review photo captions, stage labels and the three inferred sequences; confirm surname spelling before adding a personal credit.
-5. Replace the home stack demonstration and about placeholder with approved copy. Confirm server-rendered vs truly static requirements. A contact form is not implemented; call/text links are available.
-6. Review dependency/security updates and deployment readiness before public production use. Add GitHub/CI/CD only when requested.
+1. Have the owner confirm the copy listed under “Copy awaiting owner confirmation,” the portrait's authorization, photo captions, stage labels and the three inferred sequences, and the surname spelling.
+2. Verify the public site from a browser on another network. Let's Encrypt completed a `tls-alpn-01` challenge for this hostname, so port 443 was reachable from the internet at that moment; that is not the same as a verified visit, and port 80's external reachability is untested.
+3. Confirm server-rendered vs truly static requirements (see the architecture clarification). A contact form is not implemented; call/text links are available. Ask before adding a public email.
+4. Expand browser/accessibility coverage as real interactions are added; real-device and Safari testing is still missing.
+5. Review Python dependency security and deployment readiness before public production use. Add GitHub/CI/CD only when requested.
+6. Arrange an off-host backup or remote when authorized; local Git does not survive loss of the droplet.
 
 ## Resumability
 

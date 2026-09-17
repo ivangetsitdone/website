@@ -10,6 +10,7 @@ WORKDIR /build
 RUN pip install --no-cache-dir Pillow==11.3.0
 COPY scripts/build_photos.py ./scripts/build_photos.py
 COPY content/photos/ ./content/photos/
+COPY content/portraits/ ./content/portraits/
 COPY app/data/portfolio.json ./app/data/portfolio.json
 RUN python scripts/build_photos.py
 

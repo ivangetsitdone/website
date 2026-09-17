@@ -29,4 +29,16 @@ for photo in catalog['photos']:
             clean.save(output / f'{key}-{label}.webp', 'WEBP', quality=quality, method=6)
 for pair in catalog['pairs']:
     assert all(key in ids for key in pair['photos']), pair
-print(f'Built {len(ids) * 2} WebP images in {output}')
+
+portrait = catalog['portrait']
+portrait_source = ROOT / 'content/portraits' / f"{portrait['id']}.jpg"
+assert hashlib.sha256(portrait_source.read_bytes()).hexdigest() == portrait['sha256'], portrait_source
+with Image.open(portrait_source) as original:
+    image = ImageOps.exif_transpose(original).convert('RGB')
+    image.thumbnail((900, 900), Image.Resampling.LANCZOS)
+    clean = Image.new('RGB', image.size)
+    clean.paste(image)
+    assert clean.size == (portrait['width'], portrait['height']), clean.size
+    clean.save(output / f"{portrait['id']}.webp", 'WEBP', quality=82, method=6)
+
+print(f'Built {len(ids) * 2} project WebP images and 1 portrait in {output}')
