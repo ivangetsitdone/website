@@ -1,0 +1,9 @@
+.git
+.env
+.env.*
+recovery
+**/node_modules
+**/__pycache__
+.venv
+app/static
+*.log
