@@ -14,7 +14,7 @@
   </nav></header>
   <main id="main"><div class="eyebrow">Foundation preview / 001</div><h1>{{ title }}</h1><p class="intro">{{ description }}</p>
   {% if slug in ['', 'contact'] %}
-    <p><a href="tel:+19712883488" hx-boost="false">Call 971-288-3488</a></p>
+    <p><a href="tel:+19712883488" hx-boost="false">Call 971-288-3488</a> or <a href="sms:+19712883488" hx-boost="false">Text 971-288-3488</a></p>
   {% endif %}
   {% if slug == '' %}
     <section class="panel" aria-label="Stack demonstration"><strong>The whole stack, connected.</strong><p>FastAPI + Jinja render this page. HTMX updates the greeting below without a page reload.</p>

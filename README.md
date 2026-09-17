@@ -8,7 +8,7 @@ A mobile-first contractor services website, recovered from an interrupted develo
 - Supplied contact name: Ivan Pineda; supplied profile: https://nextdoor.com/profile/01TRMJKkx92rDy-wW (not fetched or republished).
 - Confirmed service area: Forest Grove and surrounding communities within a 30-mile radius. Displayed on home and services pages; no state or specific neighboring cities inferred. Rebuild, HTTP smoke checks (including service-area assertions), and all four browser tests passed after this update.
 - Owner-described experience: showers, flooring, fencing, basic plumbing fixture replacement, basic electrical work, and interior/exterior painting. Listed on services page without inferring specific shower/electrical tasks or licensing. Confirm permitted scope and any licensing requirements before expanding claims. Services update rebuilt successfully; HTTP checks (including service text) and all four browser tests passed.
-- Confirmed public phone: **971-288-3488**. Click-to-call links on home and contact pages; SMS availability not assumed. Rebuild, HTTP checks (including phone links), and four browser tests passed. Actual telephone dialing is not tested.
+- Confirmed public phone: **971-288-3488**. Owner confirmed calls and texts are welcome. Click-to-call and SMS links on home and contact pages. Rebuild, HTTP checks (including phone/SMS links), and four browser tests passed after SMS update. Actual telephone dialing and SMS handoff/delivery are not tested.
 - Still needed: optional public email, domain, and permission for any reused profile text/photos. Do not infer credentials or publish contact details without confirmation.
 
 ## Mission
