@@ -12,7 +12,7 @@ test('greeting, Vue lifecycle, boosted navigation and history', async ({ page })
   await expect(page.locator('.demo [role=status]')).toHaveText('1 hello');
   for (const name of ['Services', 'About', 'Portfolio', 'Before & after', 'Contact']) {
     await page.getByRole('navigation').getByRole('link', { name, exact: true }).click();
-    await expect(page).toHaveTitle(`${name} · Contractor Studio`);
+    await expect(page).toHaveTitle(`${name} · Zip LLC Handyman Services`);
     await expect(page.locator('nav [aria-current=page]')).toHaveText(name);
     expect(await page.evaluate(() => window.testDocumentMarker)).toBe(true);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -22,9 +22,9 @@ test('greeting, Vue lifecycle, boosted navigation and history', async ({ page })
   await page.getByRole('button', { name: 'Say hello', exact: true }).click();
   await expect(page.locator('.demo [role=status]')).toHaveText('1 hello');
   await page.goBack();
-  await expect(page).toHaveTitle('Contact · Contractor Studio');
+  await expect(page).toHaveTitle('Contact · Zip LLC Handyman Services');
   await page.goForward();
-  await expect(page).toHaveTitle('Home · Contractor Studio');
+  await expect(page).toHaveTitle('Home · Zip LLC Handyman Services');
   const restoredCount = parseInt(await page.locator('.demo [role=status]').innerText(), 10);
   await page.getByRole('button', { name: 'Say hello', exact: true }).click();
   await expect(page.locator('.demo [role=status]')).toHaveText(`${restoredCount + 1} hello${restoredCount + 1 === 1 ? '' : 's'}`);

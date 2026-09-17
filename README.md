@@ -2,6 +2,12 @@
 
 A mobile-first contractor services website, recovered from an interrupted development session on 2026-09-17.
 
+## Confirmed business details
+
+- Public business name supplied by owner: **Zip LLC Handyman Services**. Used in site header, page titles and footer. Rebuilt preview and reran HTTP smoke checks and all four browser tests successfully after branding change (2026-09-17).
+- Supplied contact name: Ivan Pineda; supplied profile: https://nextdoor.com/profile/01TRMJKkx92rDy-wW (not fetched or republished).
+- Still needed: services, service area, public phone/email, domain, and permission for any reused profile text/photos. Do not infer credentials or publish contact details without confirmation.
+
 ## Mission
 
 First prove a working **Hello World** stack: FastAPI + Jinja server rendering, HTMX navigation/partial updates, Vue 3 single-file components only where useful, and locally bundled assets. Package it with Docker Compose and Caddy. Then iterate on services, about, contact, portfolio, and before/after pages using real business details and authorized photos.

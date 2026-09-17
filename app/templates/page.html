@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="{{ description }}">
-  <title>{{ label }} · Contractor Studio</title>
+  <title>{{ label }} · Zip LLC Handyman Services</title>
   <link rel="stylesheet" href="/static/site.css">
   <script type="module" src="/static/site.js"></script>
 </head>
 <body hx-boost="true">
   <a class="skip" href="#main" hx-boost="false">Skip to content</a>
-  <header><a class="brand" href="/">CONTRACTOR / STUDIO</a><nav aria-label="Main navigation">
+  <header><a class="brand" href="/">Zip LLC Handyman Services</a><nav aria-label="Main navigation">
     {% for path, info in pages.items() %}<a href="/{{ path }}" {% if slug == path %}aria-current="page"{% endif %}>{{ info[0] }}</a>{% endfor %}
   </nav></header>
   <main id="main"><div class="eyebrow">Foundation preview / 001</div><h1>{{ title }}</h1><p class="intro">{{ description }}</p>
@@ -20,6 +20,6 @@
       <div data-vue-hello></div>
     </section>
   {% endif %}
-  </main><footer>Contractor Studio · Development preview · Business details coming soon.</footer>
+  </main><footer>Zip LLC Handyman Services · Development preview · Business details coming soon.</footer>
 </body>
 </html>
