@@ -27,6 +27,10 @@ for path, title in [('/', 'Hello World'), ('/services', 'Built around your proje
     assert '/static/site.js' in body and '/static/site.css' in body
     if path in ('/', '/services'):
         assert 'Forest Grove' in body and '30-mile radius' in body
+services = fetch('/services')[0]
+for service in ('showers', 'flooring', 'fencing', 'plumbing fixture replacement',
+                'basic electrical work', 'interior and exterior painting'):
+    assert service in services
 assert 'UTC' in fetch('/hello')[0]
 for path, mime in [('/static/site.js', 'javascript'), ('/static/site.css', 'text/css')]:
     body, headers = fetch(path)

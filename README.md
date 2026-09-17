@@ -7,7 +7,8 @@ A mobile-first contractor services website, recovered from an interrupted develo
 - Public business name supplied by owner: **Zip LLC Handyman Services**. Used in site header, page titles and footer. Rebuilt preview and reran HTTP smoke checks and all four browser tests successfully after branding change (2026-09-17).
 - Supplied contact name: Ivan Pineda; supplied profile: https://nextdoor.com/profile/01TRMJKkx92rDy-wW (not fetched or republished).
 - Confirmed service area: Forest Grove and surrounding communities within a 30-mile radius. Displayed on home and services pages; no state or specific neighboring cities inferred. Rebuild, HTTP smoke checks (including service-area assertions), and all four browser tests passed after this update.
-- Still needed: services, public phone/email, domain, and permission for any reused profile text/photos. Do not infer credentials or publish contact details without confirmation.
+- Owner-described experience: showers, flooring, fencing, basic plumbing fixture replacement, basic electrical work, and interior/exterior painting. Listed on services page without inferring specific shower/electrical tasks or licensing. Confirm permitted scope and any licensing requirements before expanding claims. Services update rebuilt successfully; HTTP checks (including service text) and all four browser tests passed.
+- Still needed: public phone/email, domain, and permission for any reused profile text/photos. Do not infer credentials or publish contact details without confirmation.
 
 ## Mission
 
