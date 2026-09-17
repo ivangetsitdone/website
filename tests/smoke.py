@@ -25,6 +25,8 @@ for path, title in [('/', 'Hello World'), ('/services', 'Built around your proje
     body, _ = fetch(path)
     assert f'<h1>{title}</h1>' in body
     assert '/static/site.js' in body and '/static/site.css' in body
+    if path in ('/', '/contact'):
+        assert 'href="tel:+19712883488" hx-boost="false">Call 971-288-3488</a>' in body
     if path in ('/', '/services'):
         assert 'Forest Grove' in body and '30-mile radius' in body
 services = fetch('/services')[0]

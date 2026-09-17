@@ -15,7 +15,7 @@ PAGES = {
     'about': ('About', 'Meet your contractor.', 'Our story, team, and credentials will live here.'),
     'portfolio': ('Portfolio', 'Work worth sharing.', 'A gallery of real projects is coming. Photo sourcing and permission will be confirmed first.'),
     'before-after': ('Before & after', 'See the difference.', 'Before-and-after project comparisons will live here.'),
-    'contact': ('Contact', 'Let’s build something.', 'Contact details and a working inquiry form will be added next. This preview does not collect submissions.'),
+    'contact': ('Contact', 'Let’s build something.', 'Call Zip LLC Handyman Services to discuss your project in Forest Grove or the surrounding area within a 30-mile radius. This preview does not collect online submissions.'),
 }
 
 @app.get('/healthz')
