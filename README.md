@@ -9,11 +9,17 @@ A mobile-first contractor services website, recovered from an interrupted develo
 - Confirmed service area: Forest Grove and surrounding communities within a 30-mile radius. Displayed on home and services pages; no state or specific neighboring cities inferred. Rebuild, HTTP smoke checks (including service-area assertions), and all four browser tests passed after this update.
 - Owner-described experience: showers, flooring, fencing, basic plumbing fixture replacement, basic electrical work, and interior/exterior painting. Listed on services page without inferring specific shower/electrical tasks or licensing. Confirm permitted scope and any licensing requirements before expanding claims. Services update rebuilt successfully; HTTP checks (including service text) and all four browser tests passed.
 - Confirmed public phone: **971-288-3488**. Owner confirmed calls and texts are welcome. Click-to-call and SMS links on home and contact pages. Rebuild, HTTP checks (including phone/SMS links), and four browser tests passed after SMS update. Actual telephone dialing and SMS handoff/delivery are not tested.
-- Still needed: optional public email, domain, and permission for any reused profile text/photos. Do not infer credentials or publish contact details without confirmation.
+- Still needed: optional public email and domain. Uploaded portfolio photos were authorized for this site; Nextdoor text/photos have not been imported or authorized separately. Do not infer credentials or publish unconfirmed contact details.
 
-## Portfolio work in progress
+## Portfolio — deployed and verified, 2026-09-17
 
-Owner authorized use of the uploaded project photos. A first-pass catalog of 35 selected photos and three provisional sequences is now versioned with original source images. See `content/README.md` for visual interpretations, uncertain stages, provenance, and reconstruction. A Docker photo stage generates metadata-free WebP assets; gallery UI and verification are the next checkpoint. Original surname spelling needs confirmation (Pineda/Pidena); public attribution uses the business name.
+- `/portfolio`: 35 selected photos from 54 owner-supplied uploads, with original captions, category/stage filters and a responsive grid. Native-dialog viewer supports previous/next, arrow keys, Escape, focus return and contained keyboard focus. Photo links and captions work without JavaScript.
+- `/before-after`: three provisional sequences (side-yard clearing, garden steps, shower wall preparation → tile). Shower photos are explicitly **in progress**, not finished. Captions and groupings need owner review; “Detail” does not claim a completed job.
+- Original selected JPEGs, SHA-256 provenance and editable catalog are in Git. Docker generates 70 metadata-free WebPs (8.31 MiB total; each under 500 KB); the grid uses lazy thumbnails and the viewer loads the larger image on demand. Original JPEGs are not in the runtime image or served publicly.
+- See `content/README.md` for selection decisions, uncertainties and reconstruction. Edit `app/data/portfolio.json` for captions/order/stages; don't rerun the one-time importer over editorial edits. Raw uploads and unselected images remain in ignored `recovery/uploads/`.
+- Compose rebuild, HTTP smoke checks, 70-image/source-isolation checks, and 16 Chromium tests pass at desktop/mobile sizes. Tests cover filters/empty results, viewer controls/focus, failed images, HTMX history, no-JS fallback and all thumbnail decoding. Axe WCAG A/AA checks report no violations on the gallery and open viewer; this is not a full accessibility audit or real-device/Safari verification. Desktop/mobile screenshots were visually reviewed; evidence is ignored under `recovery/`.
+- No additional host packages installed for image processing: Pillow runs only in a disposable Docker build stage. Build logs: `recovery/portfolio-build.log`, `recovery/portfolio-rebuild.log`.
+- Original surname spelling needs confirmation (Pineda/Pidena); public attribution uses the confirmed business name. Local Git is still not an off-host backup; keep the MacBook originals.
 
 ## Mission
 
@@ -30,9 +36,9 @@ No GitHub repository or CI/CD yet; local Git checkpoints are for recovery.
 - Preview listens on host port 80: `http://<droplet-ip>/` (external firewall/reachability not yet tested). No domain or HTTPS verified.
 - Build logs: ignored `recovery/resume-build.log` and `recovery/rebuild.log`. Missing Buildx produces a harmless warning; Docker's fallback builder succeeded.
 - HTTP smoke checks pass for all six pages, health, greeting, JS/CSS, security header and 404s.
-- Four Chromium tests pass at desktop/mobile widths: greeting updates, Vue counter/remount/history interaction, boosted navigation without reload, titles/current links, overflow checks and keyboard skip link. Screenshots saved in ignored `recovery/`. This is not a full accessibility or cross-browser audit.
+- Original stack checks still pass within the expanded 16-test Chromium suite: greeting updates, Vue counter/remount/history interaction, boosted navigation without reload, titles/current links, overflow checks and keyboard skip link. See portfolio verification above.
 - Fixed Vite library-mode output referencing Node's `process` in browser JavaScript. Updated Vite to 7.3.6; frontend npm audit reports zero vulnerabilities. Python dependency security review remains pending.
-- Business content remains placeholder. Repository-local Git identity is `Project Assistant <project-assistant@localhost>` because none was configured; no global identity or remote added.
+- Business name, service area, service experience, call/text links and portfolio are populated; home still contains the stack demo and about remains placeholder. Repository-local Git identity is `Project Assistant <project-assistant@localhost>` because none was configured; no global identity or remote added.
 
 ## Recovery history (before successful resume)
 
@@ -50,7 +56,11 @@ No GitHub repository or CI/CD yet; local Git checkpoints are for recovery.
 ```text
 app/main.py             FastAPI routes and placeholder page data
 app/templates/          Jinja pages and greeting fragment
-frontend/               Vue SFC, HTMX entrypoint, CSS, Vite config and npm lock
+frontend/               Vue SFC, HTMX entrypoint, gallery viewer/CSS, Vite config
+app/data/portfolio.json Editable captions, categories, stages, photo provenance/sequences
+content/photos/         Original curated JPEG sources (tracked, not served)
+scripts/build_photos.py Reproducible metadata-free WebP generation in Docker
+tests/                  HTTP, asset and desktop/mobile browser checks
 Dockerfile              Node asset build + Python runtime
 compose.yaml            App and Caddy services
 Caddyfile               Reverse proxy and response headers
@@ -83,7 +93,7 @@ For a real domain, configure `SITE_ADDRESS=example.com` in an untracked `.env`, 
 docker compose down  # stop; preserves named volumes
 ```
 
-Avoid `down -v` unless intentionally deleting Caddy state/certificates. Local Python startup requires frontend assets first: `cd frontend && npm ci && npm run build` (Node 22 recommended); Docker handles this automatically. `app/static` is generated and not tracked.
+Avoid `down -v` unless intentionally deleting Caddy state/certificates. Local Python startup requires frontend and photo assets first: `cd frontend && npm ci && npm run build` (Node 22 recommended), plus `python scripts/build_photos.py` from the project root in a Python environment with Pillow 11.3.0. Docker handles both automatically and is the verified deployment path. `app/static` and `app/media` are generated and not tracked.
 
 ## Repeatable verification
 
@@ -91,6 +101,7 @@ From the project root, with Compose running:
 
 ```sh
 python3 tests/smoke.py  # optional argument: http://other-host
+python3 tests/portfolio_http.py  # checks all images, hashes and source isolation
 cd tests/browser
 npm ci
 PLAYWRIGHT_BROWSERS_PATH=../../recovery/browsers npx playwright install chromium
@@ -106,8 +117,8 @@ Browser tests use one worker to limit memory. `BASE_URL=http://other-host npm te
 1. Verify access from an external browser at `http://<droplet-ip>/`; localhost checks do not prove cloud firewall access.
 2. Supply a domain and configure DNS/HTTPS before production.
 3. Expand browser/accessibility coverage as real interactions are added.
-4. Confirm server-rendered vs truly static requirements. Obtain business name, service area, services, contact details, domain, and photo-source permissions.
-5. Implement real content, gallery/before-after interactions, and a properly handled contact form. Do not imply placeholder forms deliver messages.
+4. Have owner review photo captions, stage labels and the three inferred sequences; confirm surname spelling before adding a personal credit.
+5. Replace the home stack demonstration and about placeholder with approved copy. Confirm server-rendered vs truly static requirements. A contact form is not implemented; call/text links are available.
 6. Review dependency/security updates and deployment readiness before public production use. Add GitHub/CI/CD only when requested.
 
 ## Resumability

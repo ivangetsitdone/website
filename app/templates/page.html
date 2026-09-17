@@ -12,7 +12,8 @@
   <header><a class="brand" href="/">Zip LLC Handyman Services</a><nav aria-label="Main navigation">
     {% for path, info in pages.items() %}<a href="/{{ path }}" {% if slug == path %}aria-current="page"{% endif %}>{{ info[0] }}</a>{% endfor %}
   </nav></header>
-  <main id="main"><div class="eyebrow">Foundation preview / 001</div><h1>{{ title }}</h1><p class="intro">{{ description }}</p>
+  <main id="main"{% if slug in ['portfolio', 'before-after'] %} class="portfolio-page"{% endif %}><div class="eyebrow">{% if slug in ['portfolio', 'before-after'] %}Zip LLC / The project album{% else %}Foundation preview / 001{% endif %}</div><h1>{{ title }}</h1><p class="intro">{{ description }}</p>
+  {% if slug in ['portfolio', 'before-after'] %}{% include 'gallery.html' %}{% endif %}
   {% if slug in ['', 'contact'] %}
     <p><a href="tel:+19712883488" hx-boost="false">Call 971-288-3488</a> or <a href="sms:+19712883488" hx-boost="false">Text 971-288-3488</a></p>
   {% endif %}
@@ -23,6 +24,6 @@
       <div data-vue-hello></div>
     </section>
   {% endif %}
-  </main><footer>Zip LLC Handyman Services · Development preview · Business details coming soon.</footer>
+  </main><footer>Zip LLC Handyman Services · Forest Grove &amp; surrounding communities · 30-mile service radius</footer>
 </body>
 </html>

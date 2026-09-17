@@ -20,7 +20,7 @@ for photo in catalog['photos']:
     assert hashlib.sha256(source.read_bytes()).hexdigest() == photo['sha256'], source
     with Image.open(source) as original:
         image = ImageOps.exif_transpose(original).convert('RGB')
-        for label, size, quality in [('thumb', (480, 640), 78), ('full', (1440, 1440), 86)]:
+        for label, size, quality in [('thumb', (480, 640), 78), ('full', (1440, 1440), 80)]:
             resized = image.copy()
             resized.thumbnail(size, Image.Resampling.LANCZOS)
             # Copy pixels into a fresh image to discard all source metadata.

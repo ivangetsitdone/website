@@ -21,7 +21,7 @@ ENTRIES = [
     (36, 'Tile installation underway', 'Showers & tile', 'In progress', 'Marble-look tiles and a mosaic niche are being fitted, with tile spacers and red-coated wall areas still visible.'),
     (32, 'Tub surround and mosaic band', 'Showers & tile', 'In progress', 'A horizontal mosaic accent runs into the stacked niches above the tub. Masking tape remains along the ceiling edge.'),
     (15, 'Recessed shower shelf', 'Showers & tile', 'Detail', 'A mosaic-backed shelf is inset into a light tile shower wall, keeping bottles within reach.'),
-    (16, 'Shower enclosure overview', 'Showers & tile', 'Detail', 'A light-colored shower enclosure with a curtain rail, wall-mounted grab bar and recessed shelf.'),
+    (16, 'Shower enclosure overview', 'Showers & tile', 'Detail', 'A light tile shower enclosure with a curtain rail, corner baskets and a recessed shelf.'),
     (6, 'Flooring at the doorway', 'Interiors', 'Detail', 'Wood-look flooring meets white baseboards and a doorway, with blue masking tape still visible on the trim.'),
     (30, 'Cool gray room palette', 'Interiors', 'In progress', 'Gray walls, white baseboards and gray-brown plank flooring meet beneath a small window; supplies remain on the floor.'),
     (31, 'Room viewed from the hall', 'Interiors', 'In progress', 'A doorway view shows the gray room, contrasting white trim and plank floor while cleanup is still underway.'),
