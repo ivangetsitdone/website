@@ -10,8 +10,8 @@ app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
 app.mount('/static', StaticFiles(directory=ROOT / 'static'), name='static')
 templates = Jinja2Templates(directory=ROOT / 'templates')
 PAGES = {
-    '': ('Home', 'Hello World', 'A solid foundation for something great. Our contractor website starts here.'),
-    'services': ('Services', 'Built around your project.', 'Our services and specialties will be added next.'),
+    '': ('Home', 'Hello World', 'Zip LLC Handyman Services serves Forest Grove and surrounding communities within a 30-mile radius.'),
+    'services': ('Services', 'Built around your project.', 'Serving Forest Grove and surrounding communities within a 30-mile radius. Our services and specialties will be added next.'),
     'about': ('About', 'Meet your contractor.', 'Our story, team, and credentials will live here.'),
     'portfolio': ('Portfolio', 'Work worth sharing.', 'A gallery of real projects is coming. Photo sourcing and permission will be confirmed first.'),
     'before-after': ('Before & after', 'See the difference.', 'Before-and-after project comparisons will live here.'),

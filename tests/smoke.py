@@ -25,6 +25,8 @@ for path, title in [('/', 'Hello World'), ('/services', 'Built around your proje
     body, _ = fetch(path)
     assert f'<h1>{title}</h1>' in body
     assert '/static/site.js' in body and '/static/site.css' in body
+    if path in ('/', '/services'):
+        assert 'Forest Grove' in body and '30-mile radius' in body
 assert 'UTC' in fetch('/hello')[0]
 for path, mime in [('/static/site.js', 'javascript'), ('/static/site.css', 'text/css')]:
     body, headers = fetch(path)
