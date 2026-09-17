@@ -92,19 +92,19 @@
     },
     {
       "id": "p15",
-      "title": "Recessed shower shelf",
+      "title": "The original shower niche",
       "category": "Showers & tile",
-      "stage": "Detail",
-      "caption": "A mosaic-backed shelf is inset into a light tile shower wall, keeping bottles within reach.",
+      "stage": "Before",
+      "caption": "Before the remodel: a mosaic-backed niche set into the original white tile wall.",
       "source": "photo_2026-09-17 13.01.59.jpeg",
       "sha256": "f62b7ff7a7f00db3a94463e019a3c144a6d914fd298fb28db9af79b064651e29"
     },
     {
       "id": "p16",
-      "title": "Shower enclosure overview",
+      "title": "The shower before the remodel",
       "category": "Showers & tile",
-      "stage": "Detail",
-      "caption": "A light tile shower enclosure with a curtain rail, corner baskets and a recessed shelf.",
+      "stage": "Before",
+      "caption": "Before the remodel: the original white tile enclosure with a curtain rail, corner baskets and a recessed niche.",
       "source": "photo_2026-09-17 13.02.02.jpeg",
       "sha256": "3382d05d98a56065a44d0e45c28b991b3bac3eac0484b4e9833720a461097b53"
     },
@@ -164,19 +164,19 @@
     },
     {
       "id": "p09",
-      "title": "Exterior siding during the work",
+      "title": "Siding before painting",
       "category": "Painting",
-      "stage": "In progress",
-      "caption": "A horizontal gray-blue strip contrasts with light siding while the adjacent corner trim remains exposed.",
+      "stage": "Before",
+      "caption": "Replacement boards in gray-blue and tan interrupt the light siding on this wall before it is painted.",
       "source": "photo_2026-09-17 12.59.05.jpeg",
       "sha256": "b8e5486146bb957466e704b5c5497612d2c8b80898adf9090d1b2b4e44ce8c5e"
     },
     {
       "id": "p10",
-      "title": "Light siding and trim",
+      "title": "The painted wall",
       "category": "Painting",
-      "stage": "In progress",
-      "caption": "Light-colored horizontal siding fills the wall, with a paint can and supplies at ground level.",
+      "stage": "After",
+      "caption": "The same wall after painting: siding and trim in one even light color, with the paint can still at ground level.",
       "source": "photo_2026-09-17 12.59.06.jpeg",
       "sha256": "e11a3e9629cca8df8be105cbc7bac74556bd8a2dfd047bf9a4b05b6f6b89dc27"
     },
@@ -266,7 +266,7 @@
       "title": "Leaf-covered sidewalk edge",
       "category": "Outdoor projects",
       "stage": "Before",
-      "caption": "Fallen leaves blanket the strip between a wooded slope and the sidewalk. A matching final view is not confirmed.",
+      "caption": "Fallen leaves and brush blanket the strip between a wooded slope and the sidewalk.",
       "source": "photo_2026-09-17 13.03.08.jpeg",
       "sha256": "60ef754dc88c11726f6d1c12f5cc544a5ccbc0c1bb359926a6d9599a74379f5e"
     },
@@ -274,25 +274,25 @@
       "id": "p44",
       "title": "Cleared sidewalk border",
       "category": "Outdoor projects",
-      "stage": "Detail",
+      "stage": "After",
       "caption": "The ground beside a wooded sidewalk has been cleared back, exposing soil around the tree trunks.",
       "source": "photo_2026-09-17 13.03.10.jpeg",
       "sha256": "05b9ae64156de1a0f474f7ad207dfa1010d037326326a1497636366a00393a56"
     },
     {
       "id": "p23",
-      "title": "Parking area work underway",
+      "title": "Parking lot before restriping",
       "category": "Outdoor projects",
-      "stage": "In progress",
-      "caption": "A broad asphalt parking area with cones and people in the distance during site work.",
+      "stage": "Before",
+      "caption": "Worn, cracked asphalt with no visible parking bays. Cones are set out and the lot is being cleared.",
       "source": "photo_2026-09-17 13.02.31.jpeg",
       "sha256": "5eb37bf78fb9edbe49f726855cf3b96f1971fd0f124076c68e3c8c4a24a2d359"
     },
     {
       "id": "p24",
-      "title": "Parking bay markings",
+      "title": "Fresh parking bay markings",
       "category": "Outdoor projects",
-      "stage": "Detail",
+      "stage": "After",
       "caption": "Bright white parking-space lines cross the asphalt, with cones still standing in the lot.",
       "source": "photo_2026-09-17 13.02.33.jpeg",
       "sha256": "f0d0eb73b7e801976947c0a84db5f3d80b868da511c55da6ef08b87369b52c69"
@@ -337,13 +337,42 @@
     },
     {
       "id": "shower-tile",
-      "title": "From wall preparation to tile",
+      "title": "From the original shower to new tile",
       "photos": [
+        "p15",
+        "p16",
         "p38",
         "p36",
         "p29"
       ],
-      "note": "Likely work sequence: two stacked niches and the same tub corner connect these views. These are progress photos, not a completed shower."
+      "note": "The owner confirmed the first two photos show the original shower before this project. The rest are progress photos of the rebuild, not a completed shower."
+    },
+    {
+      "id": "sidewalk-clearing",
+      "title": "Clearing a leaf-covered walkway",
+      "photos": [
+        "p43",
+        "p44"
+      ],
+      "note": "Owner-confirmed before and after: the leaf- and brush-covered strip beside the sidewalk, cleared back to bare soil."
+    },
+    {
+      "id": "parking-lot",
+      "title": "Restriping a parking lot",
+      "photos": [
+        "p23",
+        "p24"
+      ],
+      "note": "Owner-confirmed before and after: worn asphalt with no visible bays, then fresh white parking lines."
+    },
+    {
+      "id": "exterior-painting",
+      "title": "Painting patched siding",
+      "photos": [
+        "p09",
+        "p10"
+      ],
+      "note": "Owner-confirmed before and after: replacement boards in mismatched colors, then the whole wall in one even finish."
     }
   ],
   "portrait": {

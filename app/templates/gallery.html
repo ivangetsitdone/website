@@ -15,8 +15,8 @@
 {% endmacro %}
 <section data-gallery aria-label="Project photographs">
   <div class="gallery-intro">
-    <p class="editorial-note"><strong>A first look through the project album.</strong> Captions, stages and photo sequences are based on what is visible and await owner review. “Detail” means the overall completion stage is unknown.</p>
-    {% if slug == 'portfolio' %}<a class="text-link" href="/before-after">Explore the project sequences →</a>
+    <p class="editorial-note"><strong>A first look through the project album.</strong> Captions and stages describe what is visible. The owner has confirmed the before and after pairings below; the remaining captions and stage labels still await review. “Detail” means the overall completion stage is unknown.</p>
+    {% if slug == 'portfolio' %}<a class="text-link" href="/before-after">Explore the before &amp; after projects →</a>
     {% else %}<a class="text-link" href="/portfolio">View the complete photo grid →</a>{% endif %}
   </div>
   {% if slug == 'portfolio' %}
@@ -44,7 +44,7 @@
   {% else %}
     {% for pair in pairs %}
     <section class="project-sequence" aria-labelledby="{{ pair.id }}">
-      <div class="sequence-heading"><span class="eyebrow">Sequence / {{ '%02d'|format(loop.index) }}</span><h2 id="{{ pair.id }}">{{ pair.title }}</h2><p>{{ pair.note }}</p></div>
+      <div class="sequence-heading"><span class="eyebrow">Project / {{ '%02d'|format(loop.index) }}</span><h2 id="{{ pair.id }}">{{ pair.title }}</h2><p>{{ pair.note }}</p></div>
       <div class="photo-grid sequence-grid">
         {% for photo in pair.photos %}{{ photo_card(photo) }}{% endfor %}
       </div>

@@ -22,7 +22,7 @@ PAGES = {
     'services': ('Services', 'What can I help you with?', 'From home repairs and shower remodels to fences and yard cleanups, I bring 10+ years of hands-on experience to projects around the home. Serving Forest Grove and surrounding communities within a 30-mile radius.'),
     'about': ('About', 'Hi, I’m Ivan Pineda.', 'I’m the person behind Zip LLC Handyman Services—a hardworking local handyman with 10+ years of experience and a family reason to keep building.'),
     'portfolio': ('Portfolio', 'Work worth sharing.', 'A closer look at my work: showers, flooring, fences, painting and outdoor projects. Explore the details and the stages in between.'),
-    'before-after': ('Before & after', 'See the difference.', 'From overgrown spaces to visible progress. A few photo sequences that tell the story behind the work.'),
+    'before-after': ('Before & after', 'See the difference.', 'From overgrown spaces to fresh finishes. Projects photographed before, during and after the work.'),
     'contact': ('Contact me', 'Tell me about your project.', 'Call or text me at 971-288-3488. Serving Forest Grove and surrounding communities within a 30-mile radius, with evening and weekend availability.'),
 }
 SERVICES = [

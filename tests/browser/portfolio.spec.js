@@ -64,7 +64,7 @@ test('gallery survives boosted navigation and back/forward restoration', async (
   await page.locator('[data-photo]').first().click();
   await expect(page.getByRole('dialog')).toBeVisible();
   await page.keyboard.press('Escape');
-  await page.getByRole('link', { name: 'Explore the project sequences' }).click();
+  await page.getByRole('link', { name: 'Explore the before & after projects' }).click();
   await expect(page.locator('.project-sequence')).toHaveCount(catalog.pairs.length);
   await page.locator('[data-photo]').first().click();
   await expectLoaded(page.getByRole('dialog').locator('img'));
@@ -82,7 +82,9 @@ test('gallery survives boosted navigation and back/forward restoration', async (
   await page.locator('[data-photo]').first().click();
   await expect(page.getByRole('dialog')).toBeVisible();
   await page.getByRole('button', { name: 'Next photo' }).click();
-  await expect(page.locator('[data-viewer-count]')).toHaveText('2 / 7');
+  // The before/after viewer walks every photo in every project, however long the projects grow.
+  const sequenceTotal = catalog.pairs.reduce((total, pair) => total + pair.photos.length, 0);
+  await expect(page.locator('[data-viewer-count]')).toHaveText(`2 / ${sequenceTotal}`);
   expect(errors).toEqual([]);
 });
 
@@ -92,8 +94,8 @@ test('all thumbnails decode and sequences preserve progress labels', async ({ pa
   await page.locator('[data-photo] img').evaluateAll(images => images.forEach(image => image.loading = 'eager'));
   await expect.poll(() => page.locator('[data-photo] img').evaluateAll(images => images.every(image => image.complete && image.naturalWidth > 0))).toBe(true);
   await page.goto('/before-after');
-  const shower = page.locator('.project-sequence').filter({ hasText: 'From wall preparation to tile' });
-  await expect(shower.locator('.stage')).toHaveText(['In progress', 'In progress', 'In progress']);
+  const shower = page.locator('.project-sequence').filter({ hasText: 'From the original shower to new tile' });
+  await expect(shower.locator('.stage')).toHaveText(['Before', 'Before', 'In progress', 'In progress', 'In progress']);
   await expect(page.locator('.sequence-grid').first().locator('.stage')).toHaveText(['Before', 'After']);
   await page.screenshot({ path: `../../recovery/sequences-${test.info().project.name}.png` });
 });
