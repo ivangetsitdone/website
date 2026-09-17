@@ -10,7 +10,15 @@ First prove a working **Hello World** stack: FastAPI + Jinja server rendering, H
 
 No GitHub repository or CI/CD yet; local Git checkpoints are for recovery.
 
-## Recovery status
+## Verified runtime — 2026-09-17
+
+- Droplet upgraded by owner to 2 GB (1.9 GiB visible); no swap. No host configuration changes made during resume.
+- `docker compose config --quiet` and `docker compose up -d --build` passed. App is healthy and Caddy is running; `curl -fsS http://localhost/healthz` returns `{"status":"ok"}`.
+- Preview listens on host port 80: `http://<droplet-ip>/` (external firewall/reachability not yet tested). No domain or HTTPS verified.
+- Build log: ignored `recovery/resume-build.log`. Build reports one high npm advisory; investigate before production. Missing Buildx produces a harmless warning; Docker's fallback builder succeeded.
+- Browser and comprehensive HTTP checks are next. Business content remains placeholder.
+
+## Recovery history (before successful resume)
 
 - Original project lived at `/opt/contractor-site`; moved intact to `/root/dev/contractor-site`.
 - All 12 source files written in the previous session matched the log exactly. The generated npm lockfile also survived (13 recovered files total).
