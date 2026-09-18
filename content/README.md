@@ -1,6 +1,6 @@
 # Portfolio source material
 
-The owner uploaded 54 JPEGs and authorized a portfolio with captions and inferred before/after groupings in the project conversation. The supplied attribution is Ivan; the conversation contains both “Pineda” and “Pidena,” so confirm surname spelling before adding a personal credit. Public credit uses the business name as displayed on the site, Zip LLC. The words “handyman services” were removed from public copy on 2026-09-18 for licensing reasons; see the main README.
+The owner uploaded 54 JPEGs and authorized a portfolio with captions and inferred before/after groupings in the project conversation. The supplied attribution is Ivan; the conversation contains both “Pineda” and “Pidena,” so confirm surname spelling before adding a personal credit. Public credit uses the registered business name, Zip, LLC. The words “handyman services” were removed from public copy on 2026-09-18 for licensing reasons; see the main README.
 
 35 source photos are preserved unchanged in `photos/` and local Git for reconstruction. These are original source material, not generated website assets. None of the imported JPEGs had EXIF metadata. Original upload filenames and SHA-256 checksums are recorded in `app/data/portfolio.json`; that file is the editable catalog used by the site. Unselected uploads remain in ignored `recovery/uploads/` and are not needed to rebuild.
 

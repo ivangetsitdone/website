@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="{{ description }}">
   <link rel="canonical" href="{{ canonical }}">
-  <title>{{ label }} · Zip LLC</title>
+  <title>{{ label }} · Zip, LLC</title>
   <link rel="stylesheet" href="/static/site.css">
   <script type="module" src="/static/site.js"></script>
 </head>
 <body hx-boost="true">
   <a class="skip" href="#main" hx-boost="false">Skip to content</a>
   <header class="site-header">
-    <a class="brand" href="/" aria-label="Zip LLC home"><span>ZIP LLC</span><span class="brand-detail">Yard care · Hauling · Cleaning</span></a>
+    <a class="brand" href="/" aria-label="Zip, LLC home"><span>ZIP, LLC</span><span class="brand-detail">Residential Yard Care · Small Projects · Hauling · Honey Dos</span></a>
     <nav aria-label="Main navigation">
       {% for path, info in pages.items() %}<a href="/{{ path }}" {% if slug == path %}aria-current="page"{% endif %}>{{ info[0] }}</a>{% endfor %}
     </nav>
@@ -21,7 +21,7 @@
     {% if slug == '' %}
       {% include 'home.html' %}
     {% else %}
-      <div class="eyebrow">{% if slug in ['portfolio', 'before-after'] %}Ivan Pineda / Work history{% else %}Zip LLC / {{ label }}{% endif %}</div>
+      <div class="eyebrow">{% if slug in ['portfolio', 'before-after'] %}Ivan Pineda / Work history{% else %}Zip, LLC / {{ label }}{% endif %}</div>
       <h1>{{ title }}</h1>
       <p class="intro">{{ description }}</p>
       {% if slug in ['portfolio', 'before-after'] %}{% include 'gallery.html' %}
@@ -31,7 +31,7 @@
     {% endif %}
   </main>
   <footer class="site-footer">
-    <div><strong>Zip LLC</strong><p>Ivan Pineda · Forest Grove &amp; surrounding communities<br>30-mile service radius · Evenings &amp; weekends</p>
+    <div><strong>Zip, LLC</strong><p>Ivan Pineda · Forest Grove &amp; surrounding communities<br>30-mile service radius · Evenings &amp; weekends</p>
       <p class="footer-disclosure">{{ registry.name }} · Oregon business registry <a href="{{ registry.search_url }}" hx-boost="false" target="_blank" rel="noopener">#{{ registry.number }}</a> · {{ short_disclosure }}</p></div>
     <div class="footer-contact"><a href="tel:+19712883488" hx-boost="false">Call 971-288-3488</a><a href="sms:+19712883488" hx-boost="false">Text me</a></div>
   </footer>

@@ -20,8 +20,8 @@ PORTRAIT = PORTFOLIO['portrait']
 PAGES = {
     '': ('Home', 'Cleanups, hauling and a helping hand.', 'I’m Ivan Pineda. Evenings and weekends I take on yard cleanups, junk hauling, pressure washing and moving help around Forest Grove and within a 30-mile radius.'),
     'services': ('What I do', 'Small jobs, done properly.', 'Yard cleanups, debris hauling, pressure washing, gutter clearing and moving help in Forest Grove and the surrounding communities. Construction, plumbing and electrical work needs a licensed contractor, and I am studying for that license now.'),
-    'about': ('About', 'Hi, I’m Ivan Pineda.', 'A hardworking local with ten years of hands-on building experience, working toward an Oregon CCB license while taking on the smaller jobs around the home.'),
-    'portfolio': ('My work', 'Ten years of hands-on work.', 'A record of projects I have worked on: showers, flooring, fences, painting and outdoor work. This is my work history, not a list of services I am offering today.'),
+    'about': ('About', 'Hi, I’m Ivan Pineda.', 'A hardworking local with a lifetime of hands-on building experience, working toward an Oregon CCB license while taking on the smaller jobs around the home.'),
+    'portfolio': ('My work', 'Work I’ve had a hand in.', 'A record of projects I have worked on: showers, flooring, fences, painting and outdoor work. This is my work history, not a list of services I am offering today.'),
     'before-after': ('Project stories', 'See the difference.', 'A closer look at projects I have worked on, photographed before, during and after. Part of my work history rather than services on offer.'),
     'contact': ('Contact me', 'Tell me about your project.', 'Call or text me at 971-288-3488 about yard, hauling, cleaning or moving work. Serving Forest Grove and surrounding communities within a 30-mile radius, evenings and weekends.'),
 }
@@ -52,6 +52,8 @@ SHORT_DISCLOSURE = 'Not a CCB-licensed contractor.'
 REGISTRY = {
     'name': 'Zip, LLC',
     'number': '2249807-97',
+    'registered': '2024-04-04',
+    'registered_label': 'April 2024',
     'search_url': 'https://sos.oregon.gov/business/Pages/find.aspx',
 }
 

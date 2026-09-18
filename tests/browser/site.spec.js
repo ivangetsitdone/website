@@ -25,7 +25,7 @@ test('home content, boosted navigation, head metadata and history', async ({ pag
   await page.evaluate(() => { window.testDocumentMarker = true; });
   for (const name of NAV) {
     await page.getByRole('navigation').getByRole('link', { name, exact: true }).click();
-    await expect(page).toHaveTitle(`${name} · Zip LLC`);
+    await expect(page).toHaveTitle(`${name} · Zip, LLC`);
     await expect(page.locator('nav [aria-current=page]')).toHaveText(name);
     expect(await page.evaluate(() => window.testDocumentMarker)).toBe(true);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -44,9 +44,9 @@ test('home content, boosted navigation, head metadata and history', async ({ pag
   await page.getByRole('navigation').getByRole('link', { name: 'Home', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Cleanups, hauling and a helping hand.');
   await page.goBack();
-  await expect(page).toHaveTitle('Contact me · Zip LLC');
+  await expect(page).toHaveTitle('Contact me · Zip, LLC');
   await page.goForward();
-  await expect(page).toHaveTitle('Home · Zip LLC');
+  await expect(page).toHaveTitle('Home · Zip, LLC');
   await expect(page.getByRole('link', { name: 'What I can take on →' })).toBeVisible();
   await page.screenshot({ path: `../../recovery/${test.info().project.name}.png`, fullPage: true });
   expect(errors).toEqual([]);

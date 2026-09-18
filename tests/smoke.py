@@ -33,15 +33,21 @@ assert json.loads(fetch('/healthz')[0]) == {'status': 'ok'}
 for path, label, heading in [('/', 'Home', 'Cleanups, hauling and a helping hand.'),
                              ('/services', 'What I do', 'Small jobs, done properly.'),
                              ('/about', 'About', 'Hi, I’m Ivan Pineda.'),
-                             ('/portfolio', 'My work', 'Ten years of hands-on work.'),
+                             ('/portfolio', 'My work', 'Work I’ve had a hand in.'),
                              ('/before-after', 'Project stories', 'See the difference.'),
                              ('/contact', 'Contact me', 'Tell me about your project.')]:
     body, _ = fetch(path)
     assert f'>{heading}</h1>' in body, path
-    assert f'<title>{label} · Zip LLC</title>' in body, path
+    assert f'<title>{label} · Zip, LLC</title>' in body, path
+    # The registered entity name carries a comma; copy must match the registry.
+    assert 'Zip LLC' not in body, path
     # Advertising as a handyman is contractor advertising in Oregon; the word must not
     # appear in public copy while Ivan is unlicensed.
     assert 'handyman' not in body.lower(), path
+    # The owner asked that no specific length of experience be claimed; the registration
+    # date carries that weight instead.
+    for claim in ('ten years', '10 years', '10+ years', 'years of experience', 'years of hands-on'):
+        assert claim not in body.lower(), (path, claim)
     assert f'<link rel="canonical" href="{SITE}{path}">' in body, path
     assert '<meta name="description" content="' in body
     assert '/static/site.js' in body and '/static/site.css' in body
@@ -62,6 +68,7 @@ for path, label, heading in [('/', 'Home', 'Cleanups, hauling and a helping hand
 home = fetch('/')[0]
 assert 'Call 971-288-3488' in home and 'Text 971-288-3488' in home
 assert '/media/p43-full.webp' in home
+assert '<time datetime="2024-04-04">April 2024</time>' in home
 offered_home = between(home, 'service-preview-grid', 'licence-note')
 for word in REGULATED:
     assert word not in offered_home.lower(), ('home offers regulated work', word)
