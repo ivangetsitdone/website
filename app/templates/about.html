@@ -1,5 +1,5 @@
 <section class="about-layout" aria-label="About Ivan">
-  <figure class="portrait"><img src="/media/{{ portrait.id }}.webp" alt="{{ portrait.alt }}" width="{{ portrait.width }}" height="{{ portrait.height }}"><figcaption>{{ portrait.caption }}</figcaption></figure>
+  <figure class="portrait"><img src="{{ asset('/media/' + portrait.id + '.webp') }}" alt="{{ portrait.alt }}" width="{{ portrait.width }}" height="{{ portrait.height }}"><figcaption>{{ portrait.caption }}</figcaption></figure>
   <div class="about-copy">
     <h2>Hands-on work, and a license to earn.</h2>
     <p>I’ve spent my working life with my hands — general construction, home repairs and outdoor projects. I’ve framed, tiled, painted, dug and hauled, and I’ve learned the part most people never see: the preparation that decides whether a job holds up.</p>

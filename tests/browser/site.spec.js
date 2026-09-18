@@ -21,6 +21,7 @@ test('home content, boosted navigation, head metadata and history', async ({ pag
   expect((await page.locator('body').innerText()).toLowerCase()).not.toContain('handyman');
   await expect(page.getByRole('link', { name: 'Call 971-288-3488' }).first()).toHaveAttribute('href', 'tel:+19712883488');
   expect(await isLoaded(page.locator('.hero-photo img'))).toBe(true);
+  expect(await isLoaded(page.locator('.brand-mark'))).toBe(true);
   // A marker on the live document proves later navigation never reloads the page.
   await page.evaluate(() => { window.testDocumentMarker = true; });
   for (const name of NAV) {
@@ -59,6 +60,7 @@ test('about portrait and contact details', async ({ page }) => {
   await expect(portrait).toHaveAttribute('alt', /Ivan Pineda/);
   await page.screenshot({ path: `../../recovery/about-${test.info().project.name}.png`, fullPage: true });
   await page.goto('/contact');
+  expect(await isLoaded(page.locator('.business-card img'))).toBe(true);
   await expect(page.getByRole('link', { name: 'Call 971-288-3488' }).first()).toHaveAttribute('href', 'tel:+19712883488');
   await expect(page.getByRole('link', { name: 'Text 971-288-3488' })).toHaveAttribute('href', 'sms:+19712883488');
   await expect(page.getByText('Forest Grove and surrounding communities').first()).toBeVisible();

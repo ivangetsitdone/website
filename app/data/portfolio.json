@@ -399,5 +399,19 @@
     "height": 800,
     "source": "ivan-headshot-download.jpeg",
     "sha256": "f25ec49ad7ca69d924d26d3542231ac261f86602320d8e466fe3081b2048e972"
+  },
+  "brand": {
+    "logo": {
+      "source": "logo.png",
+      "sha256": "ab37e3781306db0f68b4d13edf774a0839933f4fecdf23559949cb106b560e79",
+      "size": 512,
+      "alt": "Zip, LLC logo: a maroon and gold badge reading Zip, LLC."
+    },
+    "card": {
+      "source": "business-card.png",
+      "sha256": "d4cdc0486a86041a0f2c9c2b73bd575adb0caf0c9c7cc22d3c59246797811e94",
+      "width": 1400,
+      "alt": "Zip, LLC business card: Ivan Pineda, Zip, LLC. Honey Dos, Hauling, Yard Care, Small Projects. Forest Grove and nearby. 971-288-3488. ivanpineda.bottah.dev. Evenings and weekends."
+    }
   }
 }

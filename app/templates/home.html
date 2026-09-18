@@ -7,7 +7,7 @@
     <div class="actions"><a class="button-link" href="sms:+19712883488" hx-boost="false">Text 971-288-3488</a><a class="button-link secondary" href="tel:+19712883488" hx-boost="false">Call 971-288-3488</a></div>
     <a class="understated-link" href="/services">What I can take on →</a>
   </div>
-  <figure class="hero-photo"><img src="/media/{{ hero.id }}-full.webp" alt="{{ hero.caption }}" width="960" height="1280" fetchpriority="high"><figcaption>From my work · {{ hero.title }}</figcaption></figure>
+  <figure class="hero-photo"><img src="{{ asset('/media/' + hero.id + '-full.webp') }}" alt="{{ hero.caption }}" width="960" height="1280" fetchpriority="high"><figcaption>From my work · {{ hero.title }}</figcaption></figure>
 </section>
 <section class="home-services section-space" aria-labelledby="home-services-heading">
   <div class="section-heading"><div><span class="eyebrow">Evenings &amp; weekends</span><h2 id="home-services-heading">The honey-do list, finally done.</h2></div><a href="/services">See everything I do →</a></div>

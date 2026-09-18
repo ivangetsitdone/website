@@ -50,6 +50,19 @@ These statements are live on the site but are **not** recorded as confirmed anyw
 - The surname spelling **Pineda** (used in copy, the footer and the domain) — `content/README.md` still records the Pineda/Pidena ambiguity.
 - Publishing the About page portrait.
 
+## Asset caching — fixed 2026-09-18
+
+Generated assets keep stable filenames across builds, and neither Caddy nor FastAPI was sending `Cache-Control`, so browsers applied heuristic caching: the owner saw a stale stylesheet render the new business card at its full 1400px width. Templates now call `asset('/static/site.css')`, which appends a content version derived from the file's size and mtime, and a middleware sends `public, max-age=31536000, immutable` for versioned asset URLs, `no-cache` for bare asset URLs and for HTML. Smoke checks assert both headers and the `?v=` markers. A global `img { max-width: 100% }` rule is the belt-and-braces guard if a stylesheet ever does go stale.
+
+## Brand assets — added 2026-09-18
+
+The owner supplied a logo and a business card. Originals are tracked in `content/brand/` with SHA-256 hashes in `app/data/portfolio.json` under `brand`, the same provenance treatment as the photos; the build stage generates everything that is served.
+
+- **Logo.** The supplied artwork is a circular badge on an opaque white square. `scripts/build_photos.py` measures the non-white bounding box, checks it is square within 2%, and masks it with a supersampled ellipse, so `/media/logo.webp` and `/media/logo.png` are transparent and sit cleanly on the page background. It appears in the header at 52px and doubles as the site icon (`/media/icon.png`, 180px, `rel="icon"` and `rel="apple-touch-icon"`).
+- **Business card** renders on the contact page from `/media/card.webp` (1400px wide). Its alt text carries the same details as the page text.
+- **Swap the card when Ivan picks a domain.** The printed card shows `ivanpineda.bottah.dev`. When the real domain is registered, replace `content/brand/business-card.png`, update the `sha256` in the catalog, and rebuild — the build fails on a hash mismatch, which is the intended tripwire.
+- Palette drawn from the logo: deep maroon `#5a0000` and athletic gold `#ffd800`. Maroon carries buttons, links-on-light and the eyebrow tint; gold is limited to focus rings on dark buttons and the rule beside the licensing note. Chrome stays warm-neutral (`--bg #f7f4f1`, `--line #e3dcd7`) so photographs dominate. All colours are CSS custom properties at the top of `frontend/style.css`; axe still reports no WCAG A/AA contrast violations.
+
 ## Confirmed business details
 
 - Registered entity name, from the Oregon registry: **Zip, LLC** (registry 2249807-97, registered 2024-04-04). All site copy uses that exact name, comma included, and a smoke check fails on “Zip LLC” without it. The owner originally supplied “Zip LLC Handyman Services”. The site displays **“Zip, LLC”** with the tagline “Honey Dos · Hauling · Yard Care · Small Projects” (owner’s wording, 2026-09-18; see the licensing questions below): the owner flagged on 2026-09-18 that advertising as a handyman is contractor advertising in Oregon while unlicensed. The word “handyman” appears nowhere in public copy, and both test suites fail if it returns. If the assumed business name is registered as “Zip LLC Handyman Services,” ask whether the registration itself needs changing — that is outside this site. Rebuilt preview and reran HTTP smoke checks and all four browser tests successfully after branding change (2026-09-17).

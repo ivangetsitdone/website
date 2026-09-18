@@ -34,8 +34,24 @@ with urlopen(f"{base}/media/{portrait['id']}.webp", timeout=10) as response:
     assert data[:4] == b'RIFF' and data[8:12] == b'WEBP'
     assert len(data) < 500_000, len(data)
     size += len(data)
+brand = catalog['brand']
+for key, spec in brand.items():
+    source = ROOT / 'content/brand' / spec['source']
+    assert hashlib.sha256(source.read_bytes()).hexdigest() == spec['sha256'], source
+BRAND_FILES = (('/media/logo.webp', 'image/webp'), ('/media/logo.png', 'image/png'),
+               ('/media/card.webp', 'image/webp'), ('/media/icon.png', 'image/png'))
+for path, kind in BRAND_FILES:
+    with urlopen(base + path, timeout=10) as response:
+        data = response.read()
+        assert response.status == 200 and response.headers['Content-Type'] == kind, path
+        assert len(data) < 500_000, (path, len(data))
+        # The badge must carry an alpha channel: colour type 6 in the PNG header.
+        if path == '/media/logo.png':
+            assert data[25] == 6, ('logo.png is not RGBA', data[25])
+        size += len(data)
 for path in ('/media/missing.webp', '/media/p12.jpg', '/content/photos/p12.jpg',
-             '/content/portraits/ivan-pineda.jpg', '/recovery/uploads/', '/data/portfolio.json'):
+             '/content/portraits/ivan-pineda.jpg', '/content/brand/logo.png',
+             '/recovery/uploads/', '/data/portfolio.json'):
     try:
         urlopen(base + path, timeout=10)
     except HTTPError as error:
@@ -43,4 +59,4 @@ for path in ('/media/missing.webp', '/media/p12.jpg', '/content/photos/p12.jpg',
     else:
         raise AssertionError(f'Should not be public: {path}')
 print(f'PASS {len(ids)} catalog sources, {len(ids) * 2} project WebP assets plus 1 portrait '
-      f'({size / 1024 / 1024:.2f} MiB total), sequences and source isolation.')
+      f'and {len(BRAND_FILES)} brand files ({size / 1024 / 1024:.2f} MiB total), sequences and source isolation.')

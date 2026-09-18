@@ -1,3 +1,4 @@
+import hashlib
 import json
 from pathlib import Path
 from fastapi import FastAPI, Request, HTTPException
@@ -10,6 +11,41 @@ app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
 app.mount('/static', StaticFiles(directory=ROOT / 'static'), name='static')
 app.mount('/media', StaticFiles(directory=ROOT / 'media'), name='media')
 templates = Jinja2Templates(directory=ROOT / 'templates')
+_asset_versions: dict[str, str] = {}
+
+
+def asset(url: str) -> str:
+    """Return a generated asset URL with a content version, for safe long caching.
+
+    Filenames are stable across builds, so without this a browser can keep serving
+    an old stylesheet against fresh HTML.
+    """
+    if url not in _asset_versions:
+        file = ROOT / url.lstrip('/')
+        if file.is_file():
+            stat = file.stat()
+            digest = hashlib.sha256(f'{stat.st_mtime_ns}:{stat.st_size}'.encode()).hexdigest()
+            _asset_versions[url] = digest[:10]
+        else:
+            _asset_versions[url] = ''
+    version = _asset_versions[url]
+    return f'{url}?v={version}' if version else url
+
+
+templates.env.globals['asset'] = asset
+
+
+@app.middleware('http')
+async def cache_headers(request: Request, call_next):
+    response = await call_next(request)
+    path = request.url.path
+    if path.startswith(('/static/', '/media/')):
+        # Versioned URLs can be cached hard; bare ones must revalidate.
+        response.headers['Cache-Control'] = ('public, max-age=31536000, immutable'
+                                             if request.query_params.get('v') else 'no-cache')
+    else:
+        response.headers['Cache-Control'] = 'no-cache'
+    return response
 PORTFOLIO = json.loads((ROOT / 'data/portfolio.json').read_text())
 PHOTOS = PORTFOLIO['photos']
 PHOTO_BY_ID = {photo['id']: photo for photo in PHOTOS}
@@ -18,6 +54,7 @@ PAIRS = [{**pair, 'photos': [PHOTO_BY_ID[key] for key in pair['photos']]}
          for pair in PORTFOLIO['pairs']]
 PORTRAIT = PORTFOLIO['portrait']
 HERO = PHOTO_BY_ID['p42']
+BRAND = PORTFOLIO['brand']
 PAGES = {
     '': ('Home', 'Consider it done.', 'I’m Ivan Pineda. Evenings and weekends I work through the honey-do list: yard cleanups, junk hauling, pressure washing, gutters and moving help around Forest Grove and within a 30-mile radius.'),
     'services': ('What I do', 'Small jobs, done properly.', 'Yard cleanups, debris hauling, pressure washing, gutter clearing and moving help in Forest Grove and the surrounding communities. Construction, plumbing and electrical work needs a licensed contractor, and I am studying for that license now.'),
@@ -65,7 +102,7 @@ def page(request: Request, slug: str = ''):
     return templates.TemplateResponse(request=request, name='page.html', context={
         'slug': slug, 'label': label, 'title': title, 'description': description, 'pages': PAGES,
         'photos': PHOTOS, 'categories': CATEGORIES, 'pairs': PAIRS, 'services': SERVICES,
-        'portrait': PORTRAIT, 'hero': HERO, 'license_note': LICENSE_NOTE,
+        'portrait': PORTRAIT, 'hero': HERO, 'brand': BRAND, 'license_note': LICENSE_NOTE,
         'short_disclosure': SHORT_DISCLOSURE, 'registry': REGISTRY,
         'canonical': f'https://ivanpineda.bottah.dev/{slug}',
     })

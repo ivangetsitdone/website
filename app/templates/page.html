@@ -6,13 +6,15 @@
   <meta name="description" content="{{ description }}">
   <link rel="canonical" href="{{ canonical }}">
   <title>{{ label }} · Zip, LLC</title>
-  <link rel="stylesheet" href="/static/site.css">
-  <script type="module" src="/static/site.js"></script>
+  <link rel="icon" href="{{ asset('/media/icon.png') }}" sizes="180x180">
+  <link rel="apple-touch-icon" href="{{ asset('/media/icon.png') }}">
+  <link rel="stylesheet" href="{{ asset('/static/site.css') }}">
+  <script type="module" src="{{ asset('/static/site.js') }}"></script>
 </head>
 <body hx-boost="true">
   <a class="skip" href="#main" hx-boost="false">Skip to content</a>
   <header class="site-header">
-    <a class="brand" href="/" aria-label="Zip, LLC home"><span>ZIP, LLC</span><span class="brand-detail">Honey Dos · Hauling · Yard Care · Small Projects</span></a>
+    <a class="brand" href="/" aria-label="Zip, LLC home"><img class="brand-mark" src="{{ asset('/media/logo.webp') }}" alt="" width="52" height="52"><span class="brand-text"><span>Zip, LLC</span><span class="brand-detail">Honey Dos · Hauling · Yard Care · Small Projects</span></span></a>
     <nav aria-label="Main navigation">
       {% for path, info in pages.items() %}<a href="/{{ path }}" {% if slug == path %}aria-current="page"{% endif %}>{{ info[0] }}</a>{% endfor %}
     </nav>

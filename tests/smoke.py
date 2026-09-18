@@ -36,7 +36,7 @@ for path, label, heading in [('/', 'Home', 'Consider it done.'),
                              ('/portfolio', 'My work', 'Work I’ve had a hand in.'),
                              ('/before-after', 'Project stories', 'See the difference.'),
                              ('/contact', 'Contact me', 'Tell me about your project.')]:
-    body, _ = fetch(path)
+    body, headers = fetch(path)
     assert f'>{heading}</h1>' in body, path
     assert f'<title>{label} · Zip, LLC</title>' in body, path
     # The registered entity name carries a comma; copy must match the registry.
@@ -50,7 +50,11 @@ for path, label, heading in [('/', 'Home', 'Consider it done.'),
         assert claim not in body.lower(), (path, claim)
     assert f'<link rel="canonical" href="{SITE}{path}">' in body, path
     assert '<meta name="description" content="' in body
-    assert '/static/site.js' in body and '/static/site.css' in body
+    # Generated assets carry a content version so a stale stylesheet cannot outlive a deploy.
+    assert '/static/site.js?v=' in body and '/static/site.css?v=' in body, path
+    assert headers['Cache-Control'] == 'no-cache', path
+    # Brand mark and site icon ship with every page.
+    assert '/media/logo.webp' in body and '/media/icon.png' in body, path
     # Every page offers the confirmed phone contact and carries the licensing disclosure.
     assert 'href="tel:+19712883488"' in body and 'href="sms:+19712883488"' in body, path
     # The licensing fact is said once per page, in the footer, with the registration.
@@ -96,9 +100,13 @@ for path in ('/portfolio', '/before-after'):
 contact = fetch('/contact')[0]
 assert 'Call 971-288-3488' in contact and 'Text 971-288-3488' in contact
 assert 'no online form' in contact
+assert '/media/card.webp' in contact and 'ivanpineda.bottah.dev' in contact
 for path, mime in [('/static/site.js', 'javascript'), ('/static/site.css', 'text/css')]:
     body, headers = fetch(path)
     assert body and mime in headers['Content-Type']
+    assert headers['Cache-Control'] == 'no-cache', path
+    versioned = fetch(path + '?v=test')[1]
+    assert versioned['Cache-Control'] == 'public, max-age=31536000, immutable', path
 fetch('/hello', 404)
 fetch('/not-a-page', 404)
 fetch('/static/not-a-file', 404)
