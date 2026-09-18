@@ -9,7 +9,7 @@ SITE = 'https://ivanpineda.bottah.dev'
 # Ivan holds no Oregon CCB or trade license yet, so the blocks that offer work must
 # never name regulated construction. The wording lives only in the "what I don't take
 # on" note and in the work-history pages, which describe past experience.
-FULL_DISCLOSURE = 'Zip, LLC is not licensed by the Oregon Construction Contractors Board.'
+LICENSE_NOTE_OPENING = 'Zip, LLC is not a CCB-licensed contractor.'
 REGULATED = ('remodel', 'sheetrock', 'drywall', 'tile', 'flooring', 'plumbing',
              'electrical', 'painting', 'shower', 'install', 'repair', 'retaining wall')
 
@@ -58,7 +58,8 @@ for path, label, heading in [('/', 'Home', 'Consider it done.'),
     assert '#2249807-97' in body and 'sos.oregon.gov/business/Pages/find.aspx' in body, path
     # htmx must not try to boost an off-site link.
     assert 'hx-boost="false" target="_blank"' in body, path
-    assert body.count(FULL_DISCLOSURE) == (1 if path == '/services' else 0), path
+    # Said once, on the services page. The footer short form covers every other page.
+    assert body.count(LICENSE_NOTE_OPENING) == (1 if path == '/services' else 0), path
     assert 'data-vue-hello' not in body and 'hx-get="/hello"' not in body, path
     if path in ('/', '/services', '/contact'):
         assert 'Forest Grove' in body and '30-mile radius' in body, path
@@ -81,7 +82,7 @@ for word in REGULATED:
     assert word not in offered.lower(), ('services page offers regulated work', word)
 # The regulated trades appear only in the note that declines them.
 scope = between(services, '<aside class="scope-note"', '</aside>')
-for word in (FULL_DISCLOSURE, 'Oregon CCB exam', 'licensed contractor', 'Plumbing and electrical'):
+for word in (LICENSE_NOTE_OPENING, 'Oregon CCB exam', 'licensed contractor'):
     assert word in scope, word
 
 about = fetch('/about')[0]
@@ -90,7 +91,7 @@ assert 'Construction Contractors Board exam' in about
 for path in ('/portfolio', '/before-after'):
     body = fetch(path)[0]
     # Past work is presented as experience, never as services on offer.
-    assert 'not a list of services I’m offering today' in body, path
+    assert 'my work history rather than the services I offer today' in body, path
 
 contact = fetch('/contact')[0]
 assert 'Call 971-288-3488' in contact and 'Text 971-288-3488' in contact

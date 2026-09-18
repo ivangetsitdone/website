@@ -34,18 +34,11 @@ SERVICES = [
     ('Moving & assembly help', 'An extra pair of hands for loading, moving furniture around the house and putting flat-pack furniture together.'),
     ('Seasonal odd jobs', 'The small maintenance jobs on your list. If you are not sure whether it is something I can take on, just ask.'),
 ]
-# Work that needs an Oregon CCB or trade license. Named here so visitors are pointed
-# to a licensed contractor, never offered as a service.
-NOT_OFFERED = [
-    'Remodeling, tile, flooring and sheetrock',
-    'Painting of any kind — interior, exterior or pavement marking',
-    'Fences, decks, patios and retaining walls',
-    'Plumbing and electrical work of any kind',
-]
-DISCLOSURE = ('Zip, LLC is not licensed by the Oregon Construction Contractors Board. '
-              'I take on yard, hauling, cleaning and moving work only. Construction, plumbing and '
-              'electrical work needs a licensed contractor.')
-# Said once per page in the footer; the full disclosure lives on the services page.
+# Said once on the services page. The footer carries the short form site-wide; the
+# site does not otherwise list what Ivan cannot do.
+LICENSE_NOTE = ('Zip, LLC is not a CCB-licensed contractor. I’m studying for the Oregon CCB exam now, '
+                'and until it is issued I stay with the work above — if your job needs a licensed '
+                'contractor, I’ll say so and point you toward one.')
 SHORT_DISCLOSURE = 'Not a CCB-licensed contractor.'
 # The owner's Oregon Secretary of State registration. The direct record URL on
 # egov.sos.state.or.us sits behind bot protection that can show visitors an error page,
@@ -72,7 +65,7 @@ def page(request: Request, slug: str = ''):
     return templates.TemplateResponse(request=request, name='page.html', context={
         'slug': slug, 'label': label, 'title': title, 'description': description, 'pages': PAGES,
         'photos': PHOTOS, 'categories': CATEGORIES, 'pairs': PAIRS, 'services': SERVICES,
-        'portrait': PORTRAIT, 'hero': HERO, 'not_offered': NOT_OFFERED, 'disclosure': DISCLOSURE,
+        'portrait': PORTRAIT, 'hero': HERO, 'license_note': LICENSE_NOTE,
         'short_disclosure': SHORT_DISCLOSURE, 'registry': REGISTRY,
         'canonical': f'https://ivanpineda.bottah.dev/{slug}',
     })

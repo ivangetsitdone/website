@@ -15,7 +15,7 @@
 {% endmacro %}
 <section data-gallery aria-label="Project photographs">
   <div class="gallery-intro">
-    <p class="editorial-note"><strong>A record of projects I’ve worked on.</strong> This is my work history, not a list of services I’m offering today — see <a href="/services">what I do now</a>.</p>
+    <p class="editorial-note"><strong>A record of projects I’ve worked on</strong> — my work history rather than the services I offer today; <a href="/services">here’s what I take on now</a>.</p>
     {% if slug == 'portfolio' %}<a class="text-link" href="/before-after">Project stories, before and after →</a>
     {% else %}<a class="text-link" href="/portfolio">View the complete work history →</a>{% endif %}
   </div>
@@ -44,7 +44,7 @@
   {% else %}
     {% for pair in pairs %}
     {% if loop.first or pair.offer != loop.previtem.offer %}
-    <h2 class="group-heading">{% if pair.offer == 'current' %}Work I can take on today{% else %}Work that needs the license I’m earning{% endif %}</h2>
+    <h2 class="group-heading">{% if pair.offer == 'current' %}Work I can take on today{% else %}Bigger projects, once my license lands{% endif %}</h2>
     {% endif %}
     <section class="project-sequence" aria-labelledby="{{ pair.id }}">
       <div class="sequence-heading"><span class="eyebrow">Project / {{ '%02d'|format(loop.index) }}</span><h3 id="{{ pair.id }}">{{ pair.title }}</h3><p>{{ pair.note }}</p></div>

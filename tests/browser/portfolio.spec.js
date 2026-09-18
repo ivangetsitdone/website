@@ -102,7 +102,7 @@ test('all thumbnails decode and sequences preserve progress labels', async ({ pa
 
 test('projects run from what Ivan can take on today to the licensed work', async ({ page }) => {
   await page.goto('/before-after');
-  await expect(page.locator('.group-heading')).toHaveText(['Work I can take on today', 'Work that needs the license I’m earning']);
+  await expect(page.locator('.group-heading')).toHaveText(['Work I can take on today', 'Bigger projects, once my license lands']);
   const rendered = await page.locator('.project-sequence h3[id]').evaluateAll(headings => headings.map(h => h.id));
   expect(rendered).toEqual(catalog.pairs.map(pair => pair.id));
   // The offered work comes first as one block, and the shower remodel closes the page.

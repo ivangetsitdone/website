@@ -74,9 +74,11 @@ test('offered work, declined work and the work-history framing', async ({ page }
     expect(offered, `services grid offers regulated work: ${word}`).not.toContain(word);
   }
   await expect(page.locator('.scope-note')).toContainText('Oregon CCB exam');
-  await expect(page.locator('.scope-note li')).toHaveCount(4);
+  // One line about the license, not a list of what he cannot do.
+  await expect(page.locator('.scope-note p')).toHaveCount(1);
+  await expect(page.locator('.scope-note li')).toHaveCount(0);
   await page.goto('/portfolio');
-  await expect(page.locator('.editorial-note')).toContainText('not a list of services I’m offering today');
+  await expect(page.locator('.editorial-note')).toContainText('my work history rather than the services I offer today');
 });
 
 test('content pages pass automated accessibility checks', async ({ page }) => {
