@@ -37,13 +37,16 @@ for path, label, heading in [('/', 'Home', 'Cleanups, hauling and a helping hand
                              ('/contact', 'Contact me', 'Tell me about your project.')]:
     body, _ = fetch(path)
     assert f'>{heading}</h1>' in body, path
-    assert f'<title>{label} · Zip LLC Handyman Services</title>' in body, path
+    assert f'<title>{label} · Zip LLC</title>' in body, path
+    # Advertising as a handyman is contractor advertising in Oregon; the word must not
+    # appear in public copy while Ivan is unlicensed.
+    assert 'handyman' not in body.lower(), path
     assert f'<link rel="canonical" href="{SITE}{path}">' in body, path
     assert '<meta name="description" content="' in body
     assert '/static/site.js' in body and '/static/site.css' in body
     # Every page offers the confirmed phone contact and carries the licensing disclosure.
     assert 'href="tel:+19712883488"' in body and 'href="sms:+19712883488"' in body, path
-    assert 'not licensed by the Oregon Construction Contractors Board' in body, path
+    assert 'Zip LLC is not licensed by the Oregon Construction Contractors Board' in body, path
     assert 'data-vue-hello' not in body and 'hx-get="/hello"' not in body, path
     if path in ('/', '/services', '/contact'):
         assert 'Forest Grove' in body and '30-mile radius' in body, path

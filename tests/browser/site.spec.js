@@ -14,14 +14,15 @@ test('home content, boosted navigation, head metadata and history', async ({ pag
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Cleanups, hauling and a helping hand.');
   await expect(page.getByRole('link', { name: 'Text 971-288-3488' })).toHaveAttribute('href', 'sms:+19712883488');
   // The licensing disclosure has to reach every visitor, on every page.
-  await expect(page.locator('.footer-disclosure')).toContainText('not licensed by the Oregon Construction Contractors Board');
+  await expect(page.locator('.footer-disclosure')).toContainText('Zip LLC is not licensed by the Oregon Construction Contractors Board');
+  expect((await page.locator('body').innerText()).toLowerCase()).not.toContain('handyman');
   await expect(page.getByRole('link', { name: 'Call 971-288-3488' }).first()).toHaveAttribute('href', 'tel:+19712883488');
   expect(await isLoaded(page.locator('.hero-photo img'))).toBe(true);
   // A marker on the live document proves later navigation never reloads the page.
   await page.evaluate(() => { window.testDocumentMarker = true; });
   for (const name of NAV) {
     await page.getByRole('navigation').getByRole('link', { name, exact: true }).click();
-    await expect(page).toHaveTitle(`${name} · Zip LLC Handyman Services`);
+    await expect(page).toHaveTitle(`${name} · Zip LLC`);
     await expect(page.locator('nav [aria-current=page]')).toHaveText(name);
     expect(await page.evaluate(() => window.testDocumentMarker)).toBe(true);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -40,9 +41,9 @@ test('home content, boosted navigation, head metadata and history', async ({ pag
   await page.getByRole('navigation').getByRole('link', { name: 'Home', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Cleanups, hauling and a helping hand.');
   await page.goBack();
-  await expect(page).toHaveTitle('Contact me · Zip LLC Handyman Services');
+  await expect(page).toHaveTitle('Contact me · Zip LLC');
   await page.goForward();
-  await expect(page).toHaveTitle('Home · Zip LLC Handyman Services');
+  await expect(page).toHaveTitle('Home · Zip LLC');
   await expect(page.getByRole('link', { name: 'What I can take on →' })).toBeVisible();
   await page.screenshot({ path: `../../recovery/${test.info().project.name}.png`, fullPage: true });
   expect(errors).toEqual([]);

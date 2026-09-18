@@ -41,7 +41,7 @@ NOT_OFFERED = [
     'Fences, decks, patios and retaining walls',
     'Plumbing and electrical work of any kind',
 ]
-DISCLOSURE = ('Zip LLC Handyman Services is not licensed by the Oregon Construction Contractors Board. '
+DISCLOSURE = ('Zip LLC is not licensed by the Oregon Construction Contractors Board. '
               'I take on yard, hauling, cleaning and moving work only. Construction, plumbing and '
               'electrical work needs a licensed contractor.')
 

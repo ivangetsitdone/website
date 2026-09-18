@@ -14,7 +14,7 @@ The site was therefore rewritten on 2026-09-18 to advertise only work that does 
 
 - **Offered** (`SERVICES` in `app/main.py`): yard cleanup and leaf removal, junk and debris hauling, pressure washing, gutter clearing, moving and assembly help, seasonal odd jobs.
 - **Declined in public copy** (`NOT_OFFERED`): remodeling/tile/flooring/sheetrock, painting, fences/decks/patios/retaining walls, plumbing and electrical. These words appear only in the “What I don't take on yet” note, which points visitors to a licensed contractor.
-- **Disclosure** (`DISCLOSURE`): rendered in the footer of every page and repeated on home, services and contact. It states plainly that the business is not CCB licensed.
+- **Disclosure** (`DISCLOSURE`): begins “Zip LLC is not licensed by the Oregon Construction Contractors Board,” rendered in the footer of every page and repeated on home, services and contact. It states plainly that the business is not CCB licensed.
 - **Work history**: `/portfolio` (“My work”) and `/before-after` (“Project stories”) present the photo archive as ten years of past experience — a résumé — with an explicit line that it is “not a list of services I'm offering today.” No call to action on that work.
 
 **Guardrails in the test suite.** `tests/smoke.py` and `tests/browser/site.spec.js` fail if any regulated-trade word (remodel, sheetrock, drywall, tile, flooring, plumbing, electrical, painting, shower, install, repair) appears inside the blocks that offer work, and if the disclosure is missing from any page. Keep those checks when editing copy; they are the reason a well-meaning edit cannot quietly re-advertise construction.
@@ -49,7 +49,7 @@ These statements are live on the site but are **not** recorded as confirmed anyw
 
 ## Confirmed business details
 
-- Public business name supplied by owner: **Zip LLC Handyman Services**. Used in site header, page titles and footer. Rebuilt preview and reran HTTP smoke checks and all four browser tests successfully after branding change (2026-09-17).
+- Public business name supplied by owner: **Zip LLC Handyman Services**. The site now displays **“Zip LLC”** only, with the tagline “Yard care · Hauling · Cleaning”: the owner flagged on 2026-09-18 that advertising as a handyman is contractor advertising in Oregon while unlicensed. The word “handyman” appears nowhere in public copy, and both test suites fail if it returns. If the assumed business name is registered as “Zip LLC Handyman Services,” ask whether the registration itself needs changing — that is outside this site. Rebuilt preview and reran HTTP smoke checks and all four browser tests successfully after branding change (2026-09-17).
 - Supplied contact name: Ivan Pineda; supplied profile: https://nextdoor.com/profile/01TRMJKkx92rDy-wW (not fetched or republished).
 - Confirmed service area: Forest Grove and surrounding communities within a 30-mile radius. Displayed on home and services pages; no state or specific neighboring cities inferred. Rebuild, HTTP smoke checks (including service-area assertions), and all four browser tests passed after this update.
 - Owner-described experience: showers, flooring, fencing, basic plumbing fixture replacement, basic electrical work, and interior/exterior painting. Listed on services page without inferring specific shower/electrical tasks or licensing. Confirm permitted scope and any licensing requirements before expanding claims. Services update rebuilt successfully; HTTP checks (including service text) and all four browser tests passed.
