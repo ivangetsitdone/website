@@ -83,7 +83,8 @@ button:focus-visible, .button-link:focus-visible { outline-color: var(--gold); }
 .contact-checklist li { margin-bottom: .75rem; }
 .site-footer { border-top: 1px solid var(--line); font-size: .85rem; color: var(--muted); }
 .footer-blocks { display: flex; justify-content: space-between; align-items: start; gap: 1.5rem; }
-.footer-credit { margin: 1.75rem 0 0; font-size: .75rem; color: var(--muted); opacity: .85; }
+.footer-credit { margin: 3rem 0 0; padding-top: 1.25rem; border-top: 1px solid var(--line); text-align: center; font-size: .7rem; letter-spacing: .04em; color: var(--muted); }
+.footer-credit a { text-decoration-thickness: from-font; }
 .site-footer p { margin-bottom: 0; }
 .footer-disclosure { max-width: 46rem; margin-top: 1rem; font-size: .8rem; color: var(--muted); }
 .footer-disclosure a { color: inherit; }
