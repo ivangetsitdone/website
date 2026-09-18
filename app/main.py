@@ -41,9 +41,19 @@ NOT_OFFERED = [
     'Fences, decks, patios and retaining walls',
     'Plumbing and electrical work of any kind',
 ]
-DISCLOSURE = ('Zip LLC is not licensed by the Oregon Construction Contractors Board. '
+DISCLOSURE = ('Zip, LLC is not licensed by the Oregon Construction Contractors Board. '
               'I take on yard, hauling, cleaning and moving work only. Construction, plumbing and '
               'electrical work needs a licensed contractor.')
+# Said once per page in the footer; the full disclosure lives on the services page.
+SHORT_DISCLOSURE = 'Not a CCB-licensed contractor.'
+# The owner's Oregon Secretary of State registration. The direct record URL on
+# egov.sos.state.or.us sits behind bot protection that can show visitors an error page,
+# so the public link points at the stable search page and the number is given in text.
+REGISTRY = {
+    'name': 'Zip, LLC',
+    'number': '2249807-97',
+    'search_url': 'https://sos.oregon.gov/business/Pages/find.aspx',
+}
 
 @app.get('/healthz')
 def health():
@@ -60,5 +70,6 @@ def page(request: Request, slug: str = ''):
         'slug': slug, 'label': label, 'title': title, 'description': description, 'pages': PAGES,
         'photos': PHOTOS, 'categories': CATEGORIES, 'pairs': PAIRS, 'services': SERVICES,
         'portrait': PORTRAIT, 'not_offered': NOT_OFFERED, 'disclosure': DISCLOSURE,
+        'short_disclosure': SHORT_DISCLOSURE, 'registry': REGISTRY,
         'canonical': f'https://ivanpineda.bottah.dev/{slug}',
     })

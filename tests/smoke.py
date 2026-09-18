@@ -9,6 +9,7 @@ SITE = 'https://ivanpineda.bottah.dev'
 # Ivan holds no Oregon CCB or trade license yet, so the blocks that offer work must
 # never name regulated construction. The wording lives only in the "what I don't take
 # on" note and in the work-history pages, which describe past experience.
+FULL_DISCLOSURE = 'Zip, LLC is not licensed by the Oregon Construction Contractors Board.'
 REGULATED = ('remodel', 'sheetrock', 'drywall', 'tile', 'flooring', 'plumbing',
              'electrical', 'painting', 'shower', 'install', 'repair', 'retaining wall')
 
@@ -46,7 +47,12 @@ for path, label, heading in [('/', 'Home', 'Cleanups, hauling and a helping hand
     assert '/static/site.js' in body and '/static/site.css' in body
     # Every page offers the confirmed phone contact and carries the licensing disclosure.
     assert 'href="tel:+19712883488"' in body and 'href="sms:+19712883488"' in body, path
-    assert 'Zip LLC is not licensed by the Oregon Construction Contractors Board' in body, path
+    # The licensing fact is said once per page, in the footer, with the registration.
+    assert 'Oregon business registry' in body and 'Not a CCB-licensed contractor.' in body, path
+    assert '#2249807-97' in body and 'sos.oregon.gov/business/Pages/find.aspx' in body, path
+    # htmx must not try to boost an off-site link.
+    assert 'hx-boost="false" target="_blank"' in body, path
+    assert body.count(FULL_DISCLOSURE) == (1 if path == '/services' else 0), path
     assert 'data-vue-hello' not in body and 'hx-get="/hello"' not in body, path
     if path in ('/', '/services', '/contact'):
         assert 'Forest Grove' in body and '30-mile radius' in body, path
@@ -68,7 +74,7 @@ for word in REGULATED:
     assert word not in offered.lower(), ('services page offers regulated work', word)
 # The regulated trades appear only in the note that declines them.
 scope = between(services, '<aside class="scope-note"', '</aside>')
-for word in ('Oregon CCB exam', 'licensed contractor', 'Plumbing and electrical'):
+for word in (FULL_DISCLOSURE, 'Oregon CCB exam', 'licensed contractor', 'Plumbing and electrical'):
     assert word in scope, word
 
 about = fetch('/about')[0]

@@ -42,7 +42,8 @@ button:hover, .button-link:hover { background: #17392a; }
 .personal-note, .licence-note { padding-block: 2rem; border-block: 1px solid #cbd4cb; display: grid; grid-template-columns: 1fr 1.2fr; gap: 3rem; }
 .personal-note p, .licence-note p { margin-top: 0; }
 .licence-note p + p { margin-top: 1rem; }
-.licence-note a { font-weight: 650; display: inline-block; margin-top: 1rem; }
+.licence-note a { font-weight: 650; }
+.inline-links { display: flex; flex-wrap: wrap; gap: 1.5rem; margin-top: 1.25rem; }
 .contact-band { border-radius: 1rem; background: #e7ecdf; padding: clamp(1.5rem, 4vw, 3rem); }
 .contact-band p { max-width: 42rem; }
 .about-layout { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: clamp(2rem, 5vw, 4rem); align-items: start; margin-top: 3rem; }
@@ -67,6 +68,7 @@ button:hover, .button-link:hover { background: #17392a; }
 .site-footer { border-top: 1px solid #d6ded6; display: flex; justify-content: space-between; align-items: start; gap: 1.5rem; font-size: .85rem; color: #526155; }
 .site-footer p { margin-bottom: 0; }
 .footer-disclosure { max-width: 46rem; margin-top: 1rem; font-size: .8rem; color: #5f6a60; }
+.footer-disclosure a { color: inherit; }
 .footer-contact { display: flex; flex-direction: column; gap: .75rem; flex-shrink: 0; }
 .skip { position: absolute; top: -5rem; left: 1rem; padding: .5rem 1rem; background: #fffefb; z-index: 10; }
 .skip:focus { top: .5rem; }

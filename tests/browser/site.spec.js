@@ -14,7 +14,10 @@ test('home content, boosted navigation, head metadata and history', async ({ pag
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Cleanups, hauling and a helping hand.');
   await expect(page.getByRole('link', { name: 'Text 971-288-3488' })).toHaveAttribute('href', 'sms:+19712883488');
   // The licensing disclosure has to reach every visitor, on every page.
-  await expect(page.locator('.footer-disclosure')).toContainText('Zip LLC is not licensed by the Oregon Construction Contractors Board');
+  await expect(page.locator('.footer-disclosure')).toContainText('Not a CCB-licensed contractor');
+  const registry = page.locator('.footer-disclosure a');
+  await expect(registry).toHaveText('#2249807-97');
+  await expect(registry).toHaveAttribute('hx-boost', 'false');
   expect((await page.locator('body').innerText()).toLowerCase()).not.toContain('handyman');
   await expect(page.getByRole('link', { name: 'Call 971-288-3488' }).first()).toHaveAttribute('href', 'tel:+19712883488');
   expect(await isLoaded(page.locator('.hero-photo img'))).toBe(true);
