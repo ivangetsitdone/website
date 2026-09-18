@@ -44,6 +44,8 @@ The Hello World demonstration is gone from the public site. Home, services, abou
 
 These statements are live on the site but are **not** recorded as confirmed anywhere in this repository; they came from the previous session's conversation, whose context was lost. Confirm each one with the owner:
 
+- Two navigation labels are new and shortened for the header: **“Contact”** (the page is still titled “Contact me”) and the work-section tab **“All photos”** for `/portfolio`. Both are mine, not the owner's wording.
+
 - ~~“10+ years” of hands-on experience~~ — removed from the site on 2026-09-18 at the owner's direction: no length of experience is claimed anywhere, and the smoke checks fail if such a claim returns. The registration date carries that weight instead.
 - Availability limited to evenings and weekends around a full-time job.
 - The personal note about supporting his family and saving for his daughter's college fund.
@@ -63,20 +65,23 @@ The owner supplied a logo and a business card. Originals are tracked in `content
 - **Swap the card when Ivan picks a domain.** The printed card shows `ivanpineda.bottah.dev`. When the real domain is registered, replace `content/brand/business-card.png`, update the `sha256` in the catalog, and rebuild — the build fails on a hash mismatch, which is the intended tripwire.
 - Palette drawn from the logo: deep maroon `#5a0000` and athletic gold `#ffd800`. Maroon carries buttons, links-on-light and the eyebrow tint; gold is limited to focus rings on dark buttons and the rule beside the licensing note. Chrome stays warm-neutral (`--bg #f7f4f1`, `--line #e3dcd7`) so photographs dominate. All colours are CSS custom properties at the top of `frontend/style.css`; axe still reports no WCAG A/AA contrast violations.
 
-## Navigation and footer layout — 2026-09-18
+## Navigation — rebuilt 2026-09-18
 
-The header navigation is written mobile first and sized by column count rather than by a single collapse point. The six links divide evenly into 2, 3 and 6 columns, so the counts are explicit instead of `auto-fit`, which left an orphan link on the last row at some widths.
+The first attempt dressed six labels as a responsive grid of pill buttons. The owner read it as dated, and the research agreed: the problem was never the container. NN/G finds that hiding navigation roughly halves discoverability, and that **four or fewer top-level links should simply be shown**; above four, something has to give. The fashionable alternatives fit badly here — a floating pill nav holds about four links before it stops reading as a pill, repaints on every scroll frame through `backdrop-filter`, and floats over the photographs; a bottom tab bar is for three to five app-like destinations.
 
-- **Below 430px** — two columns of tappable cells, 44px minimum height, hairline border and `--surface` fill, matching the service cards.
-- **430–849px** — three columns.
-- **850–1119px** — one full-width row of six: a tab bar under the brand.
-- **1120px and up** — the header becomes a single flex row and the cells drop their borders and fill, leaving plain inline links beside the brand. The breakpoint is measured, not guessed: brand 413px + 32px gap + nav 623px + 48px padding = 1116px, so anything lower wrapped the nav onto a second right-aligned row.
+So the fix was structural, not decorative: **fewer links, plain text, nothing hidden.**
 
-The current page is marked by weight plus an inset gold rule (`box-shadow: inset 0 -3px 0 var(--gold)`), the one place gold appears in the chrome. The brand tagline uses `clamp(.7rem, 2.4vw, .78rem)` so it holds one line on a 375px phone.
+- **Header, four links** (`NAV` in `app/main.py`): What I do · My work · About · Contact. The logo is the home link, carrying `aria-current="page"` on the home page — Home as a separate item was redundant.
+- **The two work-history pages share “My work.”** `/portfolio` and `/before-after` sit under one header link, which takes `aria-current="true"` on both (the section, not the page), and the pages carry their own tabs — “All photos” and “Project stories” (`WORK_NAV`) — in the gallery intro band, replacing the old one-way cross-links.
+- **Footer lists every page** (`.footer-nav`), which is NN/G's recommended backstop for anything not in the header.
+- **No boxes and no containers.** The current page is marked by the text's own underline in brand gold, 3px, at a `.5em` offset; hover gives a 2px `--line-strong` underline. That gold underline is the only brand colour in the chrome, and the same treatment carries the header links, the section tabs and the footer list.
+- **Widths.** Links sit in one flex row with `justify-content: space-between` and `gap: clamp(.7rem, 2.6vw, 1.9rem)`, capped at `34rem` so they do not stretch across a tablet. From **860px** the header is a single line with the links right-aligned beside the brand — measured, not guessed: brand 413px + 32px gap + nav 332px + 48px padding = 825px. Below **380px** the page gutters drop from 1.5rem to 1.25rem, which is what keeps four links on one row at 320px.
 
-The footer call and text links are buttons on one row, each taking an equal share of the width (`grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr)`) — filled maroon for the call, outlined for the text, matching the page buttons. `minmax(0, …)` rather than `1fr` is what keeps them equal: the phone number's minimum content width otherwise made the call button wider. The number is wrapped in a `<span>` with `white-space: nowrap`, so a narrow phone breaks the label after “Call” rather than inside the number; `column-gap` restores the space the flex button would otherwise swallow. Note that a flex-basis on a footer child is read as a *height* once the footer stacks below 760px — both children are reset to `flex: 0 0 auto` there.
+The footer call and text links are buttons on one row, each taking an equal share of the width (`grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr)`) — filled maroon for the call, outlined for the text. `minmax(0, …)` rather than `1fr` is what keeps them equal: the phone number's minimum content width otherwise made the call button wider. The number is wrapped in a `<span>` with `white-space: nowrap`, so a narrow phone breaks the label after “Call” rather than inside the number; `column-gap` restores the space the flex button would otherwise swallow. A flex basis on a footer child is read as a *height* once the footer stacks below 760px — both children are reset to `flex: 0 0 auto` there.
 
-Verified at 320, 360, 375, 414, 430, 600, 761, 768, 850, 1024, 1120, 1280 and 1600px: no horizontal overflow, no orphan nav row, equal-width footer buttons on one line at every width except 320px, where the call label stacks cleanly. `tests/browser/site.spec.js` asserts the row structure, the equal widths and the absence of overflow at both test viewports; the suite is now 26 tests (13 across desktop and mobile) and all pass, axe included.
+Measured at 320, 360, 375, 414, 600, 859, 860, 1024, 1280 and 1600px: four links on one row at every width, no horizontal overflow, 44px touch targets, equal-width footer buttons. The mobile header went from 280px tall to 168px. `tests/browser/site.spec.js` asserts the single row (including a 320px check), the four labels, the shared section link on `/before-after`, the six footer links and the footer button geometry; `getByRole('navigation')` calls are scoped by accessible name now that the page has three nav landmarks. All 26 browser tests pass, axe WCAG A/AA included.
+
+Sources: [NN/G on hamburger menus](https://www.nngroup.com/articles/hamburger-menus/), [NN/G mobile navigation patterns](https://www.nngroup.com/articles/mobile-navigation-patterns/), [floating pill navbars](https://21st.dev/blog/react-floating-navbar-components), [mobile navigation examples](https://www.uxpin.com/studio/blog/mobile-navigation-examples/).
 
 ## Confirmed business details
 

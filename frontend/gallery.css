@@ -3,9 +3,8 @@
 .portfolio-page { max-width: 1280px; padding-top: clamp(2.5rem, 6vw, 5rem); }
 .portfolio-page h1 { max-width: 1000px; font-size: clamp(2.8rem, 6vw, 4.8rem); }
 .portfolio-page .intro { max-width: 48rem; }
-.gallery-intro { display: flex; align-items: center; justify-content: space-between; gap: 2rem; margin: 2.5rem 0; padding: 1.3rem 0; border-block: 1px solid var(--line-strong); }
+.gallery-intro { display: grid; gap: .75rem; margin: 2.5rem 0; padding: .9rem 0 1.3rem; border-block: 1px solid var(--line-strong); }
 .editorial-note { max-width: 48rem; margin: 0; font-size: .9rem; color: var(--muted); }
-.text-link { flex-shrink: 0; font-weight: 650; }
 .gallery-filters { display: flex; flex-wrap: wrap; gap: 1rem; align-items: end; margin-bottom: 1.5rem; }
 .gallery-filters label { display: grid; grid-template-columns: minmax(0, 1fr); gap: .3rem; font-size: .8rem; font-weight: 650; }
 .gallery-filters select { font: inherit; font-size: 1rem; color: var(--ink); background: white; border: 1px solid var(--line-strong); border-radius: .5rem; padding: .65rem 2rem .65rem .75rem; min-height: 44px; min-width: 0; width: 100%; max-width: 100%; }
@@ -53,8 +52,6 @@ body:has(.photo-viewer[open]) { overflow: hidden; }
 .viewer-hint { font-size: .75rem; color: #cfc5bf; margin-bottom: 0; }
 @media (max-width: 1000px) {
   .photo-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .gallery-intro { display: block; }
-  .text-link { display: inline-block; margin-top: 1rem; }
   .viewer-bottom { flex-direction: column; gap: 1rem; }
 }
 @media (max-width: 600px) {

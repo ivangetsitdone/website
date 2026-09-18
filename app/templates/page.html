@@ -14,9 +14,9 @@
 <body hx-boost="true">
   <a class="skip" href="#main" hx-boost="false">Skip to content</a>
   <header class="site-header">
-    <a class="brand" href="/" aria-label="Zip, LLC home"><img class="brand-mark" src="{{ asset('/media/logo.webp') }}" alt="" width="52" height="52"><span class="brand-text"><span>Zip, LLC</span><span class="brand-detail">Honey Dos · Hauling · Yard Care · Small Projects</span></span></a>
-    <nav aria-label="Main navigation">
-      {% for path, info in pages.items() %}<a href="/{{ path }}" {% if slug == path %}aria-current="page"{% endif %}>{{ info[0] }}</a>{% endfor %}
+    <a class="brand" href="/"{% if slug == '' %} aria-current="page"{% endif %} aria-label="Zip, LLC home"><img class="brand-mark" src="{{ asset('/media/logo.webp') }}" alt="" width="52" height="52"><span class="brand-text"><span>Zip, LLC</span><span class="brand-detail">Honey Dos · Hauling · Yard Care · Small Projects</span></span></a>
+    <nav class="site-nav" aria-label="Main navigation">
+      {% for path, label in nav %}<a href="/{{ path }}"{% if slug == path %} aria-current="page"{% elif section == path %} aria-current="true"{% endif %}>{{ label }}</a>{% endfor %}
     </nav>
   </header>
   <main id="main" tabindex="-1" class="{% if slug in ['portfolio', 'before-after'] %}portfolio-page{% endif %}" data-description="{{ description }}" data-canonical="{{ canonical }}">
@@ -33,7 +33,10 @@
     {% endif %}
   </main>
   <footer class="site-footer">
-    <div><strong>Zip, LLC</strong><p>Ivan Pineda · Forest Grove &amp; surrounding communities<br>30-mile service radius · Evenings &amp; weekends</p>
+    <nav class="footer-nav" aria-label="All pages">
+      {% for path, info in pages.items() %}<a href="/{{ path }}"{% if slug == path %} aria-current="page"{% endif %}>{{ info[0] }}</a>{% endfor %}
+    </nav>
+    <div class="footer-info"><strong>Zip, LLC</strong><p>Ivan Pineda · Forest Grove &amp; surrounding communities<br>30-mile service radius · Evenings &amp; weekends</p>
     <p class="footer-disclosure">{{ registry.name }} · Oregon business registry <a href="{{ registry.search_url }}" hx-boost="false" target="_blank" rel="noopener">#{{ registry.number }}</a> · {{ short_disclosure }}</p></div>
     <div class="footer-contact"><a href="tel:+19712883488" hx-boost="false">Call <span>971-288-3488</span></a><a href="sms:+19712883488" hx-boost="false">Text me</a></div>
   </footer>

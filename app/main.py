@@ -63,6 +63,12 @@ PAGES = {
     'before-after': ('Project stories', 'See the difference.', 'A closer look at projects I have worked on, photographed before, during and after. Part of my work history rather than services on offer.'),
     'contact': ('Contact me', 'Tell me about your project.', 'Call or text me at 971-288-3488 about yard, hauling, cleaning or moving work. Serving Forest Grove and surrounding communities within a 30-mile radius, evenings and weekends.'),
 }
+# Four visible links is about what a phone row holds, and hiding navigation roughly
+# halves discoverability, so the header carries four and hides nothing: the logo is
+# the home link, and the two work-history pages sit under "My work" with their own
+# section tabs. The footer repeats every page for anyone who wants the full list.
+NAV = [('services', 'What I do'), ('portfolio', 'My work'), ('about', 'About'), ('contact', 'Contact')]
+WORK_NAV = [('portfolio', 'All photos'), ('before-after', 'Project stories')]
 SERVICES = [
     ('Yard cleanup & leaf removal', 'Overgrown corners, leaf fall, brush and weeds cleared out, with the debris hauled away.'),
     ('Junk & debris hauling', 'Garage, shed and yard clear-outs, loaded up and taken to the transfer station.'),
@@ -99,8 +105,11 @@ def page(request: Request, slug: str = ''):
     if slug not in PAGES:
         raise HTTPException(status_code=404)
     label, title, description = PAGES[slug]
+    # The work-history pages share one header link, marked as the current section.
+    section = 'portfolio' if slug in ('portfolio', 'before-after') else slug
     return templates.TemplateResponse(request=request, name='page.html', context={
         'slug': slug, 'label': label, 'title': title, 'description': description, 'pages': PAGES,
+        'nav': NAV, 'work_nav': WORK_NAV, 'section': section,
         'photos': PHOTOS, 'categories': CATEGORIES, 'pairs': PAIRS, 'services': SERVICES,
         'portrait': PORTRAIT, 'hero': HERO, 'brand': BRAND, 'license_note': LICENSE_NOTE,
         'short_disclosure': SHORT_DISCLOSURE, 'registry': REGISTRY,

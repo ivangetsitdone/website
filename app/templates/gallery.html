@@ -15,9 +15,10 @@
 {% endmacro %}
 <section data-gallery aria-label="Project photographs">
   <div class="gallery-intro">
+    <nav class="section-nav" aria-label="Work history">
+      {% for path, label in work_nav %}<a href="/{{ path }}"{% if slug == path %} aria-current="page"{% endif %}>{{ label }}</a>{% endfor %}
+    </nav>
     <p class="editorial-note"><strong>A record of projects I’ve worked on</strong> — my work history rather than the services I offer today; <a href="/services">here’s what I take on now</a>.</p>
-    {% if slug == 'portfolio' %}<a class="text-link" href="/before-after">Project stories, before and after →</a>
-    {% else %}<a class="text-link" href="/portfolio">View work portfolio →</a>{% endif %}
   </div>
   {% if slug == 'portfolio' %}
     <div class="gallery-filters" data-filters hidden>

@@ -1,7 +1,15 @@
 const { test, expect } = require('@playwright/test');
 const AxeBuilder = require('@axe-core/playwright').default;
 
-const NAV = ['What I do', 'About', 'My work', 'Project stories', 'Contact me'];
+// The header carries four links; the logo is the home link and the work-history
+// pages share "My work". Nav labels and page titles differ for Contact.
+const NAV = [
+  { link: 'What I do', title: 'What I do' },
+  { link: 'My work', title: 'My work' },
+  { link: 'About', title: 'About' },
+  { link: 'Contact', title: 'Contact me' },
+];
+const mainNav = page => page.getByRole('navigation', { name: 'Main navigation' });
 
 async function isLoaded(locator) {
   return locator.evaluate(img => img.complete && img.naturalWidth > 0);
@@ -24,10 +32,10 @@ test('home content, boosted navigation, head metadata and history', async ({ pag
   expect(await isLoaded(page.locator('.brand-mark'))).toBe(true);
   // A marker on the live document proves later navigation never reloads the page.
   await page.evaluate(() => { window.testDocumentMarker = true; });
-  for (const name of NAV) {
-    await page.getByRole('navigation').getByRole('link', { name, exact: true }).click();
-    await expect(page).toHaveTitle(`${name} · Zip, LLC`);
-    await expect(page.locator('nav [aria-current=page]')).toHaveText(name);
+  for (const { link, title } of NAV) {
+    await mainNav(page).getByRole('link', { name: link, exact: true }).click();
+    await expect(page).toHaveTitle(`${title} · Zip, LLC`);
+    await expect(mainNav(page).locator('[aria-current=page]')).toHaveText(link);
     expect(await page.evaluate(() => window.testDocumentMarker)).toBe(true);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     // Boosted swaps replace the body only, so the script keeps head metadata in sync.
@@ -42,7 +50,7 @@ test('home content, boosted navigation, head metadata and history', async ({ pag
     expect(head.canonical).toBe(head.mainCanonical);
     expect(head.canonical.startsWith('https://ivanpineda.bottah.dev/')).toBe(true);
   }
-  await page.getByRole('navigation').getByRole('link', { name: 'Home', exact: true }).click();
+  await page.getByRole('link', { name: 'Zip, LLC home' }).click();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Consider it done.');
   await page.goBack();
   await expect(page).toHaveTitle('Contact me · Zip, LLC');
@@ -99,21 +107,32 @@ test('keyboard skip link', async ({ page }) => {
   await expect(page).toHaveURL(/#main$/);
 });
 
-test('the navigation grid and the footer contact buttons fit the viewport', async ({ page }) => {
+test('the navigation and the footer contact buttons fit the viewport', async ({ page }) => {
   await page.goto('/services');
   const boxes = locator => locator.evaluateAll(els => els.map(el => {
     const box = el.getBoundingClientRect();
     return { x: Math.round(box.x), y: Math.round(box.y), width: Math.round(box.width), height: Math.round(box.height) };
   }));
 
-  // Every row of the navigation holds the same number of links: six links divide
-  // into 2, 3 and 6 columns, so no width leaves a single link stranded on a row.
-  const links = await boxes(page.locator('nav a'));
-  expect(links).toHaveLength(NAV.length + 1);
-  const rows = new Map();
-  for (const link of links) rows.set(link.y, (rows.get(link.y) || 0) + 1);
-  expect([...new Set(rows.values())]).toHaveLength(1);
-  expect(Math.min(...links.map(link => link.height))).toBeGreaterThanOrEqual(24);
+  // The four header links hold one row at every width, including a 320px phone,
+  // which is the whole reason the navigation is four links and not six.
+  const links = await boxes(page.locator('.site-nav a'));
+  expect(links).toHaveLength(NAV.length);
+  expect([...new Set(links.map(link => link.y))]).toHaveLength(1);
+  expect(Math.min(...links.map(link => link.height))).toBeGreaterThanOrEqual(44);
+  await page.setViewportSize({ width: 320, height: 720 });
+  expect([...new Set((await boxes(page.locator('.site-nav a'))).map(link => link.y))]).toHaveLength(1);
+  await page.setViewportSize(test.info().project.use.viewport);
+
+  // Nothing is hidden: the footer lists every page, the work pages share a header
+  // link, and they carry their own section tabs.
+  await expect(page.getByRole('navigation', { name: 'All pages' }).getByRole('link')).toHaveCount(6);
+  await page.goto('/before-after');
+  await expect(mainNav(page).getByRole('link', { name: 'My work' })).toHaveAttribute('aria-current', 'true');
+  const tabs = page.getByRole('navigation', { name: 'Work history' });
+  await expect(tabs.getByRole('link', { name: 'Project stories' })).toHaveAttribute('aria-current', 'page');
+  await tabs.getByRole('link', { name: 'All photos' }).click();
+  await expect(page).toHaveTitle('My work · Zip, LLC');
 
   // Call and text sit side by side and share the width evenly.
   const [call, text] = await boxes(page.locator('.footer-contact a'));
