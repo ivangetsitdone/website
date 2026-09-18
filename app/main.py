@@ -17,6 +17,7 @@ CATEGORIES = list(dict.fromkeys(photo['category'] for photo in PHOTOS))
 PAIRS = [{**pair, 'photos': [PHOTO_BY_ID[key] for key in pair['photos']]}
          for pair in PORTFOLIO['pairs']]
 PORTRAIT = PORTFOLIO['portrait']
+HERO = PHOTO_BY_ID['p42']
 PAGES = {
     '': ('Home', 'Consider it done.', 'I’m Ivan Pineda. Evenings and weekends I work through the honey-do list: yard cleanups, junk hauling, pressure washing, gutters and moving help around Forest Grove and within a 30-mile radius.'),
     'services': ('What I do', 'Small jobs, done properly.', 'Yard cleanups, debris hauling, pressure washing, gutter clearing and moving help in Forest Grove and the surrounding communities. Construction, plumbing and electrical work needs a licensed contractor, and I am studying for that license now.'),
@@ -71,7 +72,7 @@ def page(request: Request, slug: str = ''):
     return templates.TemplateResponse(request=request, name='page.html', context={
         'slug': slug, 'label': label, 'title': title, 'description': description, 'pages': PAGES,
         'photos': PHOTOS, 'categories': CATEGORIES, 'pairs': PAIRS, 'services': SERVICES,
-        'portrait': PORTRAIT, 'not_offered': NOT_OFFERED, 'disclosure': DISCLOSURE,
+        'portrait': PORTRAIT, 'hero': HERO, 'not_offered': NOT_OFFERED, 'disclosure': DISCLOSURE,
         'short_disclosure': SHORT_DISCLOSURE, 'registry': REGISTRY,
         'canonical': f'https://ivanpineda.bottah.dev/{slug}',
     })

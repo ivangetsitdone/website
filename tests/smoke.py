@@ -67,7 +67,7 @@ for path, label, heading in [('/', 'Home', 'Consider it done.'),
 
 home = fetch('/')[0]
 assert 'Call 971-288-3488' in home and 'Text 971-288-3488' in home
-assert '/media/p43-full.webp' in home
+assert '/media/p42-full.webp' in home
 assert '<time datetime="2024-04-04">April 2024</time>' in home
 offered_home = between(home, 'service-preview-grid', 'licence-note')
 for word in REGULATED:

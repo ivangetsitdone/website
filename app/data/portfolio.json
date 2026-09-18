@@ -29,10 +29,10 @@
     },
     {
       "id": "p42",
-      "title": "Garden steps revealed",
+      "title": "The steps I built",
       "category": "Outdoor projects",
       "stage": "After",
-      "caption": "A defined flight of garden steps leads toward the gate, with the surrounding soil still exposed.",
+      "caption": "A full flight of set treads climbing to the gate, with the bank graded either side.",
       "source": "photo_2026-09-17 13.03.06.jpeg",
       "sha256": "55c5c36350ffbdda7ed7edb8279c8773cb853af5403527a07741194ce6e10b9d"
     },
@@ -245,10 +245,10 @@
     },
     {
       "id": "p41",
-      "title": "Garden steps during excavation",
+      "title": "Digging out for the new steps",
       "category": "Outdoor projects",
       "stage": "In progress",
-      "caption": "Grass and soil cover parts of the existing steps, while a dug-out lower section and shovel show work underway.",
+      "caption": "The old, uneven stone path with the first section dug out ready for the new steps.",
       "source": "photo_2026-09-17 13.03.05.jpeg",
       "sha256": "c415408d772e47e97385a0556e25347527e3bd5ded0fe3ab1baa16b93c652535"
     },
@@ -338,16 +338,6 @@
       "note": "Before and after: the deck, satellite dish, neighboring wall and fence align in both views."
     },
     {
-      "id": "garden-steps",
-      "title": "Finding the steps again",
-      "offer": "current",
-      "photos": [
-        "p41",
-        "p42"
-      ],
-      "note": "Progress and after: the gate, silver-leaved planting and stair position match. The first photo already shows excavation underway."
-    },
-    {
       "id": "fence-posts",
       "title": "Replacing rotted fence posts",
       "offer": "licensed",
@@ -356,6 +346,16 @@
         "p04"
       ],
       "note": "Before and after: a steel replacement post going in where the wood post had rotted, and the fence standing again."
+    },
+    {
+      "id": "garden-steps",
+      "title": "Building a new flight of garden steps",
+      "offer": "licensed",
+      "photos": [
+        "p41",
+        "p42"
+      ],
+      "note": "During and after: the old path lifted and the ground cut out, then a new flight of steps set into the slope. Dug out by hand, graded and set slab by slab."
     },
     {
       "id": "siding-repair",
