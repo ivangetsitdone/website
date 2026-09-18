@@ -106,7 +106,7 @@ test('projects run from what Ivan can take on today to the licensed work', async
   const rendered = await page.locator('.project-sequence h3[id]').evaluateAll(headings => headings.map(h => h.id));
   expect(rendered).toEqual(catalog.pairs.map(pair => pair.id));
   // The offered work comes first as one block, and the shower remodel closes the page.
-  expect(catalog.pairs.map(pair => pair.offer)).toEqual(['current', 'current', 'current', 'current', 'licensed', 'licensed', 'licensed']);
+  expect(catalog.pairs.map(pair => pair.offer)).toEqual(['current', 'current', 'current', 'licensed', 'licensed', 'licensed', 'licensed']);
   expect(rendered.at(-1)).toBe('shower-tile');
 });
 

@@ -18,7 +18,7 @@ PAIRS = [{**pair, 'photos': [PHOTO_BY_ID[key] for key in pair['photos']]}
          for pair in PORTFOLIO['pairs']]
 PORTRAIT = PORTFOLIO['portrait']
 PAGES = {
-    '': ('Home', 'Cleanups, hauling and a helping hand.', 'I’m Ivan Pineda. Evenings and weekends I take on yard cleanups, junk hauling, pressure washing and moving help around Forest Grove and within a 30-mile radius.'),
+    '': ('Home', 'Consider it done.', 'I’m Ivan Pineda. Evenings and weekends I work through the honey-do list: yard cleanups, junk hauling, pressure washing, gutters and moving help around Forest Grove and within a 30-mile radius.'),
     'services': ('What I do', 'Small jobs, done properly.', 'Yard cleanups, debris hauling, pressure washing, gutter clearing and moving help in Forest Grove and the surrounding communities. Construction, plumbing and electrical work needs a licensed contractor, and I am studying for that license now.'),
     'about': ('About', 'Hi, I’m Ivan Pineda.', 'A hardworking local with a lifetime of hands-on building experience, working toward an Oregon CCB license while taking on the smaller jobs around the home.'),
     'portfolio': ('My work', 'Work I’ve had a hand in.', 'A record of projects I have worked on: showers, flooring, fences, painting and outdoor work. This is my work history, not a list of services I am offering today.'),
@@ -37,7 +37,7 @@ SERVICES = [
 # to a licensed contractor, never offered as a service.
 NOT_OFFERED = [
     'Remodeling, tile, flooring and sheetrock',
-    'Painting, inside or out',
+    'Painting of any kind — interior, exterior or pavement marking',
     'Fences, decks, patios and retaining walls',
     'Plumbing and electrical work of any kind',
 ]

@@ -11,7 +11,7 @@ test('home content, boosted navigation, head metadata and history', async ({ pag
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.goto('/');
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Cleanups, hauling and a helping hand.');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Consider it done.');
   await expect(page.getByRole('link', { name: 'Text 971-288-3488' })).toHaveAttribute('href', 'sms:+19712883488');
   // The licensing disclosure has to reach every visitor, on every page.
   await expect(page.locator('.footer-disclosure')).toContainText('Not a CCB-licensed contractor');
@@ -42,7 +42,7 @@ test('home content, boosted navigation, head metadata and history', async ({ pag
     expect(head.canonical.startsWith('https://ivanpineda.bottah.dev/')).toBe(true);
   }
   await page.getByRole('navigation').getByRole('link', { name: 'Home', exact: true }).click();
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Cleanups, hauling and a helping hand.');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Consider it done.');
   await page.goBack();
   await expect(page).toHaveTitle('Contact me · Zip, LLC');
   await page.goForward();

@@ -30,7 +30,7 @@ def between(body, start, end):
     return body[first:body.index(end, first)]
 
 assert json.loads(fetch('/healthz')[0]) == {'status': 'ok'}
-for path, label, heading in [('/', 'Home', 'Cleanups, hauling and a helping hand.'),
+for path, label, heading in [('/', 'Home', 'Consider it done.'),
                              ('/services', 'What I do', 'Small jobs, done properly.'),
                              ('/about', 'About', 'Hi, I’m Ivan Pineda.'),
                              ('/portfolio', 'My work', 'Work I’ve had a hand in.'),

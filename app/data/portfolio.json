@@ -338,16 +338,6 @@
       "note": "Before and after: the deck, satellite dish, neighboring wall and fence align in both views."
     },
     {
-      "id": "parking-lot",
-      "title": "Restriping a parking lot",
-      "offer": "current",
-      "photos": [
-        "p23",
-        "p24"
-      ],
-      "note": "Before and after: worn asphalt with no visible bays, then fresh white parking lines."
-    },
-    {
       "id": "garden-steps",
       "title": "Finding the steps again",
       "offer": "current",
@@ -376,6 +366,16 @@
         "p10"
       ],
       "note": "Before and after: a replaced section of siding, then the finished wall."
+    },
+    {
+      "id": "parking-lot",
+      "title": "Restriping a parking lot",
+      "offer": "licensed",
+      "photos": [
+        "p23",
+        "p24"
+      ],
+      "note": "Before and after: worn asphalt with no visible bays, then fresh white parking lines."
     },
     {
       "id": "shower-tile",
