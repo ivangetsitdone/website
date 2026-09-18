@@ -41,6 +41,16 @@ with Image.open(portrait_source) as original:
     assert clean.size == (portrait['width'], portrait['height']), clean.size
     clean.save(output / f"{portrait['id']}.webp", 'WEBP', quality=82, method=6)
 
+def clear_caption(image, band):
+    """Paint out the tagline inside the badge; it is illegible at header size."""
+    width, height = image.size
+    box = (round(width * band['left']), round(height * band['top']),
+           round(width * band['right']), round(height * band['bottom']))
+    patch = Image.new('RGB', (box[2] - box[0], box[3] - box[1]), tuple(band['fill']))
+    image.paste(patch, box)
+    return image
+
+
 def transparent_badge(image):
     """Trim the flat background from the round logo and give it an alpha channel.
 
@@ -72,7 +82,7 @@ for key, spec in brand.items():
     with Image.open(source) as original:
         image = ImageOps.exif_transpose(original)
         if key == 'logo':
-            logo = transparent_badge(image)
+            logo = transparent_badge(clear_caption(image.convert('RGB'), spec['caption_band']))
             logo.thumbnail((spec['size'], spec['size']), Image.Resampling.LANCZOS)
             # Copy the pixels into a fresh image so no source metadata survives.
             clean = Image.new('RGBA', logo.size)

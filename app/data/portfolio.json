@@ -405,7 +405,18 @@
       "source": "logo.png",
       "sha256": "ab37e3781306db0f68b4d13edf774a0839933f4fecdf23559949cb106b560e79",
       "size": 512,
-      "alt": "Zip, LLC logo: a maroon and gold badge reading Zip, LLC."
+      "alt": "Zip, LLC logo: a maroon and gold badge reading Zip, LLC.",
+      "caption_band": {
+        "top": 0.702,
+        "bottom": 0.755,
+        "left": 0.14,
+        "right": 0.86,
+        "fill": [
+          107,
+          1,
+          17
+        ]
+      }
     },
     "card": {
       "source": "business-card.png",

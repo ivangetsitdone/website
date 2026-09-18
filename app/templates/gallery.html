@@ -1,9 +1,9 @@
 {% macro photo_card(photo, level=3) %}
 <figure class="photo-card" data-photo-card data-category="{{ photo.category }}" data-stage="{{ photo.stage }}">
-  <a class="photo-link" href="/media/{{ photo.id }}-full.webp" hx-boost="false" data-photo
+  <a class="photo-link" href="{{ asset('/media/' + photo.id + '-full.webp') }}" hx-boost="false" data-photo
      data-title="{{ photo.title }}" data-caption="{{ photo.caption }}" data-stage="{{ photo.stage }}"
      aria-label="View photo: {{ photo.title }}">
-    <img src="/media/{{ photo.id }}-thumb.webp" alt="{{ photo.caption }}" width="480" height="640" loading="lazy" decoding="async">
+    <img src="{{ asset('/media/' + photo.id + '-thumb.webp') }}" alt="{{ photo.caption }}" width="480" height="640" loading="lazy" decoding="async">
     <span class="photo-expand" aria-hidden="true">View photo ↗</span>
   </a>
   <figcaption>

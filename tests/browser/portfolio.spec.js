@@ -117,7 +117,7 @@ test('photo links and captions work without JavaScript', async ({ browser, baseU
   await expect(page.locator('[data-filters]')).not.toBeVisible();
   await expect(page.locator('figcaption')).toHaveCount(catalog.photos.length);
   await page.locator('[data-photo]').first().click();
-  await expect(page).toHaveURL(/\/media\/p12-full.webp$/);
+  await expect(page).toHaveURL(/\/media\/p12-full\.webp(\?|$)/);
   await context.close();
 });
 
@@ -137,7 +137,7 @@ test('single-photo filter and image failure remain usable', async ({ page }) => 
   await page.getByLabel('Project type').selectOption('Fencing');
   await page.getByLabel('Photo stage', { exact: true }).selectOption('In progress');
   await expect(page.locator('[data-photo-card]:visible')).toHaveCount(1);
-  await page.route('**/media/*-full.webp', route => route.abort());
+  await page.route('**/media/*-full.webp*', route => route.abort());
   await page.locator('[data-photo-card]:visible [data-photo]').click();
   await expect(page.getByRole('dialog')).toBeVisible();
   await expect(page.locator('[data-image-error]')).toBeVisible();
