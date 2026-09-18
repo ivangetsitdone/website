@@ -64,7 +64,7 @@ test('gallery survives boosted navigation and back/forward restoration', async (
   await page.locator('[data-photo]').first().click();
   await expect(page.getByRole('dialog')).toBeVisible();
   await page.keyboard.press('Escape');
-  await page.getByRole('navigation', { name: 'Work history' }).getByRole('link', { name: 'Project stories' }).click();
+  await page.getByRole('navigation', { name: 'Work history' }).getByRole('link', { name: 'Before and after' }).click();
   await expect(page.locator('.project-sequence')).toHaveCount(catalog.pairs.length);
   await page.locator('[data-photo]').first().click();
   await expectLoaded(page.getByRole('dialog').locator('img'));

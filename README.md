@@ -44,7 +44,7 @@ The Hello World demonstration is gone from the public site. Home, services, abou
 
 These statements are live on the site but are **not** recorded as confirmed anywhere in this repository; they came from the previous session's conversation, whose context was lost. Confirm each one with the owner:
 
-- Two navigation labels are new and shortened for the header: **“Contact”** (the page is still titled “Contact me”) and the work-section tab **“All photos”** for `/portfolio`. Both are mine, not the owner's wording.
+- Navigation labels that are not the owner's wording: **“Contact”** in the header (the page is still titled “Contact me”) and the work-section tabs **“All photos”** and **“Before and after”**. The owner asked for the second tab to read “Before and after”; the page it opens is still titled **“Project stories”**, in the page heading, the `<title>` and the footer list, so the same destination has two names. Worth settling on one.
 
 - ~~“10+ years” of hands-on experience~~ — removed from the site on 2026-09-18 at the owner's direction: no length of experience is claimed anywhere, and the smoke checks fail if such a claim returns. The registration date carries that weight instead.
 - Availability limited to evenings and weekends around a full-time job.
@@ -72,7 +72,7 @@ The first attempt dressed six labels as a responsive grid of pill buttons. The o
 So the fix was structural, not decorative: **fewer links, plain text, nothing hidden.**
 
 - **Header, four links** (`NAV` in `app/main.py`): What I do · My work · About · Contact. The logo is the home link, carrying `aria-current="page"` on the home page — Home as a separate item was redundant.
-- **The two work-history pages share “My work.”** `/portfolio` and `/before-after` sit under one header link, which takes `aria-current="true"` on both (the section, not the page), and the pages carry their own tabs — “All photos” and “Project stories” (`WORK_NAV`) — in the gallery intro band, replacing the old one-way cross-links.
+- **The two work-history pages share “My work.”** `/portfolio` and `/before-after` sit under one header link, which takes `aria-current="true"` on both (the section, not the page). The pages carry their own tabs (`WORK_NAV`) in the gallery intro band, replacing the old one-way cross-links: **All photos** — where “My work” lands — and **Before and after**. These are styled as buttons, filled maroon for the current page and outlined for the other, deliberately unlike the header links so they read as a control on the page rather than a second copy of the main navigation.
 - **Footer lists every page** (`.footer-nav`), which is NN/G's recommended backstop for anything not in the header.
 - **No boxes and no containers.** The current page is marked by the text's own underline in brand gold, 3px, at a `.5em` offset; hover gives a 2px `--line-strong` underline. That gold underline is the only brand colour in the chrome, and the same treatment carries the header links, the section tabs and the footer list.
 - **Widths.** Links sit in one flex row with `justify-content: space-between` and `gap: clamp(.7rem, 2.6vw, 1.9rem)`, capped at `34rem` so they do not stretch across a tablet. From **860px** the header is a single line with the links right-aligned beside the brand — measured, not guessed: brand 413px + 32px gap + nav 332px + 48px padding = 825px. Below **380px** the page gutters drop from 1.5rem to 1.25rem, which is what keeps four links on one row at 320px.

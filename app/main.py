@@ -68,7 +68,7 @@ PAGES = {
 # the home link, and the two work-history pages sit under "My work" with their own
 # section tabs. The footer repeats every page for anyone who wants the full list.
 NAV = [('services', 'What I do'), ('portfolio', 'My work'), ('about', 'About'), ('contact', 'Contact')]
-WORK_NAV = [('portfolio', 'All photos'), ('before-after', 'Project stories')]
+WORK_NAV = [('portfolio', 'All photos'), ('before-after', 'Before and after')]
 SERVICES = [
     ('Yard cleanup & leaf removal', 'Overgrown corners, leaf fall, brush and weeds cleared out, with the debris hauled away.'),
     ('Junk & debris hauling', 'Garage, shed and yard clear-outs, loaded up and taken to the transfer station.'),

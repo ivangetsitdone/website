@@ -130,7 +130,7 @@ test('the navigation and the footer contact buttons fit the viewport', async ({ 
   await page.goto('/before-after');
   await expect(mainNav(page).getByRole('link', { name: 'My work' })).toHaveAttribute('aria-current', 'true');
   const tabs = page.getByRole('navigation', { name: 'Work history' });
-  await expect(tabs.getByRole('link', { name: 'Project stories' })).toHaveAttribute('aria-current', 'page');
+  await expect(tabs.getByRole('link', { name: 'Before and after' })).toHaveAttribute('aria-current', 'page');
   await tabs.getByRole('link', { name: 'All photos' }).click();
   await expect(page).toHaveTitle('My work · Zip, LLC');
 

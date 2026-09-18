@@ -27,14 +27,18 @@ a { color: inherit; text-underline-offset: .25em; }
    labels rather than a cleverer box. The current page is marked by the text's own
    underline in brand gold — the only place gold appears in the chrome. */
 .site-nav { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0 clamp(.7rem, 2.6vw, 1.9rem); max-width: 34rem; margin-top: .75rem; }
-.site-nav a, .section-nav a { display: inline-flex; align-items: center; min-height: 44px; text-decoration: none; text-underline-offset: .5em; }
-.site-nav a { font-size: clamp(.84rem, 3.4vw, .95rem); font-weight: 600; letter-spacing: -.01em; }
-.site-nav a:hover, .section-nav a:hover { text-decoration: underline; text-decoration-color: var(--line-strong); text-decoration-thickness: 2px; }
-.site-nav a[aria-current], .section-nav a[aria-current] { font-weight: 750; text-decoration: underline; text-decoration-color: var(--gold); text-decoration-thickness: 3px; }
-/* Section tabs inside the work history, where the two photo pages live. */
-.section-nav { display: flex; flex-wrap: wrap; gap: 0 1.75rem; font-size: .95rem; font-weight: 600; }
-.section-nav a { color: var(--muted); }
-.section-nav a[aria-current] { color: var(--ink); }
+.site-nav a { display: inline-flex; align-items: center; min-height: 44px; font-size: clamp(.84rem, 3.4vw, .95rem); font-weight: 600; letter-spacing: -.01em; text-decoration: none; text-underline-offset: .5em; }
+.site-nav a:hover { text-decoration: underline; text-decoration-color: var(--line-strong); text-decoration-thickness: 2px; }
+.site-nav a[aria-current] { font-weight: 750; text-decoration: underline; text-decoration-color: var(--gold); text-decoration-thickness: 3px; }
+/* Tabs inside the work history, where the two photo pages live. Buttons, so they
+   read as a control on the page rather than a second copy of the main navigation.
+   "All photos" is where "My work" lands. */
+.section-nav { display: flex; flex-wrap: wrap; gap: .5rem; }
+.section-nav a { display: inline-flex; align-items: center; min-height: 44px; padding: .5rem 1.1rem; border: 1px solid var(--line-strong); border-radius: .5rem; background: var(--surface); font-size: .9rem; font-weight: 650; text-decoration: none; }
+.section-nav a:hover { background: var(--tint); }
+.section-nav a[aria-current] { background: var(--brand); border-color: var(--brand); color: white; }
+.section-nav a[aria-current]:hover { background: var(--brand-hover); border-color: var(--brand-hover); }
+.section-nav a[aria-current]:focus-visible { outline-color: var(--gold); }
 main { min-height: 65vh; padding-top: clamp(2.5rem, 6vw, 5rem); padding-bottom: 4rem; }
 main:focus { outline: none; }
 .eyebrow { text-transform: uppercase; letter-spacing: .13em; font-size: .75rem; font-weight: 750; color: var(--eyebrow); }
