@@ -209,19 +209,19 @@
     },
     {
       "id": "p04",
-      "title": "Wood privacy fence line",
+      "title": "The fence standing again",
       "category": "Fencing",
-      "stage": "Detail",
-      "caption": "Close-set vertical wood boards form a continuous privacy fence along a narrow side passage.",
+      "stage": "After",
+      "caption": "The wood privacy fence stands straight along the side passage on its new posts.",
       "source": "photo_2026-09-17 12.59.00.jpeg",
       "sha256": "bef410f2803125d1b4878e7472852a4a3c63ad6cded1b61061755452ebf3c31c"
     },
     {
       "id": "p02",
-      "title": "Fence-post hardware detail",
+      "title": "Replacing a rotted post",
       "category": "Fencing",
-      "stage": "Detail",
-      "caption": "A dark metal fence-post component sits beside an existing wood rail, showing the connection area up close.",
+      "stage": "Before",
+      "caption": "A steel replacement post beside the old weathered rail, where the rotted wood post came out.",
       "source": "photo_2026-09-17 12.58.58.jpeg",
       "sha256": "8429b7b6253d6ef39801e0501b5e54b81e9c20e3113e21b9dfb5ceb40dac7f20"
     },
@@ -324,7 +324,7 @@
         "p18",
         "p22"
       ],
-      "note": "Likely before / after: the deck, satellite dish, neighboring wall and fence align in both views."
+      "note": "Before and after: the deck, satellite dish, neighboring wall and fence align in both views."
     },
     {
       "id": "garden-steps",
@@ -333,7 +333,7 @@
         "p41",
         "p42"
       ],
-      "note": "Likely progress / after: the gate, silver-leaved planting and stair position match. The first photo already shows excavation underway."
+      "note": "Progress and after: the gate, silver-leaved planting and stair position match. The first photo already shows excavation underway."
     },
     {
       "id": "shower-tile",
@@ -345,7 +345,7 @@
         "p36",
         "p29"
       ],
-      "note": "The owner confirmed the first two photos show the original shower before this project. The rest are progress photos of the rebuild, not a completed shower."
+      "note": "The first two photos show the original shower before this project. The rest are progress photos of the rebuild, not a completed shower."
     },
     {
       "id": "sidewalk-clearing",
@@ -354,7 +354,7 @@
         "p43",
         "p44"
       ],
-      "note": "Owner-confirmed before and after: the leaf- and brush-covered strip beside the sidewalk, cleared back to bare soil."
+      "note": "Before and after: the leaf- and brush-covered strip beside the sidewalk, cleared back to bare soil."
     },
     {
       "id": "parking-lot",
@@ -363,7 +363,7 @@
         "p23",
         "p24"
       ],
-      "note": "Owner-confirmed before and after: worn asphalt with no visible bays, then fresh white parking lines."
+      "note": "Before and after: worn asphalt with no visible bays, then fresh white parking lines."
     },
     {
       "id": "siding-repair",
@@ -372,7 +372,16 @@
         "p09",
         "p10"
       ],
-      "note": "Owner-confirmed before and after: a replaced section of siding, then the finished wall."
+      "note": "Before and after: a replaced section of siding, then the finished wall."
+    },
+    {
+      "id": "fence-posts",
+      "title": "Replacing rotted fence posts",
+      "photos": [
+        "p02",
+        "p04"
+      ],
+      "note": "Before and after: a steel replacement post going in where the wood post had rotted, and the fence standing again."
     }
   ],
   "portrait": {

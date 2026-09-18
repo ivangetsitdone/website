@@ -8,11 +8,11 @@ The owner uploaded 54 JPEGs and authorized a portfolio with captions and inferre
 
 - Captions describe visible features, not verified materials, compliance, dates, locations, or unseen work.
 - “Detail” means a project view whose overall completion status is unknown. It does not mean finished.
-- All stage labels and sequences are provisional visual interpretations awaiting the owner's review.
+- The owner has confirmed all seven project groupings, so the public notes state them plainly instead of hedging with “Likely.” Stage labels and captions for photos outside those groupings are still visual interpretations awaiting review; keep that caveat here rather than in site copy.
 - The side-yard pair has matching deck, dish, fence and neighboring wall.
 - The steps pair has matching gate and planting; the first shot is already in progress.
 - The shower project opens with two photos the owner confirmed as **before** shots of the original white tile shower (p15, p16); the rebuild photos that follow have matching niches/tub corner and are still **in progress**, not a finished installation.
-- The owner confirmed three further before/after pairs: the leaf-covered sidewalk strip (p43 → p44), the parking lot before and after restriping (p23 → p24), and the siding repair before and after finishing (p09 → p10). Their stage labels and captions were updated to match.
+- The owner confirmed three further before/after pairs: the leaf-covered sidewalk strip (p43 → p44), the parking lot before and after restriping (p23 → p24), and the siding repair before and after finishing (p09 → p10). The owner also confirmed that p02 and p04 show rotted fence posts being replaced and the fence afterwards. Their stage labels, titles and captions were updated to match.
 - Similar angles, blurry excavation close-ups and street scenery were omitted from the first curated selection. This is curation, not deletion of uploads.
 
 ## Owner portrait
