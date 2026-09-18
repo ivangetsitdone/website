@@ -42,12 +42,31 @@ with Image.open(portrait_source) as original:
     clean.save(output / f"{portrait['id']}.webp", 'WEBP', quality=82, method=6)
 
 def clear_caption(image, band):
-    """Paint out the tagline inside the badge; it is illegible at header size."""
+    """Paint out the tagline inside the badge; it is illegible at header size.
+
+    The fill is bounded per row by the gold perimeter ring rather than by a fixed
+    rectangle: the badge narrows towards the bottom, so a straight-sided box clips
+    the ring on the lower rows.
+    """
     width, height = image.size
-    box = (round(width * band['left']), round(height * band['top']),
-           round(width * band['right']), round(height * band['bottom']))
-    patch = Image.new('RGB', (box[2] - box[0], box[3] - box[1]), tuple(band['fill']))
-    image.paste(patch, box)
+    pixels = image.load()
+    fill = tuple(band['fill'])
+    inset = round(width * band['inset'])
+    draw = ImageDraw.Draw(image)
+
+    def is_gold(pixel):
+        red, green, blue = pixel[:3]
+        return red > 170 and green > 110 and blue < 110
+
+    for y in range(round(height * band['top']), round(height * band['bottom']) + 1):
+        # Look for the ring only in the outer thirds, so the gold check mark in the
+        # wordmark cannot be mistaken for it.
+        left = [x for x in range(0, round(width * 0.3)) if is_gold(pixels[x, y])]
+        right = [x for x in range(round(width * 0.7), width) if is_gold(pixels[x, y])]
+        assert left and right, ('no perimeter ring found on row', y)
+        start, end = max(left) + inset, min(right) - inset
+        assert start < end, ('caption row is narrower than the inset', y)
+        draw.line([(start, y), (end, y)], fill=fill)
     return image
 
 

@@ -407,10 +407,9 @@
       "size": 512,
       "alt": "Zip, LLC logo: a maroon and gold badge reading Zip, LLC.",
       "caption_band": {
-        "top": 0.702,
-        "bottom": 0.755,
-        "left": 0.14,
-        "right": 0.86,
+        "top": 0.7017,
+        "bottom": 0.7544,
+        "inset": 0.006,
         "fill": [
           107,
           1,
