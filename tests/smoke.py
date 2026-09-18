@@ -34,7 +34,7 @@ for path, label, heading in [('/', 'Home', 'Consider it done.'),
                              ('/services', 'What I do', 'Small jobs, done properly.'),
                              ('/about', 'About', 'Hi, I’m Ivan Pineda.'),
                              ('/portfolio', 'My work', 'Work I’ve had a hand in.'),
-                             ('/before-after', 'Project stories', 'See the difference.'),
+                             ('/before-after', 'Before and after', 'See the difference.'),
                              ('/contact', 'Contact me', 'Tell me about your project.')]:
     body, headers = fetch(path)
     assert f'>{heading}</h1>' in body, path
