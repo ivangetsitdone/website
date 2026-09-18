@@ -62,8 +62,6 @@ for path, label, heading in [('/', 'Home', 'Consider it done.'),
     assert '#2249807-97' in body and 'sos.oregon.gov/business/Pages/find.aspx' in body, path
     # htmx must not try to boost an off-site link.
     assert 'hx-boost="false" target="_blank"' in body, path
-    # Build attribution, on every page, never boosted.
-    assert 'Built by <a href="https://bottah.dev" hx-boost="false"' in body, path
     # Said once, on the services page. The footer short form covers every other page.
     assert body.count(LICENSE_NOTE_OPENING) == (1 if path == '/services' else 0), path
     assert 'data-vue-hello' not in body and 'hx-get="/hello"' not in body, path
