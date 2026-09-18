@@ -1,4 +1,4 @@
-{% macro photo_card(photo) %}
+{% macro photo_card(photo, level=3) %}
 <figure class="photo-card" data-photo-card data-category="{{ photo.category }}" data-stage="{{ photo.stage }}">
   <a class="photo-link" href="/media/{{ photo.id }}-full.webp" hx-boost="false" data-photo
      data-title="{{ photo.title }}" data-caption="{{ photo.caption }}" data-stage="{{ photo.stage }}"
@@ -8,7 +8,7 @@
   </a>
   <figcaption>
     <div class="photo-meta"><span>{{ photo.category }}</span><span class="stage stage-{{ photo.stage|lower|replace(' ', '-') }}">{{ photo.stage }}</span></div>
-    <h3>{{ photo.title }}</h3>
+    <h{{ level }}>{{ photo.title }}</h{{ level }}>
     <p>{{ photo.caption }}</p>
   </figcaption>
 </figure>
@@ -43,10 +43,13 @@
     <p class="empty-gallery" data-empty hidden>No photos match these filters. Try another project type or reset the filters.</p>
   {% else %}
     {% for pair in pairs %}
+    {% if loop.first or pair.offer != loop.previtem.offer %}
+    <h2 class="group-heading">{% if pair.offer == 'current' %}Work I can take on today{% else %}Work that needs the license I’m earning{% endif %}</h2>
+    {% endif %}
     <section class="project-sequence" aria-labelledby="{{ pair.id }}">
-      <div class="sequence-heading"><span class="eyebrow">Project / {{ '%02d'|format(loop.index) }}</span><h2 id="{{ pair.id }}">{{ pair.title }}</h2><p>{{ pair.note }}</p></div>
+      <div class="sequence-heading"><span class="eyebrow">Project / {{ '%02d'|format(loop.index) }}</span><h3 id="{{ pair.id }}">{{ pair.title }}</h3><p>{{ pair.note }}</p></div>
       <div class="photo-grid sequence-grid">
-        {% for photo in pair.photos %}{{ photo_card(photo) }}{% endfor %}
+        {% for photo in pair.photos %}{{ photo_card(photo, level=4) }}{% endfor %}
       </div>
     </section>
     {% endfor %}

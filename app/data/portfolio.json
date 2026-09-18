@@ -318,8 +318,19 @@
   ],
   "pairs": [
     {
+      "id": "sidewalk-clearing",
+      "title": "Clearing a leaf-covered walkway",
+      "offer": "current",
+      "photos": [
+        "p43",
+        "p44"
+      ],
+      "note": "Before and after: the leaf- and brush-covered strip beside the sidewalk, cleared back to bare soil."
+    },
+    {
       "id": "side-yard",
       "title": "Opening up a side yard",
+      "offer": "current",
       "photos": [
         "p18",
         "p22"
@@ -327,8 +338,19 @@
       "note": "Before and after: the deck, satellite dish, neighboring wall and fence align in both views."
     },
     {
+      "id": "parking-lot",
+      "title": "Restriping a parking lot",
+      "offer": "current",
+      "photos": [
+        "p23",
+        "p24"
+      ],
+      "note": "Before and after: worn asphalt with no visible bays, then fresh white parking lines."
+    },
+    {
       "id": "garden-steps",
       "title": "Finding the steps again",
+      "offer": "current",
       "photos": [
         "p41",
         "p42"
@@ -336,8 +358,29 @@
       "note": "Progress and after: the gate, silver-leaved planting and stair position match. The first photo already shows excavation underway."
     },
     {
+      "id": "fence-posts",
+      "title": "Replacing rotted fence posts",
+      "offer": "licensed",
+      "photos": [
+        "p02",
+        "p04"
+      ],
+      "note": "Before and after: a steel replacement post going in where the wood post had rotted, and the fence standing again."
+    },
+    {
+      "id": "siding-repair",
+      "title": "Siding repair",
+      "offer": "licensed",
+      "photos": [
+        "p09",
+        "p10"
+      ],
+      "note": "Before and after: a replaced section of siding, then the finished wall."
+    },
+    {
       "id": "shower-tile",
       "title": "From the original shower to new tile",
+      "offer": "licensed",
       "photos": [
         "p15",
         "p16",
@@ -346,42 +389,6 @@
         "p29"
       ],
       "note": "The first two photos show the original shower before this project. The rest are progress photos of the rebuild, not a completed shower."
-    },
-    {
-      "id": "sidewalk-clearing",
-      "title": "Clearing a leaf-covered walkway",
-      "photos": [
-        "p43",
-        "p44"
-      ],
-      "note": "Before and after: the leaf- and brush-covered strip beside the sidewalk, cleared back to bare soil."
-    },
-    {
-      "id": "parking-lot",
-      "title": "Restriping a parking lot",
-      "photos": [
-        "p23",
-        "p24"
-      ],
-      "note": "Before and after: worn asphalt with no visible bays, then fresh white parking lines."
-    },
-    {
-      "id": "siding-repair",
-      "title": "Siding repair",
-      "photos": [
-        "p09",
-        "p10"
-      ],
-      "note": "Before and after: a replaced section of siding, then the finished wall."
-    },
-    {
-      "id": "fence-posts",
-      "title": "Replacing rotted fence posts",
-      "photos": [
-        "p02",
-        "p04"
-      ],
-      "note": "Before and after: a steel replacement post going in where the wood post had rotted, and the fence standing again."
     }
   ],
   "portrait": {
