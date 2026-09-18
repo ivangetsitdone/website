@@ -39,8 +39,10 @@ button:hover, .button-link:hover { background: #17392a; }
 .service-preview-grid article, .service-card { padding: 1.5rem; border: 1px solid #d6ded6; border-radius: .8rem; background: #fffefb; }
 .service-number { font-size: .75rem; color: #526b5c; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
 .service-preview-grid p, .service-card p { color: #526155; margin-bottom: 0; }
-.personal-note { padding-block: 2rem; border-block: 1px solid #cbd4cb; display: grid; grid-template-columns: 1fr 1.2fr; gap: 3rem; }
-.personal-note p { margin-top: 0; }
+.personal-note, .licence-note { padding-block: 2rem; border-block: 1px solid #cbd4cb; display: grid; grid-template-columns: 1fr 1.2fr; gap: 3rem; }
+.personal-note p, .licence-note p { margin-top: 0; }
+.licence-note p + p { margin-top: 1rem; }
+.licence-note a { font-weight: 650; display: inline-block; margin-top: 1rem; }
 .contact-band { border-radius: 1rem; background: #e7ecdf; padding: clamp(1.5rem, 4vw, 3rem); }
 .contact-band p { max-width: 42rem; }
 .about-layout { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: clamp(2rem, 5vw, 4rem); align-items: start; margin-top: 3rem; }
@@ -54,6 +56,8 @@ button:hover, .button-link:hover { background: #17392a; }
 .scope-note { padding: 1.5rem; border-left: 3px solid #bc791b; margin-top: 2rem; background: #eeeee5; }
 .scope-note h2 { font-size: 1.2rem; }
 .scope-note p { margin-bottom: 0; }
+.scope-note ul { margin: 1rem 0; padding-left: 1.2rem; }
+.scope-note li { margin-bottom: .4rem; }
 .contact-layout { display: grid; grid-template-columns: 1.2fr 1fr; gap: 3rem; }
 .contact-card { background: #fffefb; border: 1px solid #d6ded6; border-radius: 1rem; padding: clamp(1.25rem, 3vw, 2rem); }
 .contact-card dt { font-weight: 750; margin-top: 1.25rem; }
@@ -62,12 +66,13 @@ button:hover, .button-link:hover { background: #17392a; }
 .contact-checklist li { margin-bottom: .75rem; }
 .site-footer { border-top: 1px solid #d6ded6; display: flex; justify-content: space-between; align-items: start; gap: 1.5rem; font-size: .85rem; color: #526155; }
 .site-footer p { margin-bottom: 0; }
+.footer-disclosure { max-width: 46rem; margin-top: 1rem; font-size: .8rem; color: #5f6a60; }
 .footer-contact { display: flex; flex-direction: column; gap: .75rem; flex-shrink: 0; }
 .skip { position: absolute; top: -5rem; left: 1rem; padding: .5rem 1rem; background: #fffefb; z-index: 10; }
 .skip:focus { top: .5rem; }
 @media (min-width: 850px) { .site-header { display: flex; justify-content: space-between; align-items: center; gap: 2rem; } nav { margin-top: 0; } }
 @media (max-width: 760px) {
-  .home-hero, .about-layout, .contact-layout, .personal-note { grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+  .home-hero, .about-layout, .contact-layout, .personal-note, .licence-note { grid-template-columns: minmax(0, 1fr); gap: 2rem; }
   .hero-photo { max-width: 480px; }
   .hero-photo img { aspect-ratio: 4 / 3; }
   .service-preview-grid, .services-grid { grid-template-columns: minmax(0, 1fr); }

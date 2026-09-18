@@ -21,7 +21,7 @@
     {% if slug == '' %}
       {% include 'home.html' %}
     {% else %}
-      <div class="eyebrow">{% if slug in ['portfolio', 'before-after'] %}Ivan Pineda / The project album{% else %}Zip LLC / {{ label }}{% endif %}</div>
+      <div class="eyebrow">{% if slug in ['portfolio', 'before-after'] %}Ivan Pineda / Work history{% else %}Zip LLC / {{ label }}{% endif %}</div>
       <h1>{{ title }}</h1>
       <p class="intro">{{ description }}</p>
       {% if slug in ['portfolio', 'before-after'] %}{% include 'gallery.html' %}
@@ -31,7 +31,8 @@
     {% endif %}
   </main>
   <footer class="site-footer">
-    <div><strong>Zip LLC Handyman Services</strong><p>Ivan Pineda · Forest Grove &amp; surrounding communities<br>30-mile service radius · Evenings &amp; weekends</p></div>
+    <div><strong>Zip LLC Handyman Services</strong><p>Ivan Pineda · Forest Grove &amp; surrounding communities<br>30-mile service radius · Evenings &amp; weekends</p>
+      <p class="footer-disclosure">{{ disclosure }}</p></div>
     <div class="footer-contact"><a href="tel:+19712883488" hx-boost="false">Call 971-288-3488</a><a href="sms:+19712883488" hx-boost="false">Text me</a></div>
   </footer>
 </body>

@@ -60,11 +60,11 @@ test('gallery survives boosted navigation and back/forward restoration', async (
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.goto('/');
-  await page.getByRole('navigation').getByRole('link', { name: 'Portfolio', exact: true }).click();
+  await page.getByRole('navigation').getByRole('link', { name: 'My work', exact: true }).click();
   await page.locator('[data-photo]').first().click();
   await expect(page.getByRole('dialog')).toBeVisible();
   await page.keyboard.press('Escape');
-  await page.getByRole('link', { name: 'Explore the before & after projects' }).click();
+  await page.getByRole('link', { name: 'Project stories, before and after' }).click();
   await expect(page.locator('.project-sequence')).toHaveCount(catalog.pairs.length);
   await page.locator('[data-photo]').first().click();
   await expectLoaded(page.getByRole('dialog').locator('img'));

@@ -18,22 +18,32 @@ PAIRS = [{**pair, 'photos': [PHOTO_BY_ID[key] for key in pair['photos']]}
          for pair in PORTFOLIO['pairs']]
 PORTRAIT = PORTFOLIO['portrait']
 PAGES = {
-    '': ('Home', 'A helping hand for your home.', 'I’m Ivan Pineda, a handyman with 10+ years of hands-on experience. I serve Forest Grove and surrounding communities within a 30-mile radius, during evenings and weekends.'),
-    'services': ('Services', 'What can I help you with?', 'From home repairs and shower remodels to fences and yard cleanups, I bring 10+ years of hands-on experience to projects around the home. Serving Forest Grove and surrounding communities within a 30-mile radius.'),
-    'about': ('About', 'Hi, I’m Ivan Pineda.', 'I’m the person behind Zip LLC Handyman Services—a hardworking local handyman with 10+ years of experience and a family reason to keep building.'),
-    'portfolio': ('Portfolio', 'Work worth sharing.', 'A closer look at my work: showers, flooring, fences, painting and outdoor projects. Explore the details and the stages in between.'),
-    'before-after': ('Before & after', 'See the difference.', 'From overgrown spaces to fresh finishes. Projects photographed before, during and after the work.'),
-    'contact': ('Contact me', 'Tell me about your project.', 'Call or text me at 971-288-3488. Serving Forest Grove and surrounding communities within a 30-mile radius, with evening and weekend availability.'),
+    '': ('Home', 'Cleanups, hauling and a helping hand.', 'I’m Ivan Pineda. Evenings and weekends I take on yard cleanups, junk hauling, pressure washing and moving help around Forest Grove and within a 30-mile radius.'),
+    'services': ('What I do', 'Small jobs, done properly.', 'Yard cleanups, debris hauling, pressure washing, gutter clearing and moving help in Forest Grove and the surrounding communities. Construction, plumbing and electrical work needs a licensed contractor, and I am studying for that license now.'),
+    'about': ('About', 'Hi, I’m Ivan Pineda.', 'A hardworking local with ten years of hands-on building experience, working toward an Oregon CCB license while taking on the smaller jobs around the home.'),
+    'portfolio': ('My work', 'Ten years of hands-on work.', 'A record of projects I have worked on: showers, flooring, fences, painting and outdoor work. This is my work history, not a list of services I am offering today.'),
+    'before-after': ('Project stories', 'See the difference.', 'A closer look at projects I have worked on, photographed before, during and after. Part of my work history rather than services on offer.'),
+    'contact': ('Contact me', 'Tell me about your project.', 'Call or text me at 971-288-3488 about yard, hauling, cleaning or moving work. Serving Forest Grove and surrounding communities within a 30-mile radius, evenings and weekends.'),
 }
 SERVICES = [
-    ('Home repairs & interiors', 'General construction experience, sheetrock repairs and flooring. Help with the practical jobs that make a room feel cared for.'),
-    ('Showers & bathrooms', 'Shower remodels, tile work and bathroom updates. Browse the project album for a look at work in progress.'),
-    ('Painting & surface care', 'Interior and exterior painting, cleaning and pressure washing for spaces that need a fresh start.'),
-    ('Fences & outdoor spaces', 'Fencing, patios and retaining walls. Tell me what you have in mind so I can understand the scope.'),
-    ('Yards & landscaping', 'Landscaping, yard overhauls and cleanup, from overgrown corners to a more usable outdoor space.'),
-    ('Fixtures & small repairs', 'Basic plumbing fixture replacement and repairs, including kitchen and bathroom sinks and toilet swaps or fixes. Experience with basic electrical work such as outlets, switches and lighting.'),
+    ('Yard cleanup & leaf removal', 'Overgrown corners, leaf fall, brush and weeds cleared out, with the debris hauled away.'),
+    ('Junk & debris hauling', 'Garage, shed and yard clear-outs, loaded up and taken to the transfer station.'),
+    ('Pressure washing', 'Driveways, sidewalks, patios, siding and fences washed down and brightened up.'),
+    ('Gutter clearing', 'Gutters and downspouts cleared of leaves and grit before the wet season sets in.'),
+    ('Moving & assembly help', 'An extra pair of hands for loading, moving furniture around the house and putting flat-pack furniture together.'),
+    ('Seasonal odd jobs', 'The small maintenance jobs on your list. If you are not sure whether it is something I can take on, just ask.'),
 ]
-
+# Work that needs an Oregon CCB or trade license. Named here so visitors are pointed
+# to a licensed contractor, never offered as a service.
+NOT_OFFERED = [
+    'Remodeling, tile, flooring and sheetrock',
+    'Painting, inside or out',
+    'Fences, decks, patios and retaining walls',
+    'Plumbing and electrical work of any kind',
+]
+DISCLOSURE = ('Zip LLC Handyman Services is not licensed by the Oregon Construction Contractors Board. '
+              'I take on yard, hauling, cleaning and moving work only. Construction, plumbing and '
+              'electrical work needs a licensed contractor.')
 
 @app.get('/healthz')
 def health():
@@ -49,6 +59,6 @@ def page(request: Request, slug: str = ''):
     return templates.TemplateResponse(request=request, name='page.html', context={
         'slug': slug, 'label': label, 'title': title, 'description': description, 'pages': PAGES,
         'photos': PHOTOS, 'categories': CATEGORIES, 'pairs': PAIRS, 'services': SERVICES,
-        'portrait': PORTRAIT,
+        'portrait': PORTRAIT, 'not_offered': NOT_OFFERED, 'disclosure': DISCLOSURE,
         'canonical': f'https://ivanpineda.bottah.dev/{slug}',
     })

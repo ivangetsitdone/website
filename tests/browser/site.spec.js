@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 const AxeBuilder = require('@axe-core/playwright').default;
 
-const NAV = ['Services', 'About', 'Portfolio', 'Before & after', 'Contact me'];
+const NAV = ['What I do', 'About', 'My work', 'Project stories', 'Contact me'];
 
 async function isLoaded(locator) {
   return locator.evaluate(img => img.complete && img.naturalWidth > 0);
@@ -11,8 +11,10 @@ test('home content, boosted navigation, head metadata and history', async ({ pag
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.goto('/');
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('A helping hand for your home.');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Cleanups, hauling and a helping hand.');
   await expect(page.getByRole('link', { name: 'Text 971-288-3488' })).toHaveAttribute('href', 'sms:+19712883488');
+  // The licensing disclosure has to reach every visitor, on every page.
+  await expect(page.locator('.footer-disclosure')).toContainText('not licensed by the Oregon Construction Contractors Board');
   await expect(page.getByRole('link', { name: 'Call 971-288-3488' }).first()).toHaveAttribute('href', 'tel:+19712883488');
   expect(await isLoaded(page.locator('.hero-photo img'))).toBe(true);
   // A marker on the live document proves later navigation never reloads the page.
@@ -36,12 +38,12 @@ test('home content, boosted navigation, head metadata and history', async ({ pag
     expect(head.canonical.startsWith('https://ivanpineda.bottah.dev/')).toBe(true);
   }
   await page.getByRole('navigation').getByRole('link', { name: 'Home', exact: true }).click();
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('A helping hand for your home.');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Cleanups, hauling and a helping hand.');
   await page.goBack();
   await expect(page).toHaveTitle('Contact me · Zip LLC Handyman Services');
   await page.goForward();
   await expect(page).toHaveTitle('Home · Zip LLC Handyman Services');
-  await expect(page.getByRole('link', { name: 'Take a look at my work →' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'What I can take on →' })).toBeVisible();
   await page.screenshot({ path: `../../recovery/${test.info().project.name}.png`, fullPage: true });
   expect(errors).toEqual([]);
 });
@@ -59,10 +61,18 @@ test('about portrait and contact details', async ({ page }) => {
   await page.screenshot({ path: `../../recovery/contact-${test.info().project.name}.png`, fullPage: true });
 });
 
-test('services list and scope note', async ({ page }) => {
+test('offered work, declined work and the work-history framing', async ({ page }) => {
   await page.goto('/services');
   await expect(page.locator('.service-card')).toHaveCount(6);
-  await expect(page.locator('.scope-note')).toContainText('licensed specialist');
+  const offered = (await page.locator('.services-grid').innerText()).toLowerCase();
+  // Nothing needing an Oregon CCB or trade license may appear in the offer itself.
+  for (const word of ['remodel', 'sheetrock', 'drywall', 'tile', 'flooring', 'plumbing', 'electrical', 'painting', 'shower', 'install', 'repair']) {
+    expect(offered, `services grid offers regulated work: ${word}`).not.toContain(word);
+  }
+  await expect(page.locator('.scope-note')).toContainText('Oregon CCB exam');
+  await expect(page.locator('.scope-note li')).toHaveCount(4);
+  await page.goto('/portfolio');
+  await expect(page.locator('.editorial-note')).toContainText('not a list of services I’m offering today');
 });
 
 test('content pages pass automated accessibility checks', async ({ page }) => {

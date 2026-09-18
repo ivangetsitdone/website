@@ -6,6 +6,27 @@ A mobile-first contractor services website, recovered from an interrupted develo
 
 `https://ivanpineda.bottah.dev` is now the default Compose/Caddy address. DNS A resolves to this droplet; no AAAA record was returned. Caddy obtained a Let's Encrypt certificate for this hostname (current expiry 2026-12-16) and redirects HTTP to HTTPS with 308. HTTPS `/healthz` passed with normal certificate verification from this host. Logs: ignored `recovery/domain-caddy.log`. Caddy retains/renews certificates in its existing named volumes; no firewall or other host settings changed. Test defaults now point at this HTTPS hostname. For a local HTTP-only preview, set `SITE_ADDRESS=:80` before `docker compose up -d`.
 
+## Licensing constraint — read before editing copy, 2026-09-18
+
+Ivan holds a business license but **no Oregon CCB license**, and no electrical or plumbing trade license. Oregon requires a CCB license to advertise construction work, requires licensees to put their CCB number in advertising, and conditions the small-job exemption on *not* advertising or holding oneself out as a contractor. Electrical and plumbing are separately licensed through the Building Codes Division; fences, decks, patios and retaining walls are typically Landscape Contractors Board work. He is studying for the CCB exam (Residential Limited Contractor was mentioned).
+
+The site was therefore rewritten on 2026-09-18 to advertise only work that does not require those licenses:
+
+- **Offered** (`SERVICES` in `app/main.py`): yard cleanup and leaf removal, junk and debris hauling, pressure washing, gutter clearing, moving and assembly help, seasonal odd jobs.
+- **Declined in public copy** (`NOT_OFFERED`): remodeling/tile/flooring/sheetrock, painting, fences/decks/patios/retaining walls, plumbing and electrical. These words appear only in the “What I don't take on yet” note, which points visitors to a licensed contractor.
+- **Disclosure** (`DISCLOSURE`): rendered in the footer of every page and repeated on home, services and contact. It states plainly that the business is not CCB licensed.
+- **Work history**: `/portfolio` (“My work”) and `/before-after` (“Project stories”) present the photo archive as ten years of past experience — a résumé — with an explicit line that it is “not a list of services I'm offering today.” No call to action on that work.
+
+**Guardrails in the test suite.** `tests/smoke.py` and `tests/browser/site.spec.js` fail if any regulated-trade word (remodel, sheetrock, drywall, tile, flooring, plumbing, electrical, painting, shower, install, repair) appears inside the blocks that offer work, and if the disclosure is missing from any page. Keep those checks when editing copy; they are the reason a well-meaning edit cannot quietly re-advertise construction.
+
+**Still to resolve with the owner and the CCB** (none of this is legal advice; the CCB answers these questions directly):
+
+1. Have the CCB review the live pages. A site showing remodeling photos with a phone number could still be read as holding out, even framed as experience and carrying the disclosure.
+2. Confirm which archived projects were his own property or done as an employee. Any paid job performed unlicensed is worth reconsidering before it is displayed.
+3. The business name itself — “Zip LLC **Handyman Services**” in the header, titles and footer — may read as offering construction. Ask whether to show “Zip LLC” alone until the license is issued.
+4. Confirm that pressure washing, gutter clearing and hauling sit outside CCB and LCB jurisdiction as performed.
+5. When the license is issued, the CCB number must appear in advertising; add it to the footer and remove the disclosure and the “not offering” note at that point.
+
 ## Site content — replaced and verified, 2026-09-17
 
 The Hello World demonstration is gone from the public site. Home, services, about and contact now carry real business copy in dedicated templates (`app/templates/home.html`, `services.html`, `about.html`, `contact.html`) with a rebuilt stylesheet, a hero photo from the project album, a services list rendered from `SERVICES` in `app/main.py`, and a scope note stating that some work may need permits or a licensed specialist.
@@ -33,7 +54,7 @@ These statements are live on the site but are **not** recorded as confirmed anyw
 - Confirmed service area: Forest Grove and surrounding communities within a 30-mile radius. Displayed on home and services pages; no state or specific neighboring cities inferred. Rebuild, HTTP smoke checks (including service-area assertions), and all four browser tests passed after this update.
 - Owner-described experience: showers, flooring, fencing, basic plumbing fixture replacement, basic electrical work, and interior/exterior painting. Listed on services page without inferring specific shower/electrical tasks or licensing. Confirm permitted scope and any licensing requirements before expanding claims. Services update rebuilt successfully; HTTP checks (including service text) and all four browser tests passed.
 - Confirmed public phone: **971-288-3488**. Owner confirmed calls and texts are welcome. Click-to-call and SMS links on home and contact pages. Rebuild, HTTP checks (including phone/SMS links), and four browser tests passed after SMS update. Actual telephone dialing and SMS handoff/delivery are not tested.
-- Still needed: optional public email and domain. Uploaded portfolio photos were authorized for this site; Nextdoor text/photos have not been imported or authorized separately. Do not infer credentials or publish unconfirmed contact details.
+- Still needed: optional public email. Licensing status is covered in the licensing section above. Uploaded portfolio photos were authorized for this site; Nextdoor text/photos have not been imported or authorized separately. Do not infer credentials or publish unconfirmed contact details.
 
 ## Portfolio — deployed and verified, 2026-09-17
 

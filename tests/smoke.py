@@ -6,6 +6,11 @@ from urllib.request import urlopen
 
 base = (sys.argv[1] if len(sys.argv) > 1 else 'https://ivanpineda.bottah.dev').rstrip('/')
 SITE = 'https://ivanpineda.bottah.dev'
+# Ivan holds no Oregon CCB or trade license yet, so the blocks that offer work must
+# never name regulated construction. The wording lives only in the "what I don't take
+# on" note and in the work-history pages, which describe past experience.
+REGULATED = ('remodel', 'sheetrock', 'drywall', 'tile', 'flooring', 'plumbing',
+             'electrical', 'painting', 'shower', 'install', 'repair', 'retaining wall')
 
 def fetch(path, status=200):
     try:
@@ -19,12 +24,16 @@ def fetch(path, status=200):
         print(f'PASS {status} {path}')
         return body, response.headers
 
+def between(body, start, end):
+    first = body.index(start)
+    return body[first:body.index(end, first)]
+
 assert json.loads(fetch('/healthz')[0]) == {'status': 'ok'}
-for path, label, heading in [('/', 'Home', 'A helping hand for your home.'),
-                             ('/services', 'Services', 'What can I help you with?'),
+for path, label, heading in [('/', 'Home', 'Cleanups, hauling and a helping hand.'),
+                             ('/services', 'What I do', 'Small jobs, done properly.'),
                              ('/about', 'About', 'Hi, I’m Ivan Pineda.'),
-                             ('/portfolio', 'Portfolio', 'Work worth sharing.'),
-                             ('/before-after', 'Before &amp; after', 'See the difference.'),
+                             ('/portfolio', 'My work', 'Ten years of hands-on work.'),
+                             ('/before-after', 'Project stories', 'See the difference.'),
                              ('/contact', 'Contact me', 'Tell me about your project.')]:
     body, _ = fetch(path)
     assert f'>{heading}</h1>' in body, path
@@ -32,9 +41,9 @@ for path, label, heading in [('/', 'Home', 'A helping hand for your home.'),
     assert f'<link rel="canonical" href="{SITE}{path}">' in body, path
     assert '<meta name="description" content="' in body
     assert '/static/site.js' in body and '/static/site.css' in body
-    # Every page offers the confirmed phone contact in the footer.
+    # Every page offers the confirmed phone contact and carries the licensing disclosure.
     assert 'href="tel:+19712883488"' in body and 'href="sms:+19712883488"' in body, path
-    # The replaced Hello World stack demo must not reappear.
+    assert 'not licensed by the Oregon Construction Contractors Board' in body, path
     assert 'data-vue-hello' not in body and 'hx-get="/hello"' not in body, path
     if path in ('/', '/services', '/contact'):
         assert 'Forest Grove' in body and '30-mile radius' in body, path
@@ -43,22 +52,36 @@ for path, label, heading in [('/', 'Home', 'A helping hand for your home.'),
 
 home = fetch('/')[0]
 assert 'Call 971-288-3488' in home and 'Text 971-288-3488' in home
-assert '/media/p12-full.webp' in home
+assert '/media/p43-full.webp' in home
+offered_home = between(home, 'service-preview-grid', 'licence-note')
+for word in REGULATED:
+    assert word not in offered_home.lower(), ('home offers regulated work', word)
+
 services = fetch('/services')[0]
-for service in ('flooring', 'Shower remodels', 'Interior and exterior painting', 'Fencing',
-                'Landscaping', 'Basic plumbing fixture replacement', 'basic electrical work'):
+for service in ('Yard cleanup', 'hauling', 'Pressure washing', 'Gutter clearing', 'Moving'):
     assert service in services, service
-# Scope is presented as experience, not a licensing or suitability promise.
-assert 'permits or a licensed specialist' in services
+offered = between(services, '<section class="services-grid', '<aside class="scope-note"')
+for word in REGULATED:
+    assert word not in offered.lower(), ('services page offers regulated work', word)
+# The regulated trades appear only in the note that declines them.
+scope = between(services, '<aside class="scope-note"', '</aside>')
+for word in ('Oregon CCB exam', 'licensed contractor', 'Plumbing and electrical'):
+    assert word in scope, word
+
 about = fetch('/about')[0]
 assert '/media/ivan-pineda.webp' in about and 'Ivan Pineda' in about
+assert 'Construction Contractors Board exam' in about
+for path in ('/portfolio', '/before-after'):
+    body = fetch(path)[0]
+    # Past work is presented as experience, never as services on offer.
+    assert 'not a list of services I’m offering today' in body, path
+
 contact = fetch('/contact')[0]
 assert 'Call 971-288-3488' in contact and 'Text 971-288-3488' in contact
 assert 'no online form' in contact
 for path, mime in [('/static/site.js', 'javascript'), ('/static/site.css', 'text/css')]:
     body, headers = fetch(path)
     assert body and mime in headers['Content-Type']
-# The Hello World demonstration fragment was removed with the stack demo.
 fetch('/hello', 404)
 fetch('/not-a-page', 404)
 fetch('/static/not-a-file', 404)

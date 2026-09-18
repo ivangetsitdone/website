@@ -15,6 +15,10 @@ The owner uploaded 54 JPEGs and authorized a portfolio with captions and inferre
 - The owner confirmed three further before/after pairs: the leaf-covered sidewalk strip (p43 → p44), the parking lot before and after restriping (p23 → p24), and the siding repair before and after finishing (p09 → p10). The owner also confirmed that p02 and p04 show rotted fence posts being replaced and the fence afterwards. Their stage labels, titles and captions were updated to match.
 - Similar angles, blurry excavation close-ups and street scenery were omitted from the first curated selection. This is curation, not deletion of uploads.
 
+## Using these photos
+
+The photo archive is published as Ivan's **work history**, not as an advertisement of services: he holds no Oregon CCB license yet (see the licensing section in the main README). Captions describe the work; nothing on those pages offers to perform it. Before expanding the archive, confirm which projects were his own property or done as an employee, and keep new captions free of any offer to do that work for hire.
+
 ## Owner portrait
 
 `portraits/ivan-pineda.jpg` (450×800, JFIF only, no EXIF) is the headshot shown on the About page. It is byte-identical to `recovery/ivan-headshot-download.jpeg`, a file downloaded during the previous session, and the surviving notes do not record who authorized republishing it — the main README still describes the supplied Nextdoor profile as “not fetched or republished.” **Confirm with the owner that this photo may be published before promoting the site.** Its SHA-256 is in `app/data/portfolio.json` under `portrait`; the build stage produces one metadata-free `/media/ivan-pineda.webp` (max 900×900, no upscaling). To pull it, remove the `<figure class="portrait">` block from `app/templates/about.html` together with the portrait steps in `scripts/build_photos.py` and `tests/portfolio_http.py`.
