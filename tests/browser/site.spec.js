@@ -98,3 +98,30 @@ test('keyboard skip link', async ({ page }) => {
   await page.keyboard.press('Enter');
   await expect(page).toHaveURL(/#main$/);
 });
+
+test('the navigation grid and the footer contact buttons fit the viewport', async ({ page }) => {
+  await page.goto('/services');
+  const boxes = locator => locator.evaluateAll(els => els.map(el => {
+    const box = el.getBoundingClientRect();
+    return { x: Math.round(box.x), y: Math.round(box.y), width: Math.round(box.width), height: Math.round(box.height) };
+  }));
+
+  // Every row of the navigation holds the same number of links: six links divide
+  // into 2, 3 and 6 columns, so no width leaves a single link stranded on a row.
+  const links = await boxes(page.locator('nav a'));
+  expect(links).toHaveLength(NAV.length + 1);
+  const rows = new Map();
+  for (const link of links) rows.set(link.y, (rows.get(link.y) || 0) + 1);
+  expect([...new Set(rows.values())]).toHaveLength(1);
+  expect(Math.min(...links.map(link => link.height))).toBeGreaterThanOrEqual(24);
+
+  // Call and text sit side by side and share the width evenly.
+  const [call, text] = await boxes(page.locator('.footer-contact a'));
+  expect(call.y).toBe(text.y);
+  expect(Math.abs(call.width - text.width)).toBeLessThanOrEqual(1);
+  expect(text.x).toBeGreaterThanOrEqual(call.x + call.width);
+  expect(Math.min(call.height, text.height)).toBeGreaterThanOrEqual(44);
+
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(0);
+});

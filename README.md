@@ -63,6 +63,21 @@ The owner supplied a logo and a business card. Originals are tracked in `content
 - **Swap the card when Ivan picks a domain.** The printed card shows `ivanpineda.bottah.dev`. When the real domain is registered, replace `content/brand/business-card.png`, update the `sha256` in the catalog, and rebuild — the build fails on a hash mismatch, which is the intended tripwire.
 - Palette drawn from the logo: deep maroon `#5a0000` and athletic gold `#ffd800`. Maroon carries buttons, links-on-light and the eyebrow tint; gold is limited to focus rings on dark buttons and the rule beside the licensing note. Chrome stays warm-neutral (`--bg #f7f4f1`, `--line #e3dcd7`) so photographs dominate. All colours are CSS custom properties at the top of `frontend/style.css`; axe still reports no WCAG A/AA contrast violations.
 
+## Navigation and footer layout — 2026-09-18
+
+The header navigation is written mobile first and sized by column count rather than by a single collapse point. The six links divide evenly into 2, 3 and 6 columns, so the counts are explicit instead of `auto-fit`, which left an orphan link on the last row at some widths.
+
+- **Below 430px** — two columns of tappable cells, 44px minimum height, hairline border and `--surface` fill, matching the service cards.
+- **430–849px** — three columns.
+- **850–1119px** — one full-width row of six: a tab bar under the brand.
+- **1120px and up** — the header becomes a single flex row and the cells drop their borders and fill, leaving plain inline links beside the brand. The breakpoint is measured, not guessed: brand 413px + 32px gap + nav 623px + 48px padding = 1116px, so anything lower wrapped the nav onto a second right-aligned row.
+
+The current page is marked by weight plus an inset gold rule (`box-shadow: inset 0 -3px 0 var(--gold)`), the one place gold appears in the chrome. The brand tagline uses `clamp(.7rem, 2.4vw, .78rem)` so it holds one line on a 375px phone.
+
+The footer call and text links are buttons on one row, each taking an equal share of the width (`grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr)`) — filled maroon for the call, outlined for the text, matching the page buttons. `minmax(0, …)` rather than `1fr` is what keeps them equal: the phone number's minimum content width otherwise made the call button wider. The number is wrapped in a `<span>` with `white-space: nowrap`, so a narrow phone breaks the label after “Call” rather than inside the number; `column-gap` restores the space the flex button would otherwise swallow. Note that a flex-basis on a footer child is read as a *height* once the footer stacks below 760px — both children are reset to `flex: 0 0 auto` there.
+
+Verified at 320, 360, 375, 414, 430, 600, 761, 768, 850, 1024, 1120, 1280 and 1600px: no horizontal overflow, no orphan nav row, equal-width footer buttons on one line at every width except 320px, where the call label stacks cleanly. `tests/browser/site.spec.js` asserts the row structure, the equal widths and the absence of overflow at both test viewports; the suite is now 26 tests (13 across desktop and mobile) and all pass, axe included.
+
 ## Confirmed business details
 
 - Registered entity name, from the Oregon registry: **Zip, LLC** (registry 2249807-97, registered 2024-04-04). All site copy uses that exact name, comma included, and a smoke check fails on “Zip LLC” without it. The owner originally supplied “Zip LLC Handyman Services”. The site displays **“Zip, LLC”** with the tagline “Honey Dos · Hauling · Yard Care · Small Projects” (owner’s wording, 2026-09-18; see the licensing questions below): the owner flagged on 2026-09-18 that advertising as a handyman is contractor advertising in Oregon while unlicensed. The word “handyman” appears nowhere in public copy, and both test suites fail if it returns. If the assumed business name is registered as “Zip LLC Handyman Services,” ask whether the registration itself needs changing — that is outside this site. Rebuilt preview and reran HTTP smoke checks and all four browser tests successfully after branding change (2026-09-17).
