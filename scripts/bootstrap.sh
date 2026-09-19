@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+# Bring this site up on a fresh host. Installs Docker if it is missing, clones the
+# repository, and starts the stack. Safe to re-run: every step checks before acting.
+#
+#   curl -fsSL https://raw.githubusercontent.com/ivangetsitdone/website/main/scripts/bootstrap.sh | bash
+#
+# cloud-init.yaml runs this same script at first boot, so a droplet created with it
+# needs nothing typed by hand.
+#
+# Environment:
+#   SITE_ADDRESS   hostname Caddy serves, or ":80" for plain HTTP on the IP.
+#                  Default ":80", which works before DNS points here. Once the A
+#                  record is right: `rm /srv/website/.env && docker compose up -d`,
+#                  since ivangetsitdone.com is the built-in default.
+#   INSTALL_CLAUDE "yes" also installs Claude Code. Default "no" — running the site
+#                  does not need it.
+set -euo pipefail
+
+REPO=${REPO:-https://github.com/ivangetsitdone/website.git}
+DIR=${DIR:-/srv/website}
+SITE_ADDRESS=${SITE_ADDRESS:-:80}
+INSTALL_CLAUDE=${INSTALL_CLAUDE:-no}
+
+log() { echo "[bootstrap] $*"; }
+
+if ! command -v docker >/dev/null; then
+  log "installing Docker"
+  apt-get update
+  apt-get install -y ca-certificates curl git
+  install -m 0755 -d /etc/apt/keyrings
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+  chmod a+r /etc/apt/keyrings/docker.asc
+  . /etc/os-release
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu ${VERSION_CODENAME} stable" \
+    > /etc/apt/sources.list.d/docker.list
+  apt-get update
+  apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+fi
+
+# Some images ship Docker without Compose v2, which compose.yaml requires.
+docker compose version >/dev/null 2>&1 || apt-get install -y docker-compose-plugin
+command -v git >/dev/null || apt-get install -y git
+
+mkdir -p "$(dirname "$DIR")"
+if [ -d "$DIR/.git" ]; then
+  log "updating $DIR"
+  git -C "$DIR" pull --ff-only
+else
+  log "cloning into $DIR"
+  git clone "$REPO" "$DIR"
+fi
+
+# compose.yaml reads SITE_ADDRESS; .env keeps it across restarts and reboots.
+if ! grep -q '^SITE_ADDRESS=' "$DIR/.env" 2>/dev/null; then
+  echo "SITE_ADDRESS=$SITE_ADDRESS" > "$DIR/.env"
+fi
+
+log "building and starting"
+cd "$DIR"
+docker compose up -d --build
+
+if [ "$INSTALL_CLAUDE" = yes ] && ! command -v claude >/dev/null; then
+  # Node 18+ is required. NodeSource rather than the distro package, whose version
+  # depends on the Ubuntu release; the native installer script has failed on a bare
+  # droplet, and npm was the fix, so this is the path known to work.
+  log "installing Claude Code"
+  curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+  apt-get install -y nodejs
+  npm install -g @anthropic-ai/claude-code
+fi
+
+log "finished at $(date -Is)"
+docker compose ps
