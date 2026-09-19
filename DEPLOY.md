@@ -21,10 +21,61 @@ with no cache, and running the suites against the result — see **Proof** at th
 Host tools are only needed to run the *tests*: Python 3 for the two HTTP suites, and Node 22
 plus a Chromium download for the browser suite.
 
+## 1a. Preparing a bare droplet
+
+Order matters: the `docker` group is created by the Docker package, so a user cannot be
+added to it before Docker is installed.
+
+```sh
+# Docker Engine and the Compose plugin, from Docker's own repository.
+# Not `apt install docker.io` (older engine) and not the snap (sandboxed paths make
+# bind mounts and compose awkward). `compose.yaml` needs Compose v2 - `docker compose`.
+apt-get update
+apt-get install -y ca-certificates curl
+install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+chmod a+r /etc/apt/keyrings/docker.asc
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] \
+https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" \
+  > /etc/apt/sources.list.d/docker.list
+apt-get update
+apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+```
+
+Then a deploy account, rather than running day to day as root:
+
+```sh
+id deploy || useradd -m -s /bin/bash deploy
+usermod -aG sudo,docker deploy
+install -d -m 700 -o deploy -g deploy /home/deploy/.ssh
+cp /root/.ssh/authorized_keys /home/deploy/.ssh/
+chown deploy:deploy /home/deploy/.ssh/authorized_keys
+chmod 600 /home/deploy/.ssh/authorized_keys
+```
+
+Group membership applies to new logins only: open a **second** session as `deploy`, confirm
+`docker ps` and `sudo -v` both work, and only then harden SSH from the still-open root
+session.
+
+```sh
+sed -i 's/^#*PermitRootLogin.*/PermitRootLogin no/; s/^#*PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config
+systemctl reload ssh
+```
+
+**What the deploy account is and is not for.** It is not a sandbox: anyone in the `docker`
+group can mount the host filesystem into a container and become root, so treat that group
+as root-equivalent. What it buys is that root SSH login can be switched off, keys are
+per-person and revocable, `sudo` leaves a trail, and routine shell work stops running as
+uid 0. The application itself is unprivileged either way — the container runs as uid 10001
+on a read-only filesystem with `cap_drop: [ALL]` and `no-new-privileges`, whoever started
+it. If a real privilege boundary is ever wanted, that is rootless Docker, which needs extra
+work to bind 80 and 443 and is overkill for a single-site host.
+
 ## 2. Bring it up
 
 ```sh
-git clone git@github.com:ivangetsitdone/website.git
+# The repository is public, so HTTPS needs no key on the new host.
+git clone https://github.com/ivangetsitdone/website.git
 cd website
 docker compose up -d --build
 ```
