@@ -2,6 +2,8 @@
 
 A mobile-first contractor services website, recovered from an interrupted development session on 2026-09-17.
 
+**Rebuilding this on another host: see [DEPLOY.md](DEPLOY.md).** The repository is self-contained — source, photo originals, catalogue, Dockerfile and tests — and that guide was verified on 2026-09-19 by cloning into an empty directory, building with no cache, and running all three suites against the result.
+
 ## Public domain — verified 2026-09-17
 
 `https://ivanpineda.bottah.dev` is now the default Compose/Caddy address. DNS A resolves to this droplet; no AAAA record was returned. Caddy obtained a Let's Encrypt certificate for this hostname (current expiry 2026-12-16) and redirects HTTP to HTTPS with 308. HTTPS `/healthz` passed with normal certificate verification from this host. Logs: ignored `recovery/domain-caddy.log`. Caddy retains/renews certificates in its existing named volumes; no firewall or other host settings changed. Test defaults now point at this HTTPS hostname. For a local HTTP-only preview, set `SITE_ADDRESS=:80` before `docker compose up -d`.
