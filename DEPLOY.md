@@ -51,11 +51,29 @@ install -d -m 700 -o deploy -g deploy /home/deploy/.ssh
 cp /root/.ssh/authorized_keys /home/deploy/.ssh/
 chown deploy:deploy /home/deploy/.ssh/authorized_keys
 chmod 600 /home/deploy/.ssh/authorized_keys
+passwd deploy          # sudo needs one; SSH stays key-only via PasswordAuthentication no
 ```
 
-Group membership applies to new logins only: open a **second** session as `deploy`, confirm
-`docker ps` and `sudo -v` both work, and only then harden SSH from the still-open root
-session.
+**The password is for `sudo`, not for logging in.** `useradd` (and `adduser
+--disabled-password`) leave the account's password locked, and `sudo` then prompts for
+something no one can supply. Logging in needs no password at all: `deploy` inherits root's
+key from the copied `authorized_keys`, so `ssh deploy@<host>` just works. If a password on
+the account is unwanted, the alternative is
+`echo 'deploy ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/deploy && chmod 440 /etc/sudoers.d/deploy`
+— though a set password means a stolen key still meets one more gate before root.
+
+Group membership applies to new logins only, so verify from a **second** session rather
+than by switching user in the first one — `su - deploy` proves nothing about SSH:
+
+```sh
+ssh deploy@<host>      # from your own machine, in a new terminal
+docker ps              # no sudo: reconnecting is what picks up the docker group
+sudo -v                # the password just set
+```
+
+Only once both of those work, harden SSH from the still-open root session. If the login
+fails, `ssh -v` usually names it; on the host check that `/home/deploy/.ssh` is `700` and
+`authorized_keys` is `600`, both owned by `deploy`.
 
 ```sh
 sed -i 's/^#*PermitRootLogin.*/PermitRootLogin no/; s/^#*PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config
