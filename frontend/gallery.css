@@ -32,8 +32,11 @@
 .sequence-heading h3 { font-size: clamp(1.7rem, 4vw, 2.5rem); line-height: 1.2; margin: .5rem 0; letter-spacing: -.035em; }
 .group-heading { margin-top: clamp(3rem, 7vw, 5rem); padding-bottom: .75rem; border-bottom: 1px solid var(--line-strong); font-size: .95rem; font-weight: 750; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
 .sequence-heading p { color: var(--muted); }
-.sequence-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.sequence-grid:has(> :nth-child(3)) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+/* Before and after only reads side by side, so a sequence never falls to one column.
+   The tracks are capped as well: across a wide window a pair of photographs would
+   otherwise grow to half the screen each. */
+.sequence-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 46rem; }
+.sequence-grid:has(> :nth-child(3)) { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 69rem; }
 .sequence-grid .photo-link img { aspect-ratio: 3 / 4; }
 .photo-viewer { color: var(--tint); background: #2b2422; border: 1px solid var(--muted); border-radius: 1rem; padding: 1rem; width: min(1000px, calc(100% - 2rem)); max-height: calc(100dvh - 2rem); overflow-y: auto; }
 .photo-viewer::backdrop { background: #120c0bea; }
@@ -55,12 +58,22 @@ body:has(.photo-viewer[open]) { overflow: hidden; }
   .viewer-bottom { flex-direction: column; gap: 1rem; }
 }
 @media (max-width: 600px) {
-  .photo-grid, .sequence-grid:has(> :nth-child(3)) { grid-template-columns: minmax(0, 1fr); }
+  .photo-grid { grid-template-columns: minmax(0, 1fr); }
   .gallery-filters label { flex: 1 1 130px; min-width: 0; }
   .photo-count { font-size: .8rem; }
   .photo-viewer { width: calc(100% - 1rem); padding: .75rem; max-height: calc(100dvh - 1rem); }
   .viewer-image img { height: 48dvh; }
   .viewer-hint { display: none; }
+}
+/* Phones keep two photos abreast, so the cards carry less padding and smaller type.
+   The compound selector outranks the single-column .photo-grid rule above. */
+@media (max-width: 700px) {
+  .photo-grid.sequence-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
+  .sequence-grid .photo-card figcaption { padding: .75rem; }
+  .sequence-grid .photo-card h4 { font-size: .95rem; margin: .55rem 0 .35rem; }
+  .sequence-grid .photo-card p { font-size: .8rem; line-height: 1.5; }
+  .sequence-grid .photo-meta { font-size: .66rem; gap: .3rem; }
+  .sequence-grid .photo-expand { font-size: .68rem; padding: .22rem .5rem; bottom: .5rem; right: .5rem; }
 }
 @media (prefers-reduced-motion: reduce) {
   .photo-link img { transition: none; }

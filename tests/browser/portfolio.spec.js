@@ -146,3 +146,25 @@ test('single-photo filter and image failure remain usable', async ({ page }) => 
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).not.toBeVisible();
 });
+
+test('sequences keep at least two photos abreast, and cap their width', async ({ page }) => {
+  await page.goto('/before-after');
+  // Columns per grid, derived from how many distinct rows the cards occupy.
+  const columns = () => page.locator('.sequence-grid').evaluateAll(grids => grids.map(grid => {
+    const cards = [...grid.querySelectorAll('.photo-card')];
+    const rows = new Set(cards.map(card => Math.round(card.getBoundingClientRect().y)));
+    return Math.ceil(cards.length / rows.size);
+  }));
+  for (const width of [320, 375, 600, 700, 1280]) {
+    await page.setViewportSize({ width, height: 900 });
+    const counts = await columns();
+    expect(counts.length).toBeGreaterThan(0);
+    // A before beside an after is the point of the page: never one per row.
+    expect(Math.min(...counts), `a sequence fell to one column at ${width}px`).toBeGreaterThanOrEqual(2);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  }
+  // On a wide screen the tracks are capped rather than filling the window.
+  await page.setViewportSize({ width: 1600, height: 900 });
+  const card = await page.locator('.sequence-grid .photo-card').first().evaluate(el => el.getBoundingClientRect().width);
+  expect(card).toBeLessThan(420);
+});

@@ -84,6 +84,12 @@ Measured at 320, 360, 375, 414, 600, 859, 860, 1024, 1280 and 1600px: four links
 
 Sources: [NN/G on hamburger menus](https://www.nngroup.com/articles/hamburger-menus/), [NN/G mobile navigation patterns](https://www.nngroup.com/articles/mobile-navigation-patterns/), [floating pill navbars](https://21st.dev/blog/react-floating-navbar-components), [mobile navigation examples](https://www.uxpin.com/studio/blog/mobile-navigation-examples/).
 
+## Before-and-after grid — adjusted 2026-09-19
+
+A sequence never falls to one column. Six of the seven projects are a single before-and-after pair, and a pair only reads side by side, so `.sequence-grid` holds two columns at every width including 320px; the five-photo shower project takes two columns on a phone and three from 900px. The compound selector `.photo-grid.sequence-grid` is what outranks the single-column `.photo-grid` rule the small-screen block applies to the portfolio page, which still stacks.
+
+Tracks are capped as well — `max-width: 46rem` for a pair, `69rem` for the longer sequence — so a photo settles at about 356px on a wide screen instead of growing past 640px. Cards on phones drop to `.75rem` padding with smaller type so two captions fit abreast. A browser test measures columns per grid at 320, 375, 600, 700 and 1280px, fails if any sequence shows one photo per row, and checks the card stays under 420px at 1600px.
+
 ## How I charge — added 2026-09-19
 
 The services page closes with a `.promise` panel headed “A small job shouldn't come with a big mystery.”: take the job even when the customer doesn't know what to buy, charge by the hour with a minimum for the visit, materials and shopping time separate, expected cost explained before starting, and a check-in before anything exceeds what was agreed.
