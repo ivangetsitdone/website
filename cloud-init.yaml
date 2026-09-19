@@ -27,6 +27,8 @@ write_files:
       # Replace with the hostname (e.g. ivangetsitdone.com) once the A record
       # points at this droplet, then run `docker compose up -d` in $DIR.
       SITE=:80
+      # Claude Code on the box, for working on it directly. "no" to skip.
+      INSTALL_CLAUDE=yes
 
       if ! command -v docker >/dev/null; then
         install -m 0755 -d /etc/apt/keyrings
@@ -54,6 +56,16 @@ write_files:
 
       cd "$DIR"
       docker compose up -d --build
+
+      # Claude Code needs Node 18+. NodeSource rather than the distro package, whose
+      # version depends on the Ubuntu release. The native installer script
+      # (claude.ai/install.sh) has failed on a bare droplet here, so this is the
+      # path that is known to work: Node 22 plus the npm package.
+      if [ "$INSTALL_CLAUDE" = yes ] && ! command -v claude >/dev/null; then
+        curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+        apt-get install -y nodejs
+        npm install -g @anthropic-ai/claude-code
+      fi
 
       # Containers carry `restart: unless-stopped`, so a reboot brings them back
       # without this script running again.
