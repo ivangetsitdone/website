@@ -25,7 +25,7 @@ The photo archive is published as Ivan's **work history**, not as an advertiseme
 
 ## Brand assets
 
-`brand/logo.png` and `brand/business-card.png` are the owner-supplied originals, tracked with hashes in the catalog and never served directly. The logo arrives as a circle on an opaque white square; the build masks it to a transparent badge. The card shows the current `ivanpineda.bottah.dev` address and must be replaced when a permanent domain is chosen.
+`brand/logo.png` and `brand/business-card.png` are the owner-supplied originals, tracked with hashes in the catalog and never served directly. The logo arrives as a circle on an opaque white square; the build masks it to a transparent badge. The card was replaced on 2026-09-18 with the owner's new artwork, which prints **IvanGetsItDone.com**. That domain was not registered when the card was swapped (Verisign RDAP returned 404, and the name had no A, NS or SOA records), and the site still serves from `ivanpineda.bottah.dev`, so the printed address does not reach this site yet.
 
 ## Rebuild
 

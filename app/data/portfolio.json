@@ -394,7 +394,7 @@
   "portrait": {
     "id": "ivan-pineda",
     "alt": "Ivan Pineda, the owner of Zip, LLC.",
-    "caption": "Ivan Pineda \u00b7 Zip, LLC",
+    "caption": "Ivan Pineda · Zip, LLC",
     "width": 450,
     "height": 800,
     "source": "ivan-headshot-download.jpeg",
@@ -419,9 +419,9 @@
     },
     "card": {
       "source": "business-card.png",
-      "sha256": "d4cdc0486a86041a0f2c9c2b73bd575adb0caf0c9c7cc22d3c59246797811e94",
+      "sha256": "1a1b7ee9befe2a745422cb9527aa139bdd048d2b8f8bdf4025cae15ddebbca89",
       "width": 1400,
-      "alt": "Zip, LLC business card: Ivan Pineda, Zip, LLC. Honey Dos, Hauling, Yard Care, Small Projects. Forest Grove and nearby. 971-288-3488. ivanpineda.bottah.dev. Evenings and weekends."
+      "alt": "Zip, LLC business card: Ivan Pineda, Zip, LLC. Honey Dos, Hauling, Yard Care, Small Projects. Forest Grove and nearby. 971-288-3488. IvanGetsItDone.com. Evenings and weekends."
     }
   }
 }
