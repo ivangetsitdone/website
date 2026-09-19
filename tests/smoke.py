@@ -4,8 +4,8 @@ import sys
 from urllib.error import HTTPError
 from urllib.request import urlopen
 
-base = (sys.argv[1] if len(sys.argv) > 1 else 'https://ivanpineda.bottah.dev').rstrip('/')
-SITE = 'https://ivanpineda.bottah.dev'
+base = (sys.argv[1] if len(sys.argv) > 1 else 'https://ivangetsitdone.com').rstrip('/')
+SITE = 'https://ivangetsitdone.com'
 # Ivan holds no Oregon CCB or trade license yet, so the blocks that offer work must
 # never name regulated construction. The wording lives only in the "what I don't take
 # on" note and in the work-history pages, which describe past experience.

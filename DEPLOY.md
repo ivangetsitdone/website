@@ -20,7 +20,7 @@ points at the droplet, set the hostname and restart:
 
 ```sh
 cd /srv/website
-echo 'SITE_ADDRESS=ivanpineda.bottah.dev' > .env
+echo 'SITE_ADDRESS=ivangetsitdone.com' > .env
 docker compose up -d
 ```
 
@@ -175,8 +175,8 @@ Three places name the domain, and they have to agree:
 
 | What | Where | Default |
 | --- | --- | --- |
-| Certificate + virtual host | `SITE_ADDRESS` env var, read by `compose.yaml` → `Caddyfile` | `ivanpineda.bottah.dev` |
-| `<link rel="canonical">` and the `canonical` context value | `app/main.py`, in the `page()` route | `https://ivanpineda.bottah.dev/...` |
+| Certificate + virtual host | `SITE_ADDRESS` env var, read by `compose.yaml` → `Caddyfile` | `ivangetsitdone.com` |
+| `<link rel="canonical">` and the `canonical` context value | `app/main.py`, in the `page()` route | `https://ivangetsitdone.com/...` |
 | Default target of all three test suites | `tests/smoke.py`, `tests/portfolio_http.py`, `tests/browser/playwright.config.js` | same |
 
 For a new domain, set `SITE_ADDRESS` (an `.env` file beside `compose.yaml` works, and is

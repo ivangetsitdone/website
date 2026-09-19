@@ -1,4 +1,4 @@
-{$SITE_ADDRESS:ivanpineda.bottah.dev} {
+{$SITE_ADDRESS:ivangetsitdone.com} {
     encode zstd gzip
     header {
         X-Content-Type-Options nosniff

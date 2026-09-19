@@ -7,7 +7,7 @@ from urllib.request import urlopen
 from urllib.error import HTTPError
 
 ROOT = Path(__file__).resolve().parent.parent
-base = (sys.argv[1] if len(sys.argv) > 1 else 'https://ivanpineda.bottah.dev').rstrip('/')
+base = (sys.argv[1] if len(sys.argv) > 1 else 'https://ivangetsitdone.com').rstrip('/')
 catalog = json.loads((ROOT / 'app/data/portfolio.json').read_text())
 ids = [photo['id'] for photo in catalog['photos']]
 assert len(ids) == len(set(ids))

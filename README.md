@@ -4,9 +4,26 @@ A mobile-first contractor services website, recovered from an interrupted develo
 
 **Rebuilding this on another host: see [DEPLOY.md](DEPLOY.md).** The repository is self-contained — source, photo originals, catalogue, Dockerfile and tests — and that guide was verified on 2026-09-19 by cloning into an empty directory, building with no cache, and running all three suites against the result.
 
-## Public domain — verified 2026-09-17
+## Public domain — ivangetsitdone.com, 2026-09-19
 
-`https://ivanpineda.bottah.dev` is now the default Compose/Caddy address. DNS A resolves to this droplet; no AAAA record was returned. Caddy obtained a Let's Encrypt certificate for this hostname (current expiry 2026-12-16) and redirects HTTP to HTTPS with 308. HTTPS `/healthz` passed with normal certificate verification from this host. Logs: ignored `recovery/domain-caddy.log`. Caddy retains/renews certificates in its existing named volumes; no firewall or other host settings changed. Test defaults now point at this HTTPS hostname. For a local HTTP-only preview, set `SITE_ADDRESS=:80` before `docker compose up -d`.
+`https://ivangetsitdone.com` is the site's address: it is the Caddy/Compose default, the
+canonical URL every page emits, and the default target of all three test suites. The domain
+was registered on or before 2026-09-19 (Verisign RDAP answers 200 where it returned 404 the
+day before), runs on Cloudflare nameservers, and its A record points at **164.92.86.44** —
+a DigitalOcean address, so the record is DNS-only rather than proxied, which is what Caddy's
+`tls-alpn-01` challenge needs. A Cloudflare *proxied* record would terminate TLS itself and
+the challenge would fail.
+
+The certificate is issued on first request, so the hostname must resolve to the host before
+that host starts with `SITE_ADDRESS` set to it. `www.ivangetsitdone.com` has no record and
+is not served.
+
+**Superseded:** `ivanpineda.bottah.dev` was the address until 2026-09-19 and is what the
+retiring droplet still serves, using a certificate that expires 2026-12-16. Nothing redirects
+the old name to the new one; add a second site block to the `Caddyfile` if that is wanted
+while the old host is still up.
+
+For a local HTTP-only preview, set `SITE_ADDRESS=:80` before `docker compose up -d`.
 
 ## Licensing constraint — read before editing copy, 2026-09-18
 
@@ -37,10 +54,10 @@ The site was therefore rewritten on 2026-09-18 to advertise only work that does 
 The Hello World demonstration is gone from the public site. Home, services, about and contact now carry real business copy in dedicated templates (`app/templates/home.html`, `services.html`, `about.html`, `contact.html`) with a rebuilt stylesheet, a hero photo from the project album, a services list rendered from `SERVICES` in `app/main.py`, and a scope note stating that some work may need permits or a licensed specialist.
 
 - Removed with the demo: the `/hello` fragment route (now 404), `app/templates/hello.html`, `frontend/Hello.vue` and the Vue mounting/unmounting code in `frontend/main.js`. `vue` and `@vitejs/plugin-vue` stay installed and configured so a single-file component can be added where interaction needs one; no component is mounted today. HTMX still drives boosted navigation.
-- Each page emits its own `<meta name="description">` and `<link rel="canonical">` (`https://ivanpineda.bottah.dev/...`). Because boosted navigation swaps the body only, `frontend/main.js` copies both from `main[data-description]`/`main[data-canonical]` after every swap; browser tests assert head and body stay in sync.
+- Each page emits its own `<meta name="description">` and `<link rel="canonical">` (`https://ivangetsitdone.com/...`). Because boosted navigation swaps the body only, `frontend/main.js` copies both from `main[data-description]`/`main[data-canonical]` after every swap; browser tests assert head and body stay in sync.
 - The About page portrait is built from `content/portraits/ivan-pineda.jpg` through the same Pillow build stage as the album: hash-verified, resized to at most 900×900 and written as one metadata-free `/media/ivan-pineda.webp`. The original is never served. **Its authorization is unconfirmed — see `content/README.md` before promoting the site.**
 - Verified after the change: `docker compose up -d --build` (log: ignored `recovery/content-build.log`), HTTP smoke checks, catalog/asset checks (71 WebP assets, 8.36 MiB, source isolation including `/content/portraits/`), and 22 Chromium tests at desktop and mobile sizes. Axe WCAG A/AA checks now cover home, services, about and contact as well as the gallery, and report no violations; that is not a full accessibility audit, and no real device or Safari was tested. Desktop and mobile screenshots for home, about and contact were reviewed under ignored `recovery/`.
-- Test defaults now target `https://ivanpineda.bottah.dev` instead of `http://localhost`. Pass a base URL argument (or `BASE_URL`) to test a local HTTP-only preview.
+- Test defaults now target `https://ivangetsitdone.com` instead of `http://localhost`. Pass a base URL argument (or `BASE_URL`) to test a local HTTP-only preview.
 
 ### Copy awaiting owner confirmation
 
@@ -65,7 +82,7 @@ The owner supplied a logo and a business card. Originals are tracked in `content
 - **Logo.** The artwork carries an inner tagline that is illegible at header size, so the build paints it out with the badge colour before masking. The fill is bounded per row by the gold perimeter ring itself — the badge narrows towards the bottom, so a straight-sided rectangle clipped the ring on the lower rows — and the band, inset and fill colour are recorded as `caption_band` on the logo entry in the catalog. The ring search deliberately ignores the middle of the badge so the gold check mark in the wordmark cannot be mistaken for the perimeter. The supplied artwork is a circular badge on an opaque white square. `scripts/build_photos.py` measures the non-white bounding box, checks it is square within 2%, and masks it with a supersampled ellipse, so `/media/logo.webp` and `/media/logo.png` are transparent and sit cleanly on the page background. It appears in the header at 52px and doubles as the site icon (`/media/icon.png`, 180px, `rel="icon"` and `rel="apple-touch-icon"`).
 - **Business card** renders on the contact page from `/media/card.webp` (1400px wide). Its alt text carries the same details as the page text.
 - **Business card, replaced 2026-09-18.** The owner supplied new artwork printing **IvanGetsItDone.com**; `content/brand/business-card.png` and the `sha256` and `alt` in the catalog were updated together and the build regenerated `/media/card.webp`. The build fails on a hash mismatch, which is the intended tripwire for any future swap.
-- **The printed domain does not resolve.** On 2026-09-18 `ivangetsitdone.com` had no A, NS or SOA records and Verisign RDAP returned 404 for it — it was not registered. The site still serves from `ivanpineda.bottah.dev`, and every canonical URL, the Caddy site address and the three test suites still point there. Register the domain, then point it at this droplet and change `canonical` in `app/main.py`, `SITE_ADDRESS`, and the default base URLs in the tests together; Caddy will issue the certificate on first request. Until then the card advertises an address that goes nowhere, and the name is available for anyone else to take.
+- **Resolved 2026-09-19.** `ivangetsitdone.com` was unregistered when the card was swapped in; it has since been registered and pointed at the new host, and the whole site moved onto it — canonical URLs, the Caddy site address and all three test suites. The printed card and the site now agree.
 - Palette drawn from the logo: deep maroon `#5a0000` and athletic gold `#ffd800`. Maroon carries buttons, links-on-light and the eyebrow tint; gold is limited to focus rings on dark buttons and the rule beside the licensing note. Chrome stays warm-neutral (`--bg #f7f4f1`, `--line #e3dcd7`) so photographs dominate. All colours are CSS custom properties at the top of `frontend/style.css`; axe still reports no WCAG A/AA contrast violations.
 
 ## Navigation — rebuilt 2026-09-18
@@ -231,7 +248,7 @@ npx playwright install-deps chromium
 npm test
 ```
 
-Browser tests use one worker to limit memory. All three suites default to `https://ivanpineda.bottah.dev`; pass a base URL argument to the Python checks, or `BASE_URL=http://localhost npm test`, to target a local HTTP-only preview instead. Dependencies, browsers, traces and screenshots are ignored, not committed. Host Node 22 and Python 3 are needed for these tests; app builds require only Docker/Compose.
+Browser tests use one worker to limit memory. All three suites default to `https://ivangetsitdone.com`; pass a base URL argument to the Python checks, or `BASE_URL=http://localhost npm test`, to target a local HTTP-only preview instead. Dependencies, browsers, traces and screenshots are ignored, not committed. Host Node 22 and Python 3 are needed for these tests; app builds require only Docker/Compose.
 
 ## Next steps
 

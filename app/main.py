@@ -115,5 +115,5 @@ def page(request: Request, slug: str = ''):
         'photos': PHOTOS, 'categories': CATEGORIES, 'pairs': PAIRS, 'services': SERVICES,
         'portrait': PORTRAIT, 'hero': HERO, 'brand': BRAND, 'license_note': LICENSE_NOTE,
         'short_disclosure': SHORT_DISCLOSURE, 'registry': REGISTRY,
-        'canonical': f'https://ivanpineda.bottah.dev/{slug}',
+        'canonical': f'https://ivangetsitdone.com/{slug}',
     })

@@ -24,7 +24,7 @@ write_files:
       REPO=https://github.com/ivangetsitdone/website.git
       DIR=/srv/website
       # ":80" serves plain HTTP on the droplet's IP, which works before DNS moves.
-      # Replace with the hostname (e.g. ivanpineda.bottah.dev) once the A record
+      # Replace with the hostname (e.g. ivangetsitdone.com) once the A record
       # points at this droplet, then run `docker compose up -d` in $DIR.
       SITE=:80
 

@@ -21,7 +21,7 @@ services:
       - "443:443"
       - "443:443/udp"
     environment:
-      SITE_ADDRESS: ${SITE_ADDRESS:-ivanpineda.bottah.dev}
+      SITE_ADDRESS: ${SITE_ADDRESS:-ivangetsitdone.com}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data

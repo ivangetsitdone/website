@@ -48,7 +48,7 @@ test('home content, boosted navigation, head metadata and history', async ({ pag
     expect(head.description).toBe(head.mainDescription);
     expect(head.description.length).toBeGreaterThan(40);
     expect(head.canonical).toBe(head.mainCanonical);
-    expect(head.canonical.startsWith('https://ivanpineda.bottah.dev/')).toBe(true);
+    expect(head.canonical.startsWith('https://ivangetsitdone.com/')).toBe(true);
   }
   await page.getByRole('link', { name: 'Zip, LLC home' }).click();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Consider it done.');
