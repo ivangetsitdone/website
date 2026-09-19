@@ -8,3 +8,10 @@
     }
     reverse_proxy app:8000
 }
+
+# www redirects to the bare domain, which is what every canonical URL names.
+# Its own address rather than `www.{$SITE_ADDRESS}`, because SITE_ADDRESS is ":80"
+# during a pre-DNS first boot and "www.:80" is not a valid site address.
+{$WWW_ADDRESS:www.ivangetsitdone.com} {
+    redir https://{$SITE_ADDRESS:ivangetsitdone.com}{uri} permanent
+}
