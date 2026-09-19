@@ -19,7 +19,7 @@ test('portfolio filters, modal controls, keyboard focus and empty state', async 
   const dialog = page.getByRole('dialog');
   await expect(dialog).toBeVisible();
   await expect(page.getByRole('button', { name: 'Close photo viewer' })).toBeFocused();
-  await expectLoaded(dialog.locator('img'));
+  await expectLoaded(dialog.locator('.viewer-slide img').first());
   await expect(dialog.locator('#viewer-title')).toHaveText(catalog.photos[0].title);
   await page.keyboard.press('ArrowRight');
   await expect(dialog.locator('#viewer-title')).toHaveText(catalog.photos[1].title);
@@ -67,7 +67,7 @@ test('gallery survives boosted navigation and back/forward restoration', async (
   await page.getByRole('navigation', { name: 'Work history' }).getByRole('link', { name: 'Before and after' }).click();
   await expect(page.locator('.project-sequence')).toHaveCount(catalog.pairs.length);
   await page.locator('[data-photo]').first().click();
-  await expectLoaded(page.getByRole('dialog').locator('img'));
+  await expectLoaded(page.getByRole('dialog').locator('.viewer-slide img').first());
   await page.getByRole('button', { name: 'Close photo viewer' }).click();
   await page.goBack();
   await expect(page).toHaveURL(/\/portfolio$/);
@@ -82,9 +82,9 @@ test('gallery survives boosted navigation and back/forward restoration', async (
   await page.locator('[data-photo]').first().click();
   await expect(page.getByRole('dialog')).toBeVisible();
   await page.getByRole('button', { name: 'Next photo' }).click();
-  // The before/after viewer walks every photo in every project, however long the projects grow.
-  const sequenceTotal = catalog.pairs.reduce((total, pair) => total + pair.photos.length, 0);
-  await expect(page.locator('[data-viewer-count]')).toHaveText(`2 / ${sequenceTotal}`);
+  // Opened from a project, the carousel is that project: the count is the pair's own,
+  // not every photo on the page, however long the projects grow.
+  await expect(page.locator('[data-viewer-count]')).toHaveText(`2 / ${catalog.pairs[0].photos.length}`);
   expect(errors).toEqual([]);
 });
 
@@ -127,7 +127,7 @@ test('gallery and open viewer pass automated accessibility checks', async ({ pag
   const audit = () => new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
   expect((await audit()).violations).toEqual([]);
   await page.locator('[data-photo]').first().click();
-  await expectLoaded(page.getByRole('dialog').locator('img'));
+  await expectLoaded(page.getByRole('dialog').locator('.viewer-slide img').first());
   expect((await audit()).violations).toEqual([]);
   await page.screenshot({ path: `../../recovery/viewer-${test.info().project.name}.png` });
 });
@@ -167,4 +167,47 @@ test('sequences keep at least two photos abreast, and cap their width', async ({
   await page.setViewportSize({ width: 1600, height: 900 });
   const card = await page.locator('.sequence-grid .photo-card').first().evaluate(el => el.getBoundingClientRect().width);
   expect(card).toBeLessThan(420);
+});
+
+test('the viewer is a carousel: scoped per project, swipeable, with dots', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.goto('/before-after');
+  const shower = page.locator('.project-sequence').filter({ hasText: 'From the original shower to new tile' });
+  await shower.locator('[data-photo]').first().click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
+  // Opening inside a project scopes the carousel to that project, not the whole page.
+  const showerPhotos = catalog.pairs.find(pair => pair.id === 'shower-tile').photos.length;
+  await expect(dialog.locator('[data-viewer-count]')).toHaveText(`1 / ${showerPhotos}`);
+  await expect(dialog.locator('.viewer-slide')).toHaveCount(showerPhotos);
+  // The stage tag rides with the photograph rather than living only in the caption.
+  await expect(dialog.locator('.viewer-slide').first().locator('.stage')).toHaveText('Before');
+  const dots = dialog.locator('[data-dots] button');
+  await expect(dots).toHaveCount(showerPhotos);
+  await expect(dots.first()).toHaveAttribute('aria-current', 'true');
+
+  // Swiping is the track's own scrolling: move it a page and the caption follows.
+  await dialog.locator('[data-track]').evaluate(track => track.scrollTo({ left: track.clientWidth, behavior: 'auto' }));
+  await expect(dialog.locator('[data-viewer-count]')).toHaveText(`2 / ${showerPhotos}`);
+  await expect(dots.nth(1)).toHaveAttribute('aria-current', 'true');
+
+  // A dot jumps straight to its photo, and the track follows the state.
+  await dots.last().click();
+  await expect(dialog.locator('[data-viewer-count]')).toHaveText(`${showerPhotos} / ${showerPhotos}`);
+  await expect.poll(() => dialog.locator('[data-track]').evaluate(track =>
+    Math.round(track.scrollLeft / track.clientWidth))).toBe(showerPhotos - 1);
+  await page.keyboard.press('Home');
+  await expect(dialog.locator('[data-viewer-count]')).toHaveText(`1 / ${showerPhotos}`);
+
+  // Only the neighbours are fetched: a long set must not pull every full image.
+  await page.keyboard.press('Escape');
+  await page.goto('/portfolio');
+  await page.locator('[data-photo]').first().click();
+  await expect(dialog.locator('.viewer-slide')).toHaveCount(catalog.photos.length);
+  expect(await dialog.locator('.viewer-slide img').evaluateAll(images =>
+    images.filter(image => image.getAttribute('src')).length)).toBeLessThan(4);
+  // Dots would be noise at this length; the counter carries the position instead.
+  await expect(page.locator('[data-dots]')).toBeHidden();
+  expect(errors).toEqual([]);
 });

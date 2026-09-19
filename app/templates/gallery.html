@@ -57,11 +57,13 @@
   {% endif %}
   <dialog class="photo-viewer" aria-labelledby="viewer-title" aria-describedby="viewer-caption">
     <div class="viewer-bar"><span data-viewer-count aria-live="polite"></span><button type="button" data-close aria-label="Close photo viewer" autofocus>Close ✕</button></div>
-    <div class="viewer-image"><img data-viewer-image alt=""><p data-image-error hidden>Image could not load. Please try again.</p></div>
+    <div class="viewer-track" data-track tabindex="0" role="group" aria-label="Photos, swipe or use the arrow keys"></div>
+    <p class="viewer-error" data-image-error hidden>Image could not load. Please try again.</p>
+    <div class="viewer-dots" data-dots role="group" aria-label="Photos in this set" hidden></div>
     <div class="viewer-bottom">
-      <div class="viewer-copy" aria-live="polite"><span class="stage" data-viewer-stage></span><h2 id="viewer-title"></h2><p id="viewer-caption"></p></div>
+      <div class="viewer-copy" aria-live="polite"><span class="viewer-category" data-viewer-category></span><h2 id="viewer-title"></h2><p id="viewer-caption"></p></div>
       <div class="viewer-controls"><button type="button" data-previous aria-label="Previous photo">← Previous</button><button type="button" data-next aria-label="Next photo">Next →</button></div>
     </div>
-    <p class="viewer-hint">Use the arrow keys to browse. Press Escape to close.</p>
+    <p class="viewer-hint">Swipe, or use the arrow keys. Press Escape to close.</p>
   </dialog>
 </section>

@@ -84,6 +84,20 @@ Measured at 320, 360, 375, 414, 600, 859, 860, 1024, 1280 and 1600px: four links
 
 Sources: [NN/G on hamburger menus](https://www.nngroup.com/articles/hamburger-menus/), [NN/G mobile navigation patterns](https://www.nngroup.com/articles/mobile-navigation-patterns/), [floating pill navbars](https://21st.dev/blog/react-floating-navbar-components), [mobile navigation examples](https://www.uxpin.com/studio/blog/mobile-navigation-examples/).
 
+## Photo viewer — rebuilt as a carousel, 2026-09-19
+
+The viewer used to swap `src` on a single `<img>`, so there was nothing to swipe: on a phone the only way through a project was the Previous/Next buttons. It is now a scroll-snap carousel — one slide per photo in a horizontal scroller with `scroll-snap-type: x mandatory` and `scroll-snap-stop: always` — so swiping is the browser's own scrolling, and the buttons, the dots and the arrow keys all drive the same scroll position. Home and End jump to the ends.
+
+- **Scoped to the project.** Opening a photo from inside a `.sequence-grid` makes the carousel that project (“1 / 5”), not all seventeen photos on the page. From the portfolio grid it is still the whole filtered set.
+- **Every tag survives.** The stage tag now rides on the slide itself, over the photograph, so it stays readable mid-swipe; the caption block underneath carries `CATEGORY · STAGE`, the title and the caption. Card tags in the grids are untouched.
+- **Dots** appear for sets of ten or fewer — each a real button, labelled “Photo 3: <title>”, marked with `aria-current`. Longer sets keep the “12 / 35” counter, because thirty-five dots is noise.
+- **Only neighbours load.** Slides hold `data-source`; the current photo and the two beside it get a `src`. Opening the 35-photo portfolio fetches three full images, not thirty-five.
+- **An `IntersectionObserver`** on the track keeps the caption, counter and dots in step when the *user* scrolls; a `settling` counter suppresses it while the carousel is scrolling itself, so the two never fight.
+
+**Axe caught a real bug here**: a scrollable region with no focusable content fails `scrollable-region-focusable` (serious) — keyboard users in Safari could not reach it. The track now carries `tabindex="0"`, `role="group"` and a label.
+
+**Why not the native CSS carousel?** `::scroll-button()` and `::scroll-marker` (CSS Overflow 5) do exactly this with no JavaScript, and the browser supplies tablist/tab semantics, roving focus and auto-disabled buttons for free. They are Chrome/Edge 135+ only — MDN still labels them “limited availability” and “experimental,” with Safari and Firefox unsupported — and this site's visitors are mostly on mobile Safari, so the dots and arrows would simply not exist for them. The scroll-snap track underneath is the same in every browser; when the pseudo-elements reach Safari, the JS dots and buttons can be replaced by a `@supports` block and deleted.
+
 ## Before-and-after grid — adjusted 2026-09-19
 
 A sequence never falls to one column. Six of the seven projects are a single before-and-after pair, and a pair only reads side by side, so `.sequence-grid` holds two columns at every width including 320px; the five-photo shower project takes two columns on a phone and three from 900px. The compound selector `.photo-grid.sequence-grid` is what outranks the single-column `.photo-grid` rule the small-screen block applies to the portfolio page, which still stacks.
@@ -100,7 +114,7 @@ This panel took the place of the licensing note on the services page, and that n
 
 ## Printable honey-do list — added 2026-09-19
 
-`app/print/honey-do-list.svg` is a US-Letter sheet (`width="8.5in"`) of sixteen checkboxes and ruled lines on Zip, LLC letterhead, with the first line already ticked off and filled in with the phone number. It sits under the business card on the contact page; the thumbnail is a link that opens the sheet itself in a new tab, and printing is left to the visitor — the site offers no print button, stylesheet or dialog.
+`app/print/honey-do-list.svg` is a US-Letter sheet (`width="8.5in"`) of sixteen checkboxes and ruled lines on Zip, LLC letterhead, with the first line already ticked off and filled in with the phone number. It sits in a full-width band below the two contact columns, borrowing the licensing note's treatment (`.scope-note.print-note`): the sheet on the left as a small thumbnail that links to itself, the heading and copy on the right. Printing is left to the visitor — the site offers no print button, stylesheet or dialog.
 
 - **It is authored source, not a generated asset**, so unlike `app/static` and `app/media` it is tracked in Git and served by its own `/print` mount. SVG means one small text file that prints crisply at any size and can be reviewed in a diff.
 - **It carries the disclosure.** The sheet leaves the site on paper with the business name and phone number on it, which makes it advertising, so its footer repeats the line every page carries: registry number and “Not a CCB-licensed contractor.” A smoke check asserts that, and fails if any regulated-trade word reaches the sheet.

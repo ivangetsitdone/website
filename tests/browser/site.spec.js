@@ -73,10 +73,10 @@ test('about portrait and contact details', async ({ page }) => {
   await expect(page.getByRole('link', { name: 'Text 971-288-3488' })).toHaveAttribute('href', 'sms:+19712883488');
   await expect(page.getByText('Forest Grove and surrounding communities').first()).toBeVisible();
   // The printable list is a link to the sheet itself, opened in its own tab.
-  const sheet = page.locator('.print-list img');
+  const sheet = page.locator('.print-note img');
   await sheet.scrollIntoViewIfNeeded();
   expect(await isLoaded(sheet)).toBe(true);
-  const sheetLink = page.locator('.print-list a');
+  const sheetLink = page.locator('.print-note a');
   await expect(sheetLink).toHaveAttribute('href', /\/print\/honey-do-list\.svg(\?|$)/);
   await expect(sheetLink).toHaveAttribute('target', '_blank');
   await expect(sheetLink).toHaveAttribute('rel', 'noopener');
