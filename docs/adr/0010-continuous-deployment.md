@@ -46,9 +46,9 @@ Deliberately **not** chosen:
   re-adding the public key and refreshing the host key. The key is not restricted with
   `command=` in `authorized_keys`; it is a root shell on the droplet, and anyone who can
   push to `main` already controls what runs there.
-- **The droplet's checkout path is not fixed.** The remote script tries the `DEPLOY_DIR`
-  repository variable, then `/srv/website`, then `/root/website`, because it has lived in
-  more than one of them.
+- **The checkout path is fixed at `/srv/website`**, matching `scripts/bootstrap.sh` and
+  `cloud-init.yaml`. A droplet with it anywhere else fails the deploy on the first command,
+  and the fix is to move the checkout, not to teach the workflow another path.
 - Documentation-only pushes still trigger a run. Nothing under `docs/` is copied into the
   image, so every layer is cached, the image ID does not change and Compose recreates
   nothing — the deploy is a no-op that still proves the site is up.

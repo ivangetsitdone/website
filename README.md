@@ -38,8 +38,8 @@ First build takes about five minutes: Vite bundles the frontend, then Pillow reg
 Deploying to a server is [DEPLOY.md](DEPLOY.md) — one command on a fresh droplet.
 After that it is automatic: **every push to `main` redeploys the live site**, then runs
 all three suites against it. See [Automatic deploys](DEPLOY.md#2a-automatic-deploys).
-The droplet is a deploy target, not a workspace — the deploy resets its checkout, so
-anything edited there is discarded.
+The droplet is a deploy target, not a workspace — the deploy resets `/srv/website` to the
+pushed commit, so anything edited there is discarded.
 
 ## How it fits together
 

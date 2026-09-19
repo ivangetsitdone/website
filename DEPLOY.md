@@ -194,12 +194,19 @@ anything edited on the host is discarded. `.env` is untracked and survives, whic
 the host worth keeping:
 
 ```sh
-ssh root@ivangetsitdone.com 'ls -d /srv/website /root/website 2>/dev/null; git -C /srv/website status --short'
+ssh root@ivangetsitdone.com 'git -C /srv/website status --short'
 ```
 
-The workflow looks for the checkout in `/srv/website`, then `/root/website`. Anywhere else,
-set a `DEPLOY_DIR` repository variable. `DEPLOY_USER` (default `root`) and `DEPLOY_HOST`
-(default `ivangetsitdone.com`, so a rotated droplet IP needs no change) work the same way.
+**The checkout must be `/srv/website`** — where `scripts/bootstrap.sh` and `cloud-init.yaml`
+put it. If an earlier deploy left it somewhere else, move it rather than pointing the
+workflow at it:
+
+```sh
+ssh root@ivangetsitdone.com 'cd /srv/website 2>/dev/null || (docker compose -f ~/website/compose.yaml down && mv ~/website /srv/website)'
+```
+
+`DEPLOY_USER` (default `root`) and `DEPLOY_HOST` (default `ivangetsitdone.com`, so a rotated
+droplet IP needs no change) are repository variables, if either ever needs overriding.
 
 ### One-time setup
 
@@ -232,6 +239,8 @@ its first step, before touching the droplet, if either secret is missing.
   `authorized_keys`, or `DEPLOY_KEY` was pasted without its trailing newline.
 - **`Host key verification failed`** — the droplet was rebuilt and its host key changed.
   Re-run the `ssh-keyscan` line above. This is the check working, not misfiring.
+- **`/srv/website: No such file or directory`** — the droplet's checkout is elsewhere. Move
+  it, as above; the path is fixed on purpose.
 - **`app is unhealthy`** — the build succeeded but the container did not come up; the job
   prints `docker compose logs`. The previous containers are already gone at that point.
 - **A red `verify` or `browser` job** — the deploy happened and the live site broke. Fix

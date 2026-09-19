@@ -1,9 +1,12 @@
 # Ship main to the droplet, then prove the live site still works.
 #
+# The droplet's checkout must be /srv/website, which is where scripts/bootstrap.sh and
+# cloud-init.yaml put it.
+#
 # Setup is two repository secrets — DEPLOY_KEY (an SSH private key whose public half is in
 # the droplet's authorized_keys) and DEPLOY_KNOWN_HOSTS (the droplet's SSH host key). The
-# optional DEPLOY_USER, DEPLOY_HOST and DEPLOY_DIR repository *variables* override the
-# defaults below. See DEPLOY.md, "Automatic deploys".
+# optional DEPLOY_USER and DEPLOY_HOST repository *variables* override the defaults below.
+# See DEPLOY.md, "Automatic deploys".
 name: Deploy
 
 on:
@@ -42,23 +45,13 @@ jobs:
       - name: Pull, rebuild and restart
         env:
           TARGET: ${{ vars.DEPLOY_USER || 'root' }}@${{ vars.DEPLOY_HOST || 'ivangetsitdone.com' }}
-          DIR: ${{ vars.DEPLOY_DIR }}
         run: |
-          ssh -o BatchMode=yes "$TARGET" 'bash -s --' "$GITHUB_SHA" "$DIR" <<'REMOTE'
+          ssh -o BatchMode=yes "$TARGET" 'bash -s --' "$GITHUB_SHA" <<'REMOTE'
           set -euo pipefail
           sha=$1
-          dir=${2:-}
 
-          # Where the droplet's checkout lives. It has been in both of these.
-          for candidate in "$dir" /srv/website /root/website; do
-            if [ -n "$candidate" ] && [ -d "$candidate/.git" ]; then dir=$candidate; break; fi
-          done
-          if [ ! -d "${dir:-}/.git" ]; then
-            echo "No checkout found. Set the DEPLOY_DIR repository variable." >&2
-            exit 1
-          fi
-          cd "$dir"
-          echo "deploying $sha into $dir"
+          cd /srv/website
+          echo "deploying $sha"
 
           # The repository is public, so the droplet needs no key of its own to fetch.
           url=https://github.com/ivangetsitdone/website.git
