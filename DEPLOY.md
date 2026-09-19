@@ -48,11 +48,28 @@ Then a deploy account, rather than running day to day as root:
 id deploy || useradd -m -s /bin/bash deploy
 usermod -aG sudo,docker deploy
 install -d -m 700 -o deploy -g deploy /home/deploy/.ssh
-cp /root/.ssh/authorized_keys /home/deploy/.ssh/
-chown deploy:deploy /home/deploy/.ssh/authorized_keys
-chmod 600 /home/deploy/.ssh/authorized_keys
 passwd deploy          # sudo needs one; SSH stays key-only via PasswordAuthentication no
 ```
+
+Now give the account a key. If the droplet was provisioned **with an SSH key**, root already
+has one to inherit; if it was provisioned with a **root password**, `/root/.ssh/authorized_keys`
+is empty or missing and there is nothing to copy — paste the public key from your own machine
+instead (`cat ~/.ssh/id_ed25519.pub`, or `ssh-keygen -t ed25519` if you have none).
+
+```sh
+# Inherit root's key, only if root actually has one:
+[ -s /root/.ssh/authorized_keys ] && cp /root/.ssh/authorized_keys /home/deploy/.ssh/
+
+# Otherwise, or in addition, paste your own public key:
+printf '%s\n' 'ssh-ed25519 AAAAC3... you@laptop' >> /home/deploy/.ssh/authorized_keys
+
+chown deploy:deploy /home/deploy/.ssh/authorized_keys
+chmod 600 /home/deploy/.ssh/authorized_keys
+wc -c /home/deploy/.ssh/authorized_keys     # must not be 0
+```
+
+A zero-byte `authorized_keys` is the quiet failure here: ownership and modes all look right,
+and SSH still answers `Permission denied (publickey)` because there is no key to match.
 
 **The password is for `sudo`, not for logging in.** `useradd` (and `adduser
 --disabled-password`) leave the account's password locked, and `sudo` then prompts for
