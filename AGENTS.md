@@ -4,6 +4,6 @@
 - Start by reading README.md, MISSION.md, `git status`, and recent Git history. Preserve existing work.
 - Keep source, tests, deployment configuration, and durable decisions in the repository. Document necessary host-level changes and reconstruction steps.
 - Use ignored `recovery/` for diagnostic logs and raw session evidence. Never commit secrets, raw session logs, dependencies, or generated assets.
-- Establish the Hello World stack before expanding features. Distinguish configuration/syntax checks from build, runtime, and browser verification.
-- Before handoff, update README.md with verified state, commands, blockers, and next steps; create a coherent local Git checkpoint. Do not invent test results.
-- Do not create remotes, publish to GitHub, or configure CI/CD without approval. Local Git is not an off-host backup.
+- Distinguish configuration/syntax checks from build, runtime, and browser verification.
+- Keep README.md as onboarding, not a changelog: durable decisions belong in `docs/adr/`, live action items in `docs/open-questions.md`. Do not invent test results.
+- The remote is `github.com/ivangetsitdone/website` and the site deploys from it. CI/CD is still not configured; ask before adding it.

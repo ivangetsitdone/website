@@ -1,15 +1,22 @@
 # Continuation prompt
 
-Resume the contractor services website in `~/dev/contractor-site`. Work only within this project directory for project artifacts. First read `AGENTS.md`, `README.md`, and local Git history; inspect the existing code rather than starting over.
+Resume the Zip, LLC website in this directory. Read `AGENTS.md`, `README.md` and recent Git
+history first, and inspect the code rather than starting over.
 
-The mission is a portable, mobile-first contractor website: home, services, about, contact, project photo portfolio, and before/after comparisons. Use FastAPI + Jinja server rendering, HTMX for navigation and partial updates, Vue 3 single-file components only where needed, locally bundled browser assets, Docker Compose, and Caddy. The original “static SPA” wording conflicts with server rendering: confirm whether self-contained assets with SPA-like navigation is sufficient; do not promise a purely static/offline site without resolving that.
+The site is live at <https://ivangetsitdone.com>, deployed from
+<https://github.com/ivangetsitdone/website> onto a DigitalOcean droplet. It is built and
+verified; the work now is refinement, not construction.
 
-**Licensing shapes every copy change: Ivan has no Oregon CCB license yet, so the site advertises only yard, hauling, cleaning and moving work, carries a disclosure on every page, and presents the photo archive as past experience rather than services. Read the licensing section of the README before editing any public wording; the test suite fails if regulated trades reappear in the blocks that offer work.**
+**Licensing shapes every copy change.** Ivan has no Oregon CCB licence, so the site
+advertises only unregulated work and presents the photo archive as past experience. Read
+[ADR-0003](docs/adr/0003-licensing-constraint.md) before editing any public wording — the
+test suite fails if regulated trades reappear in the blocks that offer work.
 
-The stack builds and runs on the owner's 2 GB droplet and is published at `https://ivangetsitdone.com` with an automatic Let's Encrypt certificate. All six pages carry real copy: the Hello World stack demo, its `/hello` route and the Vue demo component were removed, while Vue tooling stays installed for future components. The work history has 35 curated photos with filters, an accessible viewer and seven owner-confirmed projects; the About page shows a portrait built through the same hash-verified, metadata-stripping image pipeline. HTTP smoke checks, catalog/asset checks and 22 desktop/mobile Chromium tests — including axe WCAG A/AA checks on the content pages and the gallery — pass. See README for exact commands and remaining limits.
+- **Why things are as they are:** `docs/adr/`. Add a record rather than silently reversing one.
+- **What still needs a human answer:** `docs/open-questions.md` — owner confirmations,
+  questions for the CCB, and the testing gaps (no real-device or Safari coverage).
+- **How to run, edit and test:** `README.md`. **How to deploy:** `DEPLOY.md`.
 
-Before promoting the site, have the owner confirm the items under “Copy awaiting owner confirmation” in the README: the experience claims, evening/weekend availability, the personal family note, the surname spelling, and whether the About portrait may be published (its authorization is not recorded anywhere — see `content/README.md`). Also ask for review of photo captions, stage labels and the three inferred sequences.
-
-The app and Caddy are left running on ports 80/443. Preserve this verified baseline and run tests after changes. External reachability from another network, real-device/Safari testing and Python dependency security still need verification. Record what actually passes and any blockers. Ask before adding a public email, a contact form, or any social-media or photo import.
-
-Keep source, configuration, tests, and handoff notes in this repository; keep secrets, raw logs, generated assets, and dependencies out of Git. Make coherent local Git checkpoints and update the README with current status, exact run/test commands, and next steps before ending the session. Do not create a GitHub repository or CI/CD until requested. Document any unavoidable host-level changes. Never treat a started build as a verified deployment.
+Run the three suites after changes and record what actually passed. Never treat a started
+build as a verified deployment. Ask before adding a public email, a contact form, or any
+social-media or photo import.
