@@ -11,8 +11,19 @@ const NAV = [
 ];
 const mainNav = page => page.getByRole('navigation', { name: 'Main navigation' });
 
-async function isLoaded(locator) {
-  return locator.evaluate(img => img.complete && img.naturalWidth > 0);
+// The business card and the printable sheet are loading="lazy", so the navigation's load
+// event says nothing about whether they have even started. Bring the image into view the
+// way a reader would, then wait for it to decode. The previous one-shot read of `complete`
+// passed everywhere we could run it and failed on a GitHub runner, which is the whole
+// argument against asserting on a value that is still settling.
+async function expectLoaded(locator) {
+  await locator.scrollIntoViewIfNeeded();
+  // Reports why it failed rather than just `false`: a 404 and a still-downloading image
+  // are very different problems, and the CI log is all we get to tell them apart.
+  await expect.poll(() => locator.evaluate(img => img.complete && img.naturalWidth > 0
+    ? 'loaded'
+    : `not loaded (complete=${img.complete}, naturalWidth=${img.naturalWidth}, src=${img.currentSrc})`),
+    { timeout: 15000 }).toBe('loaded');
 }
 
 test('home content, boosted navigation, head metadata and history', async ({ page }) => {
@@ -28,8 +39,8 @@ test('home content, boosted navigation, head metadata and history', async ({ pag
   await expect(registry).toHaveAttribute('hx-boost', 'false');
   expect((await page.locator('body').innerText()).toLowerCase()).not.toContain('handyman');
   await expect(page.getByRole('link', { name: 'Call 971-288-3488' }).first()).toHaveAttribute('href', 'tel:+19712883488');
-  expect(await isLoaded(page.locator('.hero-photo img'))).toBe(true);
-  expect(await isLoaded(page.locator('.brand-mark'))).toBe(true);
+  await expectLoaded(page.locator('.hero-photo img'));
+  await expectLoaded(page.locator('.brand-mark'));
   // A marker on the live document proves later navigation never reloads the page.
   await page.evaluate(() => { window.testDocumentMarker = true; });
   for (const { link, title } of NAV) {
@@ -64,18 +75,18 @@ test('home content, boosted navigation, head metadata and history', async ({ pag
 test('about portrait and contact details', async ({ page }) => {
   await page.goto('/about');
   const portrait = page.locator('.portrait img');
-  expect(await isLoaded(portrait)).toBe(true);
+  await expectLoaded(portrait);
   await expect(portrait).toHaveAttribute('alt', /Ivan Pineda/);
   await page.screenshot({ path: `../../recovery/about-${test.info().project.name}.png`, fullPage: true });
   await page.goto('/contact');
-  expect(await isLoaded(page.locator('.business-card img'))).toBe(true);
+  await expectLoaded(page.locator('.business-card img'));
   await expect(page.getByRole('link', { name: 'Call 971-288-3488' }).first()).toHaveAttribute('href', 'tel:+19712883488');
   await expect(page.getByRole('link', { name: 'Text 971-288-3488' })).toHaveAttribute('href', 'sms:+19712883488');
   await expect(page.getByText('Forest Grove and surrounding communities').first()).toBeVisible();
   // The printable list is a link to the sheet itself, opened in its own tab.
   const sheet = page.locator('.print-note img');
   await sheet.scrollIntoViewIfNeeded();
-  expect(await isLoaded(sheet)).toBe(true);
+  await expectLoaded(sheet);
   const sheetLink = page.locator('.print-note a');
   await expect(sheetLink).toHaveAttribute('href', /\/print\/honey-do-list\.svg(\?|$)/);
   await expect(sheetLink).toHaveAttribute('target', '_blank');
