@@ -91,8 +91,15 @@ test('offered work, declined work and the work-history framing', async ({ page }
   for (const word of ['remodel', 'sheetrock', 'drywall', 'tile', 'flooring', 'plumbing', 'electrical', 'painting', 'shower', 'install', 'repair']) {
     expect(offered, `services grid offers regulated work: ${word}`).not.toContain(word);
   }
+  // Cost is described as character, not as a price list.
+  const promise = page.locator('.promise');
+  await expect(promise.getByRole('heading', { name: /big mystery/ })).toBeVisible();
+  await expect(promise).toContainText('I’ll check with you first');
+  expect(await promise.innerText()).not.toContain('$');
+  // The licensing position lives with the profile now: one line, not a list of
+  // what he cannot do.
+  await page.goto('/about');
   await expect(page.locator('.scope-note')).toContainText('Oregon CCB exam');
-  // One line about the license, not a list of what he cannot do.
   await expect(page.locator('.scope-note p')).toHaveCount(1);
   await expect(page.locator('.scope-note li')).toHaveCount(0);
   await page.goto('/portfolio');

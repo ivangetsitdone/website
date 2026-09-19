@@ -82,6 +82,13 @@ button:focus-visible, .button-link:focus-visible { outline-color: var(--gold); }
 .portrait figcaption { font-size: .75rem; margin-top: .6rem; color: var(--muted); }
 .about-copy { max-width: 42rem; }
 .about-copy h2 { margin-top: 0; }
+/* How the work is charged, in general terms. Character rather than a price list: it
+   closes the list of jobs, and the figures are Ivan's to give in person. */
+.promise { display: grid; grid-template-columns: 1fr 1.2fr; gap: clamp(1.5rem, 4vw, 3rem); margin-top: clamp(2rem, 5vw, 3rem); padding: clamp(1.25rem, 3vw, 2rem); background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--gold); border-radius: .9rem; }
+.promise .eyebrow { display: block; }
+.promise h2 { margin: .35rem 0 0; font-size: clamp(1.4rem, 2.6vw, 1.9rem); }
+.promise p { margin: 0 0 .9rem; }
+.promise p:last-child { margin-bottom: 0; }
 .services-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; }
 .service-card h2 { font-size: 1.45rem; margin-top: .8rem; }
 .scope-note { padding: 1.5rem; border-left: 4px solid var(--gold); margin-top: 2rem; background: var(--tint); }
@@ -126,6 +133,7 @@ button:focus-visible, .button-link:focus-visible { outline-color: var(--gold); }
 @media (max-width: 380px) { .site-header, main, .site-footer { padding-inline: 1.25rem; } }
 @media (max-width: 760px) {
   .home-hero, .about-layout, .contact-layout, .personal-note, .licence-note { grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+  .promise { grid-template-columns: minmax(0, 1fr); gap: 1.25rem; }
   .hero-photo { max-width: 480px; }
   .hero-photo img { aspect-ratio: 4 / 3; }
   .service-preview-grid, .services-grid { grid-template-columns: minmax(0, 1fr); }

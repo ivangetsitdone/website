@@ -79,11 +79,11 @@ SERVICES = [
     ('Moving & assembly help', 'An extra pair of hands for loading, moving furniture around the house and putting flat-pack furniture together.'),
     ('Seasonal odd jobs', 'The small maintenance jobs on your list. If you are not sure whether it is something I can take on, just ask.'),
 ]
-# Said once on the services page. The footer carries the short form site-wide; the
-# site does not otherwise list what Ivan cannot do.
+# Said once on the about page. The footer carries the short form site-wide; the site
+# does not otherwise list what Ivan cannot do.
 LICENSE_NOTE = ('Zip, LLC is not a CCB-licensed contractor. I’m studying for the Oregon CCB exam now, '
-                'and until it is issued I stay with the work above — if your job needs a licensed '
-                'contractor, I’ll say so and point you toward one.')
+                'and until it is issued I stay with the jobs listed under What I do — if your job '
+                'needs a licensed contractor, I’ll say so and point you toward one.')
 SHORT_DISCLOSURE = 'Not a CCB-licensed contractor.'
 # The owner's Oregon Secretary of State registration. The direct record URL on
 # egov.sos.state.or.us sits behind bot protection that can show visitors an error page,

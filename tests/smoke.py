@@ -63,8 +63,8 @@ for path, label, heading in [('/', 'Home', 'Consider it done.'),
     assert '#2249807-97' in body and 'sos.oregon.gov/business/Pages/find.aspx' in body, path
     # htmx must not try to boost an off-site link.
     assert 'hx-boost="false" target="_blank"' in body, path
-    # Said once, on the services page. The footer short form covers every other page.
-    assert body.count(LICENSE_NOTE_OPENING) == (1 if path == '/services' else 0), path
+    # Said once, on the about page. The footer short form covers every other page.
+    assert body.count(LICENSE_NOTE_OPENING) == (1 if path == '/about' else 0), path
     assert 'data-vue-hello' not in body and 'hx-get="/hello"' not in body, path
     if path in ('/', '/services', '/contact'):
         assert 'Forest Grove' in body and '30-mile radius' in body, path
@@ -82,17 +82,25 @@ for word in REGULATED:
 services = fetch('/services')[0]
 for service in ('Yard cleanup', 'hauling', 'Pressure washing', 'Gutter clearing', 'Moving'):
     assert service in services, service
-offered = between(services, '<section class="services-grid', '<aside class="scope-note"')
+offered = between(services, '<section class="services-grid', '<section class="promise"')
 for word in REGULATED:
     assert word not in offered.lower(), ('services page offers regulated work', word)
-# The regulated trades appear only in the note that declines them.
-scope = between(services, '<aside class="scope-note"', '</aside>')
-for word in (LICENSE_NOTE_OPENING, 'Oregon CCB exam', 'licensed contractor'):
-    assert word in scope, word
+# How the work is charged is described in general terms only: the owner gives the
+# figures in person, so no rate may be published here.
+promise = between(services, '<section class="promise"', '</section>')
+assert 'A small job shouldn’t come with a big mystery.' in promise
+assert 'I’ll explain the expected cost and what’s included' in promise
+assert '$' not in promise, 'the services page must not publish a rate'
+for word in REGULATED:
+    assert word not in promise.lower(), ('services page offers regulated work', word)
 
 about = fetch('/about')[0]
 assert '/media/ivan-pineda.webp' in about and 'Ivan Pineda' in about
 assert 'Construction Contractors Board exam' in about
+# The licensing position is stated once on the site, here, under the profile.
+scope = between(about, '<aside class="scope-note"', '</aside>')
+for word in (LICENSE_NOTE_OPENING, 'Oregon CCB exam', 'licensed contractor'):
+    assert word in scope, word
 for path in ('/portfolio', '/before-after'):
     body = fetch(path)[0]
     # Past work is presented as experience, never as services on offer.
