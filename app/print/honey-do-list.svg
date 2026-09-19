@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="8.5in" height="11in" viewBox="0 0 816 1056" role="img" aria-labelledby="sheet-title sheet-desc">
+  <title id="sheet-title">The honey-do list</title>
+  <desc id="sheet-desc">A printable checklist on Zip, LLC letterhead: sixteen empty checkboxes with ruled writing lines, the first one already ticked and filled in with Ivan Pineda's phone number, 971-288-3488.</desc>
+  <style>
+    text { font-family: system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
+    .brand { font-size: 40px; font-weight: 800; fill: #5a0000; letter-spacing: -1px; }
+    .tagline { font-size: 14.5px; font-weight: 600; fill: #6b5f5c; letter-spacing: .6px; }
+    .phone { font-size: 21px; font-weight: 700; fill: #5a0000; }
+    .hours { font-size: 13px; fill: #6b5f5c; }
+    .title { font-size: 35px; font-weight: 800; fill: #241a19; letter-spacing: -1.2px; }
+    .lede { font-size: 17px; fill: #6b5f5c; }
+    .done { font-size: 17px; font-weight: 600; fill: #5a0000; }
+    .foot { font-size: 10.5px; fill: #6b5f5c; }
+    .box { fill: none; stroke: #5a0000; stroke-width: 1.6; }
+    .rule { stroke: #cfc5bf; stroke-width: 1; }
+    .tick { fill: none; stroke: #5a0000; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+    .divider { stroke: #cfc5bf; stroke-width: 1; }
+  </style>
+  <rect width="816" height="1056" fill="#ffffff"/>
+  <rect width="816" height="12" fill="#5a0000"/>
+  <rect x="612" width="204" height="12" fill="#ffd800"/>
+
+  <text class="brand" x="64" y="104">Zip, LLC</text>
+  <text class="tagline" x="64" y="133">Honey Dos · Hauling · Yard Care · Small Projects</text>
+  <text class="phone" x="752" y="99" text-anchor="end">971-288-3488</text>
+  <text class="hours" x="752" y="121" text-anchor="end">Forest Grove &amp; nearby · Evenings &amp; weekends</text>
+  <line class="divider" x1="64" y1="162" x2="752" y2="162"/>
+
+  <text class="title" x="64" y="218">The honey-do list</text>
+  <text class="lede" x="64" y="248">Write it down. I’ll work down it.</text>
+
+  <rect class="box" x="64" y="301" width="23" height="23" rx="3"/>
+  <line class="rule" x1="101" y1="325" x2="752" y2="325"/>
+  <path class="tick" d="M69 313 l6 7 l13 -16"/>
+  <text class="done" x="101" y="320">Call Ivan — 971-288-3488</text>
+  <rect class="box" x="64" y="345" width="23" height="23" rx="3"/>
+  <line class="rule" x1="101" y1="369" x2="752" y2="369"/>
+  <rect class="box" x="64" y="389" width="23" height="23" rx="3"/>
+  <line class="rule" x1="101" y1="413" x2="752" y2="413"/>
+  <rect class="box" x="64" y="433" width="23" height="23" rx="3"/>
+  <line class="rule" x1="101" y1="457" x2="752" y2="457"/>
+  <rect class="box" x="64" y="477" width="23" height="23" rx="3"/>
+  <line class="rule" x1="101" y1="501" x2="752" y2="501"/>
+  <rect class="box" x="64" y="521" width="23" height="23" rx="3"/>
+  <line class="rule" x1="101" y1="545" x2="752" y2="545"/>
+  <rect class="box" x="64" y="565" width="23" height="23" rx="3"/>
+  <line class="rule" x1="101" y1="589" x2="752" y2="589"/>
+  <rect class="box" x="64" y="609" width="23" height="23" rx="3"/>
+  <line class="rule" x1="101" y1="633" x2="752" y2="633"/>
+  <rect class="box" x="64" y="653" width="23" height="23" rx="3"/>
+  <line class="rule" x1="101" y1="677" x2="752" y2="677"/>
+  <rect class="box" x="64" y="697" width="23" height="23" rx="3"/>
+  <line class="rule" x1="101" y1="721" x2="752" y2="721"/>
+  <rect class="box" x="64" y="741" width="23" height="23" rx="3"/>
+  <line class="rule" x1="101" y1="765" x2="752" y2="765"/>
+  <rect class="box" x="64" y="785" width="23" height="23" rx="3"/>
+  <line class="rule" x1="101" y1="809" x2="752" y2="809"/>
+  <rect class="box" x="64" y="829" width="23" height="23" rx="3"/>
+  <line class="rule" x1="101" y1="853" x2="752" y2="853"/>
+  <rect class="box" x="64" y="873" width="23" height="23" rx="3"/>
+  <line class="rule" x1="101" y1="897" x2="752" y2="897"/>
+  <rect class="box" x="64" y="917" width="23" height="23" rx="3"/>
+  <line class="rule" x1="101" y1="941" x2="752" y2="941"/>
+  <rect class="box" x="64" y="961" width="23" height="23" rx="3"/>
+  <line class="rule" x1="101" y1="985" x2="752" y2="985"/>
+
+  <line class="divider" x1="64" y1="1004" x2="752" y2="1004"/>
+  <text class="foot" x="64" y="1026">Zip, LLC · Oregon business registry #2249807-97 · Not a CCB-licensed contractor.</text>
+  <text class="foot" x="752" y="1026" text-anchor="end">Stick it on the fridge.</text>
+</svg>

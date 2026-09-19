@@ -84,6 +84,14 @@ Measured at 320, 360, 375, 414, 600, 859, 860, 1024, 1280 and 1600px: four links
 
 Sources: [NN/G on hamburger menus](https://www.nngroup.com/articles/hamburger-menus/), [NN/G mobile navigation patterns](https://www.nngroup.com/articles/mobile-navigation-patterns/), [floating pill navbars](https://21st.dev/blog/react-floating-navbar-components), [mobile navigation examples](https://www.uxpin.com/studio/blog/mobile-navigation-examples/).
 
+## Printable honey-do list — added 2026-09-19
+
+`app/print/honey-do-list.svg` is a US-Letter sheet (`width="8.5in"`) of sixteen checkboxes and ruled lines on Zip, LLC letterhead, with the first line already ticked off and filled in with the phone number. It sits under the business card on the contact page; the thumbnail is a link that opens the sheet itself in a new tab, and printing is left to the visitor — the site offers no print button, stylesheet or dialog.
+
+- **It is authored source, not a generated asset**, so unlike `app/static` and `app/media` it is tracked in Git and served by its own `/print` mount. SVG means one small text file that prints crisply at any size and can be reviewed in a diff.
+- **It carries the disclosure.** The sheet leaves the site on paper with the business name and phone number on it, which makes it advertising, so its footer repeats the line every page carries: registry number and “Not a CCB-licensed contractor.” A smoke check asserts that, and fails if any regulated-trade word reaches the sheet.
+- Cached like the other assets: `no-cache` bare, `immutable` when the `asset()` version is on the URL.
+
 ## Confirmed business details
 
 - Registered entity name, from the Oregon registry: **Zip, LLC** (registry 2249807-97, registered 2024-04-04). All site copy uses that exact name, comma included, and a smoke check fails on “Zip LLC” without it. The owner originally supplied “Zip LLC Handyman Services”. The site displays **“Zip, LLC”** with the tagline “Honey Dos · Hauling · Yard Care · Small Projects” (owner’s wording, 2026-09-18; see the licensing questions below): the owner flagged on 2026-09-18 that advertising as a handyman is contractor advertising in Oregon while unlicensed. The word “handyman” appears nowhere in public copy, and both test suites fail if it returns. If the assumed business name is registered as “Zip LLC Handyman Services,” ask whether the registration itself needs changing — that is outside this site. Rebuilt preview and reran HTTP smoke checks and all four browser tests successfully after branding change (2026-09-17).

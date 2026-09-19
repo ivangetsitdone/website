@@ -10,6 +10,8 @@ ROOT = Path(__file__).parent
 app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
 app.mount('/static', StaticFiles(directory=ROOT / 'static'), name='static')
 app.mount('/media', StaticFiles(directory=ROOT / 'media'), name='media')
+# Hand-authored, printable, and tracked in Git rather than generated at build time.
+app.mount('/print', StaticFiles(directory=ROOT / 'print'), name='print')
 templates = Jinja2Templates(directory=ROOT / 'templates')
 _asset_versions: dict[str, str] = {}
 
@@ -39,7 +41,7 @@ templates.env.globals['asset'] = asset
 async def cache_headers(request: Request, call_next):
     response = await call_next(request)
     path = request.url.path
-    if path.startswith(('/static/', '/media/')):
+    if path.startswith(('/static/', '/media/', '/print/')):
         # Versioned URLs can be cached hard; bare ones must revalidate.
         response.headers['Cache-Control'] = ('public, max-age=31536000, immutable'
                                              if request.query_params.get('v') else 'no-cache')

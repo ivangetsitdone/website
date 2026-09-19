@@ -72,6 +72,14 @@ test('about portrait and contact details', async ({ page }) => {
   await expect(page.getByRole('link', { name: 'Call 971-288-3488' }).first()).toHaveAttribute('href', 'tel:+19712883488');
   await expect(page.getByRole('link', { name: 'Text 971-288-3488' })).toHaveAttribute('href', 'sms:+19712883488');
   await expect(page.getByText('Forest Grove and surrounding communities').first()).toBeVisible();
+  // The printable list is a link to the sheet itself, opened in its own tab.
+  const sheet = page.locator('.print-list img');
+  await sheet.scrollIntoViewIfNeeded();
+  expect(await isLoaded(sheet)).toBe(true);
+  const sheetLink = page.locator('.print-list a');
+  await expect(sheetLink).toHaveAttribute('href', /\/print\/honey-do-list\.svg(\?|$)/);
+  await expect(sheetLink).toHaveAttribute('target', '_blank');
+  await expect(sheetLink).toHaveAttribute('rel', 'noopener');
   await page.screenshot({ path: `../../recovery/contact-${test.info().project.name}.png`, fullPage: true });
 });
 

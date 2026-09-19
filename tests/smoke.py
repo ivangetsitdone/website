@@ -10,6 +10,7 @@ SITE = 'https://ivanpineda.bottah.dev'
 # never name regulated construction. The wording lives only in the "what I don't take
 # on" note and in the work-history pages, which describe past experience.
 LICENSE_NOTE_OPENING = 'Zip, LLC is not a CCB-licensed contractor.'
+SHORT_DISCLOSURE = 'Not a CCB-licensed contractor.'
 REGULATED = ('remodel', 'sheetrock', 'drywall', 'tile', 'flooring', 'plumbing',
              'electrical', 'painting', 'shower', 'install', 'repair', 'retaining wall')
 
@@ -100,7 +101,19 @@ for path in ('/portfolio', '/before-after'):
 contact = fetch('/contact')[0]
 assert 'Call 971-288-3488' in contact and 'Text 971-288-3488' in contact
 assert 'no online form' in contact
-assert '/media/card.webp' in contact and 'ivanpineda.bottah.dev' in contact
+assert '/media/card.webp' in contact and 'IvanGetsItDone.com' in contact
+# The printable honey-do list: linked from the contact page, opened in a new tab, and
+# carrying the same disclosure as every page, because it leaves the site on paper.
+assert 'aria-label="Open the printable honey-do list in a new tab"' in contact
+assert '/print/honey-do-list.svg' in contact and 'target="_blank"' in contact
+sheet, sheet_headers = fetch('/print/honey-do-list.svg')
+assert 'image/svg+xml' in sheet_headers['Content-Type']
+assert sheet_headers['Cache-Control'] == 'no-cache'
+assert fetch('/print/honey-do-list.svg?v=test')[1]['Cache-Control'] == 'public, max-age=31536000, immutable'
+assert '971-288-3488' in sheet and '2249807-97' in sheet
+assert SHORT_DISCLOSURE in sheet
+for word in REGULATED:
+    assert word not in sheet.lower(), ('printable sheet offers regulated work', word)
 for path, mime in [('/static/site.js', 'javascript'), ('/static/site.css', 'text/css')]:
     body, headers = fetch(path)
     assert body and mime in headers['Content-Type']
@@ -110,4 +123,5 @@ for path, mime in [('/static/site.js', 'javascript'), ('/static/site.css', 'text
 fetch('/hello', 404)
 fetch('/not-a-page', 404)
 fetch('/static/not-a-file', 404)
+fetch('/print/not-a-file.svg', 404)
 print('HTTP smoke checks passed.')
