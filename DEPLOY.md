@@ -23,6 +23,14 @@ plus a Chromium download for the browser suite.
 
 ## 1a. Preparing a bare droplet
 
+**Running as root is fine, and is the shorter path.** Everything below the Docker install is
+optional hardening, and it is worth being honest about what it does and does not buy: the
+`docker` group is root-equivalent, so a deploy account is not a security boundary, and the
+application runs unprivileged inside the container either way. The real gain is switching
+off root SSH login, which needs keys — so on a droplet provisioned with a root password and
+no keys at all, this becomes a key-management errand that has nothing to do with getting the
+site up. Deploy first; come back to it if you want it.
+
 Order matters: the `docker` group is created by the Docker package, so a user cannot be
 added to it before Docker is installed.
 
@@ -114,6 +122,17 @@ git clone https://github.com/ivangetsitdone/website.git
 cd website
 docker compose up -d --build
 ```
+
+**If DNS still points at the old host**, start on plain HTTP first, or Caddy will sit there
+failing to get a certificate for a name that resolves elsewhere:
+
+```sh
+SITE_ADDRESS=:80 docker compose up -d --build
+curl -I http://<new-host-ip>/
+```
+
+Move the A record, then `docker compose down && docker compose up -d` to pick up the real
+hostname and issue the certificate.
 
 The build does three things in sequence, and fails loudly rather than quietly shipping
 something wrong:
