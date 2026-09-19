@@ -14,6 +14,7 @@ otherwise be re-litigated or accidentally undone.
 | [0007](0007-no-published-rates.md) | No prices on the site |
 | [0008](0008-deployment.md) | Docker Compose + Caddy on a single droplet |
 | [0009](0009-brand-assets.md) | Brand artwork processed at build time |
+| [0010](0010-continuous-deployment.md) | Push to main deploys over SSH, building on the droplet |
 
 Format: context, decision, consequences. Keep them short; if one needs reversing, add a
 new record that supersedes it rather than rewriting history.

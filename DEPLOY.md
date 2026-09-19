@@ -180,6 +180,64 @@ something wrong:
 First boot takes a few minutes, most of it Pillow regenerating 75 images. Watch it with
 `docker compose logs -f`.
 
+## 2a. Automatic deploys
+
+Once the host is up, every push to `main` redeploys it. `.github/workflows/deploy.yml`
+opens one SSH session, resets the checkout to the commit that triggered the run, rebuilds,
+and waits for the app container's healthcheck; two follow-on jobs then run the HTTP and
+browser suites against the live site. Reasoning is in
+[ADR-0010](docs/adr/0010-continuous-deployment.md).
+
+**The droplet is a deploy target, not a workspace.** The deploy runs `git reset --hard`, so
+anything edited on the host is discarded. `.env` is untracked and survives, which is how the
+`SITE_ADDRESS` pin stays put. Before the first automatic deploy, check there is nothing on
+the host worth keeping:
+
+```sh
+ssh root@ivangetsitdone.com 'ls -d /srv/website /root/website 2>/dev/null; git -C /srv/website status --short'
+```
+
+The workflow looks for the checkout in `/srv/website`, then `/root/website`. Anywhere else,
+set a `DEPLOY_DIR` repository variable. `DEPLOY_USER` (default `root`) and `DEPLOY_HOST`
+(default `ivangetsitdone.com`, so a rotated droplet IP needs no change) work the same way.
+
+### One-time setup
+
+Two repository secrets, from your own machine:
+
+```sh
+# A key only Actions uses. No passphrase — nothing can type one for it.
+ssh-keygen -t ed25519 -f ~/.ssh/ivan_deploy_ci -N '' -C 'github-actions@ivangetsitdone'
+
+# Let the droplet accept it.
+ssh-copy-id -i ~/.ssh/ivan_deploy_ci.pub root@ivangetsitdone.com
+
+# Hand GitHub the private half, and pin the droplet's host key so the runner cannot be
+# redirected to some other machine.
+gh secret set DEPLOY_KEY -R ivangetsitdone/website < ~/.ssh/ivan_deploy_ci
+ssh-keyscan -t ed25519 ivangetsitdone.com |
+  gh secret set DEPLOY_KNOWN_HOSTS -R ivangetsitdone/website
+```
+
+Without `gh`, the same two values go in by hand at **Settings → Secrets and variables →
+Actions → New repository secret**. `DEPLOY_KEY` is the whole private key file including its
+`-----BEGIN`/`-----END` lines; `DEPLOY_KNOWN_HOSTS` is the one-line output of `ssh-keyscan`.
+
+Then push anything, or run the workflow by hand from the **Actions** tab. The run fails on
+its first step, before touching the droplet, if either secret is missing.
+
+### When it goes wrong
+
+- **`Permission denied (publickey)`** — the public half is not in the droplet's
+  `authorized_keys`, or `DEPLOY_KEY` was pasted without its trailing newline.
+- **`Host key verification failed`** — the droplet was rebuilt and its host key changed.
+  Re-run the `ssh-keyscan` line above. This is the check working, not misfiring.
+- **`app is unhealthy`** — the build succeeded but the container did not come up; the job
+  prints `docker compose logs`. The previous containers are already gone at that point.
+- **A red `verify` or `browser` job** — the deploy happened and the live site broke. Fix
+  forward, or `git revert` and push, which deploys the revert.
+- Rebuilding the droplet resets all of this: re-add the public key and refresh the host key.
+
 ## 3. Serving a different domain
 
 Three places name the domain, and they have to agree:

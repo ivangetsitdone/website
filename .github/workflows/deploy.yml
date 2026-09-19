@@ -1,0 +1,140 @@
+# Ship main to the droplet, then prove the live site still works.
+#
+# Setup is two repository secrets — DEPLOY_KEY (an SSH private key whose public half is in
+# the droplet's authorized_keys) and DEPLOY_KNOWN_HOSTS (the droplet's SSH host key). The
+# optional DEPLOY_USER, DEPLOY_HOST and DEPLOY_DIR repository *variables* override the
+# defaults below. See DEPLOY.md, "Automatic deploys".
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# One deploy at a time, and never cancel one part-way: a half-applied deploy is worse than
+# a queued one.
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+env:
+  SITE: https://ivangetsitdone.com
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Authorise the runner against the droplet
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          if [ -z "$DEPLOY_KEY" ] || [ -z "$KNOWN_HOSTS" ]; then
+            echo "::error::DEPLOY_KEY and DEPLOY_KNOWN_HOSTS are not set. See DEPLOY.md."
+            exit 1
+          fi
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      - name: Pull, rebuild and restart
+        env:
+          TARGET: ${{ vars.DEPLOY_USER || 'root' }}@${{ vars.DEPLOY_HOST || 'ivangetsitdone.com' }}
+          DIR: ${{ vars.DEPLOY_DIR }}
+        run: |
+          ssh -o BatchMode=yes "$TARGET" 'bash -s --' "$GITHUB_SHA" "$DIR" <<'REMOTE'
+          set -euo pipefail
+          sha=$1
+          dir=${2:-}
+
+          # Where the droplet's checkout lives. It has been in both of these.
+          for candidate in "$dir" /srv/website /root/website; do
+            if [ -n "$candidate" ] && [ -d "$candidate/.git" ]; then dir=$candidate; break; fi
+          done
+          if [ ! -d "${dir:-}/.git" ]; then
+            echo "No checkout found. Set the DEPLOY_DIR repository variable." >&2
+            exit 1
+          fi
+          cd "$dir"
+          echo "deploying $sha into $dir"
+
+          # The repository is public, so the droplet needs no key of its own to fetch.
+          url=https://github.com/ivangetsitdone/website.git
+          git remote set-url origin "$url" 2>/dev/null || git remote add origin "$url"
+          git fetch --prune origin main
+          # A deploy target, not a workspace: anything edited on the droplet is discarded.
+          # .env is untracked and survives, which is how SITE_ADDRESS stays pinned.
+          git reset --hard "$sha"
+
+          docker compose up -d --build
+
+          # The app's own healthcheck decides whether this deploy was good.
+          state=starting
+          for _ in $(seq 60); do
+            state=$(docker inspect -f '{{.State.Health.Status}}' "$(docker compose ps -q app)" 2>/dev/null || echo starting)
+            if [ "$state" = healthy ]; then break; fi
+            sleep 3
+          done
+          if [ "$state" != healthy ]; then
+            echo "app is $state after three minutes" >&2
+            docker compose ps
+            docker compose logs --tail 80 app
+            exit 1
+          fi
+
+          docker image prune -f >/dev/null   # layers the build just orphaned; 2 GB disk
+          docker compose ps
+          REMOTE
+
+      - name: The site answers over HTTPS
+        run: |
+          for _ in $(seq 10); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "$SITE/") && [ "$code" = 200 ] && break
+            sleep 3
+          done
+          echo "$SITE -> $code"
+          [ "$code" = 200 ]
+
+  # Post-deploy, against the live site. A failure here means something reached production
+  # that should not have; the previous containers are already gone, so read it as "roll
+  # back or fix forward", not "the deploy did not happen".
+  verify:
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pages, headers, caching and the licensing guardrails
+        run: python3 tests/smoke.py "$SITE"
+      - name: Catalogue, generated assets and source isolation
+        run: python3 tests/portfolio_http.py "$SITE"
+
+  browser:
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: tests/browser
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: tests/browser/package-lock.json
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ../../recovery/browsers
+      - run: npm test
+        env:
+          BASE_URL: ${{ env.SITE }}
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-trace
+          path: recovery/browser-results
+          retention-days: 7

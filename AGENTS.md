@@ -6,4 +6,6 @@
 - Use ignored `recovery/` for diagnostic logs and raw session evidence. Never commit secrets, raw session logs, dependencies, or generated assets.
 - Distinguish configuration/syntax checks from build, runtime, and browser verification.
 - Keep README.md as onboarding, not a changelog: durable decisions belong in `docs/adr/`, live action items in `docs/open-questions.md`. Do not invent test results.
-- The remote is `github.com/ivangetsitdone/website` and the site deploys from it. CI/CD is still not configured; ask before adding it.
+- The remote is `github.com/ivangetsitdone/website` and the site deploys from it. Every push to
+  `main` redeploys the live site via `.github/workflows/deploy.yml`, so treat `main` as production.
+  The droplet's checkout is reset on each deploy; never keep work only on the host.

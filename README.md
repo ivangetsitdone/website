@@ -36,6 +36,10 @@ First build takes about five minutes: Vite bundles the frontend, then Pillow reg
 75 images from the tracked originals. `docker compose logs -f` to watch.
 
 Deploying to a server is [DEPLOY.md](DEPLOY.md) — one command on a fresh droplet.
+After that it is automatic: **every push to `main` redeploys the live site**, then runs
+all three suites against it. See [Automatic deploys](DEPLOY.md#2a-automatic-deploys).
+The droplet is a deploy target, not a workspace — the deploy resets its checkout, so
+anything edited there is discarded.
 
 ## How it fits together
 
@@ -66,6 +70,7 @@ scripts/build_photos.py  Image pipeline; verifies hashes, strips metadata
 scripts/bootstrap.sh     Stand the site up on a fresh host
 tests/                   Two dependency-free HTTP suites, plus Playwright
 docs/adr/                Why things are the way they are
+.github/workflows/       Deploy on push to main, then test the live site
 DEPLOY.md                Rebuilding on a new host
 ```
 
@@ -128,6 +133,7 @@ Short records of why the non-obvious choices were made, in [docs/adr](docs/adr):
 | [0007](docs/adr/0007-no-published-rates.md) | No prices on the site, deliberately |
 | [0008](docs/adr/0008-deployment.md) | Docker Compose + Caddy on a single droplet |
 | [0009](docs/adr/0009-brand-assets.md) | Brand artwork processed at build time, not by hand |
+| [0010](docs/adr/0010-continuous-deployment.md) | Push to main deploys over SSH, building on the droplet |
 
 ## Business facts
 
