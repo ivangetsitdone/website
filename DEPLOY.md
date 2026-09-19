@@ -214,14 +214,14 @@ Two repository secrets, from your own machine:
 
 ```sh
 # A key only Actions uses. No passphrase — nothing can type one for it.
-ssh-keygen -t ed25519 -f ~/.ssh/ivan_deploy_ci -N '' -C 'github-actions@ivangetsitdone'
+ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519_zipllc_ci -N '' -C 'github-actions@ivangetsitdone'
 
 # Let the droplet accept it.
-ssh-copy-id -i ~/.ssh/ivan_deploy_ci.pub root@ivangetsitdone.com
+ssh-copy-id -i ~/.ssh/id_ed25519_zipllc_ci.pub root@ivangetsitdone.com
 
 # Hand GitHub the private half, and pin the droplet's host key so the runner cannot be
 # redirected to some other machine.
-gh secret set DEPLOY_KEY -R ivangetsitdone/website < ~/.ssh/ivan_deploy_ci
+gh secret set DEPLOY_KEY -R ivangetsitdone/website < ~/.ssh/id_ed25519_zipllc_ci
 ssh-keyscan -t ed25519 ivangetsitdone.com |
   gh secret set DEPLOY_KNOWN_HOSTS -R ivangetsitdone/website
 ```
