@@ -154,9 +154,9 @@ button:focus-visible, .button-link:focus-visible { outline-color: var(--gold); }
 .business-card { margin: 0; }
 .business-card img { display: block; width: 100%; height: auto; border-radius: .9rem; border: 1px solid var(--line); }
 .business-card figcaption { font-size: .78rem; color: var(--muted); margin-top: .6rem; }
-/* The printable list. A letter-size sheet, so it is shown small: it is a handout to
-   open, not a thing to read on the page. */
-.print-list { display: grid; gap: .6rem; justify-items: start; margin: 0; }
+/* The printable list, at the foot of the "A few details help" column. A letter-size
+   sheet, so it is shown small: it is a handout to open, not a thing to read here. */
+.print-list { display: grid; gap: .6rem; justify-items: start; margin: 2rem 0 0; }
 .print-list a { display: block; width: 100%; max-width: 15rem; border: 1px solid var(--line); border-radius: .5rem; overflow: hidden; background: white; }
 .print-list a:hover { border-color: var(--brand); }
 .print-list img { display: block; width: 100%; height: auto; }
