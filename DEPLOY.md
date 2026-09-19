@@ -7,6 +7,25 @@ assets, and the tests that check the result. Nothing has to be copied off the ol
 Verified on 2026-09-19 by cloning this repository into an empty directory, building it
 with no cache, and running the suites against the result — see **Proof** at the bottom.
 
+## 0. The short way: cloud-init
+
+Paste [`cloud-init.yaml`](cloud-init.yaml) into the **User data** field when creating the
+droplet. It installs Docker if the image lacks it, clones this repository to `/srv/website`,
+writes `.env`, and starts the site — the droplet boots with the site already running, and
+nothing is typed on the host at all. First boot takes a few minutes while the images build;
+`/var/log/site-bootstrap.log` has the transcript.
+
+It comes up on plain HTTP so it does not depend on DNS having moved yet. Once the A record
+points at the droplet, set the hostname and restart:
+
+```sh
+cd /srv/website
+echo 'SITE_ADDRESS=ivanpineda.bottah.dev' > .env
+docker compose up -d
+```
+
+The rest of this guide is the manual equivalent, for when something needs doing by hand.
+
 ## 1. What the new host needs
 
 - **Docker Engine and the Compose plugin.** Nothing else: Node, Python and Pillow all run
