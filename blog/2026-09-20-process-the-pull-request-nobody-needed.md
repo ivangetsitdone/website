@@ -193,7 +193,7 @@ run finished in two minutes, so by the time there was a result to commit there w
 in-flight run left to cancel. Testing it needs two pushes inside one run's window — which is
 exactly the real scenario it models: pushing a fixup while CI is still chewing on the commit
 before it. So that is what the next two commits on this branch do, deliberately and close
-together.
+together — this is the second of them, pushed within a minute of the first.
 
 ## Recap
 
