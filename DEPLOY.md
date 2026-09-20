@@ -197,9 +197,12 @@ anything reaches the droplet. Reasoning is in
 
 **What a deploy does to the live site.** Compose builds first, with the current containers
 still serving, and replaces them only once the build succeeds — so a broken tree cannot take
-the site down. It is not blue-green: the swap itself is a restart, Caddy answers 502 for the
-seconds it takes, and when the new container is unhealthy the old one is already gone.
-Rolling back is `git revert` and push, which is a normal deploy through the same gate.
+the site down. It is not blue-green, though: the swap is a restart, and measured on an
+identical stack at 25 samples a second it costs **8.4s of 502** when the app container is
+replaced, plus **3.6s of refused connections** when Caddy is too (which happens when
+`compose.yaml` or the `Caddyfile` changes). When the new container turns out to be
+unhealthy, the old one is already gone. Rolling back is `git revert` and push, which is a
+normal deploy through the same gate.
 
 **The droplet is a deploy target, not a workspace.** The deploy runs `git reset --hard`, so
 anything edited on the host is discarded. `.env` is untracked and survives, which is how the

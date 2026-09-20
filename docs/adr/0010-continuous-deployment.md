@@ -48,8 +48,13 @@ Deliberately **not** chosen:
   build, and are replaced only once it succeeds, so a broken tree cannot take the site down.
   What it does not give is a tested new version running beside the old one: when the new
   container is unhealthy, the old one is already gone.
-- **There is a visible restart.** Replacing the app container leaves Caddy briefly proxying
-  to nothing. Measured over a real deploy, the gap is seconds; Caddy answers 502 inside it.
+- **Every deploy has a visible outage.** Measured on an identical stack, sampling the proxy
+  25 times a second: replacing the app container gives **8.4s of 502**, and replacing Caddy
+  itself — which happens whenever `compose.yaml` or the `Caddyfile` changes — gives **3.6s
+  of refused connections**. Compose has no rolling update, so this is inherent to running
+  one container per service. `lb_try_duration` on the reverse proxy would turn the app's
+  window into slow requests instead of errors; it is not configured. For a site whose job
+  is to make the phone ring, a few seconds of 502 during a merge has been judged acceptable.
 - **Old images do not accumulate; build cache would.** Each deploy prunes the image the
   previous one left untagged, and trims build cache older than a week. Both matter on a
   2 GB droplet, and the deploy prints `df -h /` so a filling disk is visible before it bites.
