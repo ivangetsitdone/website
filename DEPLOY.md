@@ -308,36 +308,28 @@ continues to serve `main` from `/srv/website` and the `app` service.
 1. Create an **A** record for `preview.ivangetsitdone.com` pointing to the same droplet IP as
    the bare domain. Keep it **DNS-only**, not Cloudflare-proxied, so Caddy can complete its
    TLS-ALPN certificate challenge.
-2. Merge the preview infrastructure through the normal production workflow first. That deploy
-   installs `/usr/local/sbin/website-preview-deploy` from trusted `main`.
-3. Generate a separate key and install only its public half as a forced command:
+2. Create a GitHub environment named `preview`, restrict its deployment branches to selected
+   branch `main`, and optionally add required reviewers. Store the private half of the dedicated
+   preview key as `PREVIEW_DEPLOY_KEY` in that environment. Its matching public half is tracked
+   at `deploy/preview_deploy.pub`.
+3. Merge the preview infrastructure through the normal production workflow. After production
+   is healthy, that deploy installs the root-owned forced command, creates the `preview-deploy`
+   account, joins it to the Docker group, and writes the restricted `authorized_keys` entry from
+   the committed public key.
+4. Enable the public Caddy hostname only after DNS resolves:
 
 ```sh
-# On your own machine:
-ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519_zipllc_preview -N '' -C 'github-preview@ivangetsitdone'
-
-# On the droplet as root; substitute the one-line .pub contents below.
-id preview-deploy >/dev/null 2>&1 || useradd -m -s /bin/bash preview-deploy
-usermod -aG docker preview-deploy
-install -d -m 700 -o preview-deploy -g preview-deploy /home/preview-deploy/.ssh
-install -d -m 755 -o preview-deploy -g preview-deploy /srv/website-preview
-printf '%s\n' 'restrict,command="/usr/local/sbin/website-preview-deploy" ssh-ed25519 AAAA... github-preview@ivangetsitdone' \
-  > /home/preview-deploy/.ssh/authorized_keys
-chown preview-deploy:preview-deploy /home/preview-deploy/.ssh/authorized_keys
-chmod 600 /home/preview-deploy/.ssh/authorized_keys
+gh variable set PREVIEW_ADDRESS -R ivangetsitdone/website \
+  --body preview.ivangetsitdone.com
 ```
 
-4. In GitHub, create an environment named `preview`. Restrict its deployment branches to
-   selected branch `main`; optionally add required reviewers for a click-to-approve gate. Store
-   the private key as the environment secret:
+The next `main` deployment writes that value to the host's `.env`. Until the variable is set,
+preview stays on unpublished internal address `:8081`, so a missing DNS record cannot trigger
+certificate attempts. The existing repository `DEPLOY_KNOWN_HOSTS` secret is reused only for
+host-key verification; the production private key is never exposed to the preview workflow.
 
-```sh
-gh secret set PREVIEW_DEPLOY_KEY -R ivangetsitdone/website --env preview \
-  < ~/.ssh/id_ed25519_zipllc_preview
-```
-
-The existing repository `DEPLOY_KNOWN_HOSTS` secret is reused only for host-key verification;
-the production private key is never exposed to the preview workflow.
+To rotate the preview key, generate a new pair, replace `deploy/preview_deploy.pub` through a
+reviewed production PR, and update the environment secret before deploying another preview.
 
 ### Deploy a reviewed candidate
 
