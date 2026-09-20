@@ -188,7 +188,7 @@ three jobs, in order:
 | Job | Where | What |
 | --- | --- | --- |
 | `check` | runner | Builds the images, starts the stack on plain HTTP, runs all three suites against it. Runs on pull requests too; touches nothing live. |
-| `deploy` | droplet | Resets `/srv/website` to the commit, rebuilds, waits for the app's healthcheck. Skipped for pull requests. |
+| `deploy` | droplet | Resets `/srv/website` to the commit, rebuilds, waits for the app's healthcheck, reloads Caddy, asserts `HEAD`. Rolls back on any failure. Skipped for pull requests. |
 | `verify` | runner | Re-runs the two HTTP suites against production, proving this host and its certificate serve what was tested. |
 
 A pull request therefore runs `check` alone: a change that breaks the site is caught before
@@ -197,12 +197,20 @@ anything reaches the droplet. Reasoning is in
 
 **What a deploy does to the live site.** Compose builds first, with the current containers
 still serving, and replaces them only once the build succeeds — so a broken tree cannot take
-the site down. It is not blue-green, though: the swap is a restart, and measured on an
-identical stack at 25 samples a second it costs **8.4s of 502** when the app container is
-replaced, plus **3.6s of refused connections** when Caddy is too (which happens when
-`compose.yaml` or the `Caddyfile` changes). When the new container turns out to be
-unhealthy, the old one is already gone. Rolling back is `git revert` and push, which is a
-normal deploy through the same gate.
+the site down. The swap is still a restart, but nobody sees it: the app image is compiled at
+build time so it starts in about three seconds, and Caddy holds connections and retries
+across the gap rather than returning 502. Measured at 25 samples a second while the app
+container is replaced: **zero errors, one request held for 3.72 seconds**.
+
+Replacing Caddy itself costs about **3.6 seconds of refused connections**, since nothing is
+left to absorb it. That happens only when `compose.yaml` changes — a `Caddyfile` change is a
+graceful reload with no interruption at all.
+
+**If the new build will not serve**, the deploy puts the previous commit back, rebuilds it
+from cache and waits for it to become healthy, then fails the job. Rehearsed against a real
+clone with a commit that builds cleanly and refuses to start: the site ends at HTTP 200 on
+the previous commit, and the run is red. A rollback is an incident — read the log, fix
+forward, push again. `git revert` and push is a normal deploy through the same gate.
 
 **The droplet is a deploy target, not a workspace.** The deploy runs `git reset --hard`, so
 anything edited on the host is discarded. `.env` is untracked and survives, which is how the
@@ -257,8 +265,12 @@ its first step, before touching the droplet, if either secret is missing.
   Re-run the `ssh-keyscan` line above. This is the check working, not misfiring.
 - **`/srv/website: No such file or directory`** — the droplet's checkout is elsewhere. Move
   it, as above; the path is fixed on purpose.
-- **`app is unhealthy`** — the build succeeded but the container did not come up; the job
-  prints `docker compose logs`. The previous containers are already gone at that point.
+- **`rolling back to <sha>`** — the new build never became healthy. The job prints
+  `docker compose logs` first; that is where the reason is. The site is back on the previous
+  commit by the time the job goes red.
+- **`the rollback is unhealthy too - the site is down`** — the rare bad one. The previous
+  commit no longer builds or starts either, which usually means the host, not the code:
+  check `df -h /` in the same log, then `docker compose logs` on the droplet.
 - **A red `verify` or `browser` job** — the deploy happened and the live site broke. Fix
   forward, or `git revert` and push, which deploys the revert.
 - Rebuilding the droplet resets all of this: re-add the public key and refresh the host key.
