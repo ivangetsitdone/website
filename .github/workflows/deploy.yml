@@ -182,19 +182,15 @@ jobs:
           # The preview SSH key is forced to this root-owned script.
           install -o root -g root -m 0755 scripts/deploy_preview.sh \
             /usr/local/sbin/website-preview-deploy
-          id preview-deploy >/dev/null 2>&1 || useradd -m -s /bin/bash preview-deploy
-          # useradd creates a locked account that sshd rejects before checking keys. Give it
-          # an unknown random password; SSH still uses only the forced-command public key.
-          preview_password=$(openssl rand -base64 32)
-          printf 'preview-deploy:%s\n' "$preview_password" | chpasswd
-          usermod -aG docker preview-deploy
-          install -d -m 0700 -o preview-deploy -g preview-deploy /home/preview-deploy/.ssh
-          install -d -m 0755 -o preview-deploy -g preview-deploy /srv/website-preview
+          install -d -m 0700 -o root -g root /root/.ssh
+          touch /root/.ssh/authorized_keys
+          sed -i '/github-preview@ivangetsitdone$/d' /root/.ssh/authorized_keys
           preview_public_key=$(cat deploy/preview_deploy.pub)
           printf 'restrict,command="/usr/local/sbin/website-preview-deploy" %s\n' \
-            "$preview_public_key" > /home/preview-deploy/.ssh/authorized_keys
-          chown preview-deploy:preview-deploy /home/preview-deploy/.ssh/authorized_keys
-          chmod 0600 /home/preview-deploy/.ssh/authorized_keys
+            "$preview_public_key" >> /root/.ssh/authorized_keys
+          chown root:root /root/.ssh/authorized_keys
+          chmod 0600 /root/.ssh/authorized_keys
+          install -d -m 0755 -o root -g root /srv/website-preview
 
           # The image the last deploy built is now untagged, and the build cache grows
           # without bound. Both matter on a 2 GB droplet with a small disk.
