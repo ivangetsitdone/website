@@ -183,6 +183,10 @@ jobs:
           install -o root -g root -m 0755 scripts/deploy_preview.sh \
             /usr/local/sbin/website-preview-deploy
           id preview-deploy >/dev/null 2>&1 || useradd -m -s /bin/bash preview-deploy
+          # useradd creates a locked account that sshd rejects before checking keys. Give it
+          # an unknown random password; SSH still uses only the forced-command public key.
+          preview_password=$(openssl rand -base64 32)
+          printf 'preview-deploy:%s\n' "$preview_password" | chpasswd
           usermod -aG docker preview-deploy
           install -d -m 0700 -o preview-deploy -g preview-deploy /home/preview-deploy/.ssh
           install -d -m 0755 -o preview-deploy -g preview-deploy /srv/website-preview
