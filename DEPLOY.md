@@ -289,14 +289,14 @@ The mutable `preview` branch identifies a candidate for owner review at
 The trusted Preview workflow is dispatched from `main` with the exact current preview SHA.
 Candidate tests run without deployment secrets.
 
-On the host, the separate preview key is added to root's `authorized_keys` with `restrict` and
-a forced `/usr/local/sbin/website-preview-deploy` command. It cannot open an interactive shell
-or choose another command. The deployer is installed only after a trusted `main` production
-deploy is healthy. The candidate image is built and tested on an isolated GitHub runner,
-capped at 600 MB and streamed with a SHA-256 checksum. The host verifies the checksum and exact
-`origin/preview` SHA, loads the image, and applies the trusted `/srv/website/compose.preview.yaml`.
-Candidate Dockerfiles never execute on the production host, and the runtime has CPU, memory and
-PID limits in addition to its read-only filesystem.
+On the host, the separate preview key belongs to the dedicated `preview-deploy` system user and
+is restricted to a forced `/usr/local/sbin/website-preview-deploy` command. It cannot open an
+interactive shell or choose another command. The deployer is installed only after a trusted
+`main` production deploy is healthy. The candidate image is built and tested on an isolated
+GitHub runner, capped at 600 MB and streamed with a SHA-256 checksum. The host verifies the
+checksum and exact `origin/preview` SHA, loads the image, and applies the trusted
+`/srv/website/compose.preview.yaml`. Candidate Dockerfiles never execute on the production
+host, and the runtime has CPU, memory and PID limits in addition to its read-only filesystem.
 
 The preview app publishes no host port. It joins the existing `website_default` Docker network
 as `preview-app`; the production Caddy container proxies the preview hostname to that alias.
@@ -314,9 +314,9 @@ continues to serve `main` from `/srv/website` and the `app` service.
    preview key as `PREVIEW_DEPLOY_KEY` in that environment. Its matching public half is tracked
    at `deploy/preview_deploy.pub`.
 3. Merge the preview infrastructure through the normal production workflow. After production
-   is healthy, that deploy installs the root-owned forced command and adds the reviewed public
-   key to root's `authorized_keys` with `restrict` and that forced command. Existing root keys
-   are preserved.
+   is healthy, that deploy installs the root-owned forced command, provisions the dedicated
+   `preview-deploy` system user, and writes the reviewed public key to the AuthorizedKeysFile
+   paths reported by the live SSH configuration. Any earlier preview key under root is removed.
 4. Enable the public Caddy hostname only after DNS resolves:
 
 ```sh
