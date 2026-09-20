@@ -29,6 +29,9 @@ services:
       # Caddy provisions a certificate for every named site, so a preview host that
       # cannot answer a challenge for www must be given an address, not the name.
       WWW_ADDRESS: ${WWW_ADDRESS:-www.ivangetsitdone.com}
+      # Preview stays on an unpublished internal address until DNS exists and the
+      # PREVIEW_ADDRESS repository variable is set to preview.ivangetsitdone.com.
+      PREVIEW_ADDRESS: ${PREVIEW_ADDRESS:-:8081}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data

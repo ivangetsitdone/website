@@ -157,7 +157,7 @@ docker compose up -d --build
 failing to get a certificate for a name that resolves elsewhere:
 
 ```sh
-SITE_ADDRESS=:80 WWW_ADDRESS=:8080 docker compose up -d --build
+SITE_ADDRESS=:80 WWW_ADDRESS=:8080 PREVIEW_ADDRESS=:8081 docker compose up -d --build
 curl -I http://<new-host-ip>/
 ```
 
@@ -282,6 +282,71 @@ its first step, before touching the droplet, if either secret is missing.
   forward, or `git revert` and push, which deploys the revert.
 - Rebuilding the droplet resets all of this: re-add the public key and refresh the host key.
 
+## 2b. Preview deploys
+
+The mutable `preview` branch identifies a candidate for owner review at
+<https://preview.ivangetsitdone.com>, but it does **not** define or trigger its own deployment.
+The trusted Preview workflow is dispatched from `main` with the exact current preview SHA.
+Candidate tests run without deployment secrets.
+
+On the host, a separate `preview-deploy` SSH account is restricted to the root-owned
+`/usr/local/sbin/website-preview-deploy` command. That command is installed only after a
+trusted `main` production deploy is healthy. The candidate image is built and tested on an
+isolated GitHub runner, capped at 600 MB and streamed with a SHA-256 checksum. The host verifies
+the checksum and exact `origin/preview` SHA, loads the image, and applies the trusted
+`/srv/website/compose.preview.yaml`. Candidate Dockerfiles never execute on the production
+host, and the runtime has CPU, memory and PID limits in addition to its read-only filesystem.
+
+The preview app publishes no host port. It joins the existing `website_default` Docker network
+as `preview-app`; the production Caddy container proxies the preview hostname to that alias.
+Responses carry `X-Robots-Tag: noindex, nofollow, noarchive`. This discourages indexing but is
+not access control, so deploy only photos already authorized for public disclosure. Production
+continues to serve `main` from `/srv/website` and the `app` service.
+
+### One-time preview setup
+
+1. Create an **A** record for `preview.ivangetsitdone.com` pointing to the same droplet IP as
+   the bare domain. Keep it **DNS-only**, not Cloudflare-proxied, so Caddy can complete its
+   TLS-ALPN certificate challenge.
+2. Create a GitHub environment named `preview`, restrict its deployment branches to selected
+   branch `main`, and optionally add required reviewers. Store the private half of the dedicated
+   preview key as `PREVIEW_DEPLOY_KEY` in that environment. Its matching public half is tracked
+   at `deploy/preview_deploy.pub`.
+3. Merge the preview infrastructure through the normal production workflow. After production
+   is healthy, that deploy installs the root-owned forced command, creates the `preview-deploy`
+   account, joins it to the Docker group, and writes the restricted `authorized_keys` entry from
+   the committed public key.
+4. Enable the public Caddy hostname only after DNS resolves:
+
+```sh
+gh variable set PREVIEW_ADDRESS -R ivangetsitdone/website \
+  --body preview.ivangetsitdone.com
+```
+
+The next `main` deployment writes that value to the host's `.env`. Until the variable is set,
+preview stays on unpublished internal address `:8081`, so a missing DNS record cannot trigger
+certificate attempts. The existing repository `DEPLOY_KNOWN_HOSTS` secret is reused only for
+host-key verification; the production private key is never exposed to the preview workflow.
+
+To rotate the preview key, generate a new pair, replace `deploy/preview_deploy.pub` through a
+reviewed production PR, and update the environment secret before deploying another preview.
+
+### Deploy a reviewed candidate
+
+```sh
+git push --force-with-lease origin HEAD:preview
+candidate=$(git rev-parse HEAD)
+gh workflow run Preview --repo ivangetsitdone/website --ref main -f candidate_sha="$candidate"
+gh run list --workflow Preview --limit 1
+```
+
+The workflow confirms the requested SHA is the current `preview` ref, runs all three suites and
+builds the capped candidate image on a runner, then asks the forced-command host deployer to
+verify and load that tested image under trusted runtime policy. It finally reruns the HTTP and
+browser suites against the HTTPS preview. A green preview is evidence for review, not permission
+to publish; approved work still goes through a pull request to `main` and the production
+workflow.
+
 ## 3. Serving a different domain
 
 Three places name the domain, and they have to agree:
@@ -301,7 +366,7 @@ the second one.
 For a **local HTTP-only preview** with no certificate at all:
 
 ```sh
-SITE_ADDRESS=:80 WWW_ADDRESS=:8080 docker compose up -d
+SITE_ADDRESS=:80 WWW_ADDRESS=:8080 PREVIEW_ADDRESS=:8081 docker compose up -d
 ```
 
 ## 4. Verify, in order

@@ -27,7 +27,7 @@ inside the build.
 ```sh
 git clone https://github.com/ivangetsitdone/website.git
 cd website
-printf 'SITE_ADDRESS=:80\nWWW_ADDRESS=:8080\n' > .env   # plain HTTP; omit for the real domain
+printf 'SITE_ADDRESS=:80\nWWW_ADDRESS=:8080\nPREVIEW_ADDRESS=:8081\n' > .env   # plain HTTP
 docker compose up -d --build
 curl -s -o /dev/null -w '%{http_code}\n' http://localhost/     # 200
 ```
@@ -39,6 +39,10 @@ Deploying to a server is [DEPLOY.md](DEPLOY.md) — one command on a fresh dropl
 After that it is automatic: **every push to `main` is built and tested on a runner, then
 deployed**, and production is re-checked afterwards. Pull requests run the tests and stop
 there. See [Automatic deploys](DEPLOY.md#2a-automatic-deploys).
+The mutable `preview` branch can be deployed separately to
+<https://preview.ivangetsitdone.com> for human review. Deployment is manually dispatched from
+the trusted `main` workflow through a preview-only forced-command credential; it never replaces
+the production checkout or app. See [Preview deploys](DEPLOY.md#2b-preview-deploys).
 The droplet is a deploy target, not a workspace — the deploy resets `/srv/website` to the
 pushed commit, so anything edited there is discarded.
 
@@ -142,6 +146,7 @@ Short records of why the non-obvious choices were made, in [docs/adr](docs/adr):
 | [0009](docs/adr/0009-brand-assets.md) | Brand artwork processed at build time, not by hand |
 | [0010](docs/adr/0010-continuous-deployment.md) | Push to main deploys over SSH, building on the droplet |
 | [0011](docs/adr/0011-dependency-hygiene.md) | Dependencies audited weekly and pinned exactly |
+| [0012](docs/adr/0012-preview-deployment.md) | Preview deploys use trusted policy and a runner-built image |
 
 ## Business facts
 

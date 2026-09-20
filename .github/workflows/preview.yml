@@ -1,0 +1,183 @@
+# Run the trusted workflow from main to deploy the exact current preview-branch commit.
+# Candidate code is tested and built without secrets; the production host only loads the image.
+name: Preview
+
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_sha:
+        description: Exact 40-character commit currently at origin/preview
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: preview
+  cancel-in-progress: false
+
+env:
+  PREVIEW_SITE: https://preview.ivangetsitdone.com
+  CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Require the trusted workflow definition from main
+        run: |
+          if [ "${{ github.ref }}" != 'refs/heads/main' ]; then
+            echo '::error::Dispatch Preview with --ref main; candidate code must not define the deployment workflow.'
+            exit 1
+          fi
+          if [[ ! "$CANDIDATE_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo '::error::candidate_sha must be a lowercase 40-character commit SHA'
+            exit 1
+          fi
+          preview=$(git ls-remote https://github.com/ivangetsitdone/website.git refs/heads/preview | cut -f1)
+          [ "$preview" = "$CANDIDATE_SHA" ] || {
+            echo "::error::candidate $CANDIDATE_SHA is not current preview ref $preview"
+            exit 1
+          }
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.CANDIDATE_SHA }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: tests/browser/package-lock.json
+      - run: npm ci
+        working-directory: tests/browser
+      - run: npx playwright install --with-deps chromium
+        working-directory: tests/browser
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ../../recovery/browsers
+
+      - name: Build the candidate and start a local stack
+        run: |
+          printf 'SITE_ADDRESS=:80\nWWW_ADDRESS=:8080\nPREVIEW_ADDRESS=:8081\n' > .env
+          docker compose up -d --build
+          for _ in $(seq 60); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' http://localhost/healthz) || true
+            if [ "$code" = 200 ]; then break; fi
+            sleep 2
+          done
+          [ "$code" = 200 ] || { docker compose ps; docker compose logs --tail 80; exit 1; }
+
+      - run: python3 tests/smoke.py http://localhost
+      - run: python3 tests/portfolio_http.py http://localhost
+      - run: python3 tests/test_preview_config.py
+      - run: npm test
+        working-directory: tests/browser
+        env:
+          BASE_URL: http://localhost
+
+      - name: Export the tested application image
+        run: |
+          image=$(docker compose images -q app)
+          [ -n "$image" ]
+          tag="website-preview-candidate:$CANDIDATE_SHA"
+          docker tag "$image" "$tag"
+          size=$(docker image inspect -f '{{.Size}}' "$tag")
+          echo "preview image size: $size bytes"
+          [ "$size" -le 600000000 ] || { echo '::error::preview image exceeds 600 MB'; exit 1; }
+          mkdir -p recovery
+          docker save "$tag" | gzip -1 > recovery/preview-image.tar.gz
+          sha256sum recovery/preview-image.tar.gz > recovery/preview-image.tar.gz.sha256
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: preview-image
+          path: |
+            recovery/preview-image.tar.gz
+            recovery/preview-image.tar.gz.sha256
+          compression-level: 0
+          retention-days: 1
+
+      - name: What the stack said, if a check failed
+        if: failure()
+        run: docker compose logs --tail 120
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: preview-playwright-trace
+          path: recovery/browser-results
+          retention-days: 7
+      - name: Stop the local stack
+        if: always()
+        run: docker compose down
+
+  deploy:
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Configure this environment to allow only main and to require review if desired.
+    environment: preview
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: preview-image
+          path: recovery
+      - name: Verify the transferred artifact
+        run: sha256sum -c recovery/preview-image.tar.gz.sha256
+
+      - name: Authorise the runner with the preview-only forced-command key
+        env:
+          PREVIEW_DEPLOY_KEY: ${{ secrets.PREVIEW_DEPLOY_KEY }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          if [ -z "$PREVIEW_DEPLOY_KEY" ] || [ -z "$KNOWN_HOSTS" ]; then
+            echo '::error::PREVIEW_DEPLOY_KEY or DEPLOY_KNOWN_HOSTS is missing. See DEPLOY.md.'
+            exit 1
+          fi
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$PREVIEW_DEPLOY_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      - name: Stream the tested image to the host-owned deployer
+        env:
+          TARGET: ${{ vars.PREVIEW_DEPLOY_USER || 'preview-deploy' }}@${{ vars.DEPLOY_HOST || 'ivangetsitdone.com' }}
+        run: |
+          archive_sha=$(cut -d' ' -f1 recovery/preview-image.tar.gz.sha256)
+          ssh -o BatchMode=yes "$TARGET" "$CANDIDATE_SHA $archive_sha" \
+            < recovery/preview-image.tar.gz
+
+      - name: Preview answers over HTTPS
+        run: |
+          for _ in $(seq 20); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "$PREVIEW_SITE/") && [ "$code" = 200 ] && break
+            sleep 3
+          done
+          echo "$PREVIEW_SITE -> $code"
+          [ "$code" = 200 ]
+
+  verify:
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.CANDIDATE_SHA }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: tests/browser/package-lock.json
+      - run: npm ci
+        working-directory: tests/browser
+      - run: npx playwright install --with-deps chromium
+        working-directory: tests/browser
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ../../recovery/browsers
+      - run: python3 tests/smoke.py "$PREVIEW_SITE"
+      - run: python3 tests/portfolio_http.py "$PREVIEW_SITE"
+      - run: npm test
+        working-directory: tests/browser
+        env:
+          BASE_URL: ${{ env.PREVIEW_SITE }}
