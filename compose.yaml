@@ -9,10 +9,14 @@ services:
     security_opt: [no-new-privileges:true]
     healthcheck:
       test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz')"]
-      interval: 15s
+      # Tuned to a container that now starts in about three seconds. These numbers set
+      # how long a deploy waits to call itself good (start_period + one interval) and how
+      # long a bad one takes to be rolled back (start_period + retries x interval): about
+      # 10s and 20s, against 25s and 55s before.
+      interval: 5s
       timeout: 3s
       retries: 3
-      start_period: 10s
+      start_period: 5s
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped
