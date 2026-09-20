@@ -192,10 +192,40 @@ Prediction 5 turned out to be **untestable as written**, which is its own small 
 run finished in two minutes, so by the time there was a result to commit there was no
 in-flight run left to cancel. Testing it needs two pushes inside one run's window — which is
 exactly the real scenario it models: pushing a fixup while CI is still chewing on the commit
-before it. So that is what the next two commits on this branch do, deliberately and close
-together — this is the second of them, pushed within a minute of the first.
+before it. So that is what the next two commits on this branch did, nine seconds apart — `5b58cec` at
+01:53:45 and `6eb5ce4` at 01:53:54 — and the sequence is worth reading a line at a time:
+
+```
+01:54:07   6eb5ce4 pending       5b58cec in_progress
+01:54:33   6eb5ce4 pending       5b58cec in_progress
+01:54:58   6eb5ce4 in_progress   5b58cec cancelled
+01:56:39   6eb5ce4 success       5b58cec cancelled
+```
+
+The prediction holds, but not in the shape you might assume. Cancellation is **not**
+instantaneous: for the best part of a minute the newer run sat `pending` while the older one
+kept running. GitHub signals the in-progress run, waits for it to wind down, and only then
+lets the group's next run start. If you are watching a pull request and wondering why your
+fixup has not started yet, that is why — it is queued behind a run that is being told to
+stop.
+
+That also completes the pair. This repository has now produced both cancellation mechanisms,
+and they are genuinely different things:
+
+| | Trigger | What got cancelled | Because |
+| --- | --- | --- | --- |
+| `main` | a newer push while a deploy ran | the **pending** run, `351a098` | a queued run always displaces pending runs in its group |
+| pull request | a newer push nine seconds later | the **in-progress** run, `5b58cec` | `cancel-in-progress` is true for `pull_request` |
+
+The first happens whatever your configuration says. The second is the one you choose. Being
+able to tell them apart is the difference between "CI is flaky" and "CI is doing exactly
+what we asked".
 
 ## Recap
+
+Five predictions, four confirmed, one mis-specified in a way that taught more than a pass
+would have. That is a good ratio for an experiment and a poor one for a deploy, which is
+roughly the argument for running experiments on branches.
 
 For a solo repository, a pull request buys you one thing — a rehearsal on a machine that is
 not production — and you can get most of that by having CI run on pushes to `main`, as we
@@ -210,7 +240,8 @@ The technical parts worth copying:
 - **Make the test job need no secrets**, so it can run on forks, so outside contributions
   arrive already tested.
 - **Cancel superseded pull-request runs; never cancel a deploy.** They are different risks
-  and deserve different answers.
+  and deserve different answers — and know that a newly queued run displaces *pending* runs
+  in its group regardless, so `cancelled` on a branch is not automatically a misconfiguration.
 - **Pin what the automatic token may do.** `contents: read` until something needs more.
 - **Branch protection is not in your repository.** Write down that it exists, because a
   future reader cannot infer it from any file.
