@@ -141,6 +141,7 @@ Short records of why the non-obvious choices were made, in [docs/adr](docs/adr):
 | [0008](docs/adr/0008-deployment.md) | Docker Compose + Caddy on a single droplet |
 | [0009](docs/adr/0009-brand-assets.md) | Brand artwork processed at build time, not by hand |
 | [0010](docs/adr/0010-continuous-deployment.md) | Push to main deploys over SSH, building on the droplet |
+| [0011](docs/adr/0011-dependency-hygiene.md) | Dependencies audited weekly and pinned exactly |
 
 ## Business facts
 

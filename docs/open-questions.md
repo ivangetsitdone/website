@@ -53,7 +53,9 @@ None of this is legal advice, and the CCB answers these directly. Background is 
 - **No real-device or Safari testing has ever been done.** Everything verified here is
   Chromium at two viewport sizes. The carousel, which leans on scroll snapping and an
   `IntersectionObserver`, is the most likely thing to behave differently on iOS.
-- **Python dependency security has not been reviewed.** The frontend audit is clean.
+- **Dependency security is audited weekly.** `pip-audit` and `npm audit` run on a schedule
+  (`.github/workflows/audit.yml`), and Dependabot opens update PRs. The one finding so far
+  was a starlette DoS, fixed in the starlette 1.6.0 pin; see [ADR-0011](adr/0011-dependency-hygiene.md).
 - **The site has not been opened from another network.** Let's Encrypt completed a
   challenge, so port 443 was reachable from the internet at that moment; that is not the
   same as a human visiting successfully.
