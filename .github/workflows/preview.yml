@@ -141,7 +141,7 @@ jobs:
 
       - name: Stream the tested image to the host-owned deployer
         env:
-          TARGET: ${{ vars.PREVIEW_DEPLOY_USER || 'root' }}@${{ vars.DEPLOY_HOST || 'ivangetsitdone.com' }}
+          TARGET: ${{ vars.PREVIEW_DEPLOY_USER || 'preview-deploy' }}@${{ vars.DEPLOY_HOST || 'ivangetsitdone.com' }}
         run: |
           archive_sha=$(cut -d' ' -f1 recovery/preview-image.tar.gz.sha256)
           ssh -o BatchMode=yes "$TARGET" "$CANDIDATE_SHA $archive_sha" \
