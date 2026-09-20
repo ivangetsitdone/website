@@ -76,6 +76,8 @@ class PreviewConfigTests(unittest.TestCase):
         self.assertNotIn("workflow_dispatch:", production)
         self.assertIn("PREVIEW_ADDRESS: ${{ vars.PREVIEW_ADDRESS || ':8081' }}", production)
         self.assertIn("deploy/preview_deploy.pub", production)
+        self.assertIn("openssl rand -base64 32", production)
+        self.assertIn("| chpasswd", production)
         self.assertIn('restrict,command=\"/usr/local/sbin/website-preview-deploy\"', production)
         self.assertTrue((ROOT / "deploy/preview_deploy.pub").read_text().startswith("ssh-ed25519 "))
         install_at = production.index("/usr/local/sbin/website-preview-deploy")
