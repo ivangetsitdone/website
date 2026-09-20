@@ -1,4 +1,4 @@
-# Ship main to the droplet, then prove the live site still works.
+# Build and test on a runner; only then ship main to the droplet.
 #
 # The droplet's checkout must be /srv/website, which is where scripts/bootstrap.sh and
 # cloud-init.yaml put it.
@@ -12,19 +12,79 @@ name: Deploy
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
 
-# One deploy at a time, and never cancel one part-way: a half-applied deploy is worse than
-# a queued one.
+# One run per branch. A superseded pull-request run is cancelled; a superseded main run is
+# not, because a half-applied deploy is worse than a queued one.
 concurrency:
-  group: deploy
-  cancel-in-progress: false
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   SITE: https://ivangetsitdone.com
 
 jobs:
+  # The gate. Stands the whole stack up on the runner and tests it there, so a change that
+  # breaks the site is caught before anything reaches the droplet. Touches nothing live and
+  # needs no secrets, so it runs on pull requests from anywhere.
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: tests/browser/package-lock.json
+      - run: npm ci
+        working-directory: tests/browser
+      - run: npx playwright install --with-deps chromium
+        working-directory: tests/browser
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ../../recovery/browsers
+
+      - name: Build the images and start the stack
+        run: |
+          # Plain HTTP on the runner, and a port for the www redirect rather than its real
+          # hostname: Caddy provisions a certificate for every named site it is given, and
+          # this host can answer no challenge for either name.
+          printf 'SITE_ADDRESS=:80\nWWW_ADDRESS=:8080\n' > .env
+          docker compose up -d --build
+          for _ in $(seq 60); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' http://localhost/healthz) || true
+            if [ "$code" = 200 ]; then break; fi
+            sleep 2
+          done
+          [ "$code" = 200 ] || { docker compose ps; docker compose logs --tail 80; exit 1; }
+
+      - name: Pages, headers, caching and the licensing guardrails
+        run: python3 tests/smoke.py http://localhost
+      - name: Catalogue, generated assets and source isolation
+        run: python3 tests/portfolio_http.py http://localhost
+      - name: Browser suite, desktop and mobile
+        run: npm test
+        working-directory: tests/browser
+        env:
+          BASE_URL: http://localhost
+
+      - name: What the stack said, if any of that failed
+        if: failure()
+        run: docker compose logs --tail 120
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-trace
+          path: recovery/browser-results
+          retention-days: 7
+      - name: Stop the stack
+        if: always()
+        run: docker compose down
+
   deploy:
+    needs: check
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -61,6 +121,8 @@ jobs:
           # .env is untracked and survives, which is how SITE_ADDRESS stays pinned.
           git reset --hard "$sha"
 
+          # Builds first, with the current containers still serving; only once it succeeds
+          # does Compose replace them. A broken tree therefore cannot take the site down.
           docker compose up -d --build
 
           # The app's own healthcheck decides whether this deploy was good.
@@ -77,7 +139,11 @@ jobs:
             exit 1
           fi
 
-          docker image prune -f >/dev/null   # layers the build just orphaned; 2 GB disk
+          # The image the last deploy built is now untagged, and the build cache grows
+          # without bound. Both matter on a 2 GB droplet with a small disk.
+          docker image prune -f >/dev/null
+          docker builder prune -f --filter until=168h >/dev/null
+          df -h / | tail -1
           docker compose ps
           REMOTE
 
@@ -90,9 +156,8 @@ jobs:
           echo "$SITE -> $code"
           [ "$code" = 200 ]
 
-  # Post-deploy, against the live site. A failure here means something reached production
-  # that should not have; the previous containers are already gone, so read it as "roll
-  # back or fix forward", not "the deploy did not happen".
+  # Post-deploy, against production. The application was already tested on the runner, so
+  # what is left to prove is that this host, this Caddy and this certificate are serving it.
   verify:
     needs: deploy
     runs-on: ubuntu-latest
@@ -103,31 +168,3 @@ jobs:
         run: python3 tests/smoke.py "$SITE"
       - name: Catalogue, generated assets and source isolation
         run: python3 tests/portfolio_http.py "$SITE"
-
-  browser:
-    needs: deploy
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    defaults:
-      run:
-        working-directory: tests/browser
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: tests/browser/package-lock.json
-      - run: npm ci
-      - run: npx playwright install --with-deps chromium
-        env:
-          PLAYWRIGHT_BROWSERS_PATH: ../../recovery/browsers
-      - run: npm test
-        env:
-          BASE_URL: ${{ env.SITE }}
-      - uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: playwright-trace
-          path: recovery/browser-results
-          retention-days: 7

@@ -22,6 +22,9 @@ services:
       - "443:443/udp"
     environment:
       SITE_ADDRESS: ${SITE_ADDRESS:-ivangetsitdone.com}
+      # Caddy provisions a certificate for every named site, so a preview host that
+      # cannot answer a challenge for www must be given an address, not the name.
+      WWW_ADDRESS: ${WWW_ADDRESS:-www.ivangetsitdone.com}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data

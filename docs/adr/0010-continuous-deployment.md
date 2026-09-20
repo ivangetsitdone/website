@@ -15,31 +15,44 @@ manual.
 
 ## Decision
 
-`.github/workflows/deploy.yml` runs on every push to `main`. It opens one SSH session to
+`.github/workflows/deploy.yml` has three jobs.
+
+**`check`** builds the images on the runner, starts the whole stack there over plain HTTP,
+and runs all three suites against it. It touches nothing live and needs no secrets, so it
+runs on pull requests as well as on `main`.
+
+**`deploy`** needs `check`, and is skipped for pull requests. It opens one SSH session to
 the droplet, resets the checkout to the exact commit that triggered the run, runs
 `docker compose up -d --build`, and waits for the app container's own healthcheck to report
-`healthy`. Then two follow-on jobs run the existing suites against the live site.
+`healthy`.
+
+**`verify`** re-runs the two HTTP suites against production. The application was already
+proven on the runner; what is left to prove is that this host, this Caddy and this
+certificate are serving it.
 
 Deliberately **not** chosen:
 
 - **A registry.** Building on the droplet keeps one artefact — the repository — and adds no
-  credentials, no image retention policy and no second place for the site to be stale.
-  A 2 GB droplet builds it in about five minutes, and the running containers are untouched
-  until the build succeeds.
+  credentials, no image retention policy and no second place for the site to be stale. The
+  cost is that `main` builds twice, once on the runner and once on the droplet.
 - **A self-hosted runner.** A long-lived agent on the droplet with a token, to replace a
   60-second SSH session.
-- **A test gate before deploying.** The build itself is the gate: the photo pipeline
-  verifies every source hash, so a broken tree fails `docker compose up --build` and the old
-  containers keep serving. Running the suites against a throwaway stack on a pull request is
-  the obvious next step and is not done yet.
+- **Blue-green or a rollback path.** There is one app container and Compose replaces it in
+  place. Rolling back is `git revert` and push, which is a full deploy through the same gate.
 
 ## Consequences
 
 - **The droplet is a deploy target, not a workspace.** `git reset --hard` discards anything
   edited there. `.env` is untracked, so the `SITE_ADDRESS` pin survives.
-- **Tests run after the deploy, against production.** A red `verify` job means something
-  already reached the live site — read it as "fix forward", not "the deploy was blocked".
-  The licensing guardrails in `tests/smoke.py` are the reason this matters.
+- **Compose builds before it replaces.** The current containers keep serving for the whole
+  build, and are replaced only once it succeeds, so a broken tree cannot take the site down.
+  What it does not give is a tested new version running beside the old one: when the new
+  container is unhealthy, the old one is already gone.
+- **There is a visible restart.** Replacing the app container leaves Caddy briefly proxying
+  to nothing. Measured over a real deploy, the gap is seconds; Caddy answers 502 inside it.
+- **Old images do not accumulate; build cache would.** Each deploy prunes the image the
+  previous one left untagged, and trims build cache older than a week. Both matter on a
+  2 GB droplet, and the deploy prints `df -h /` so a filling disk is visible before it bites.
 - **Two secrets are the whole trust model**: `DEPLOY_KEY`, whose public half sits in the
   droplet's `authorized_keys`, and `DEPLOY_KNOWN_HOSTS`, which pins the host key so the
   runner cannot be talked into deploying to somewhere else. Rebuilding the droplet means

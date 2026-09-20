@@ -157,7 +157,7 @@ docker compose up -d --build
 failing to get a certificate for a name that resolves elsewhere:
 
 ```sh
-SITE_ADDRESS=:80 docker compose up -d --build
+SITE_ADDRESS=:80 WWW_ADDRESS=:8080 docker compose up -d --build
 curl -I http://<new-host-ip>/
 ```
 
@@ -182,11 +182,24 @@ First boot takes a few minutes, most of it Pillow regenerating 75 images. Watch 
 
 ## 2a. Automatic deploys
 
-Once the host is up, every push to `main` redeploys it. `.github/workflows/deploy.yml`
-opens one SSH session, resets the checkout to the commit that triggered the run, rebuilds,
-and waits for the app container's healthcheck; two follow-on jobs then run the HTTP and
-browser suites against the live site. Reasoning is in
+Once the host is up, every push to `main` redeploys it. `.github/workflows/deploy.yml` has
+three jobs, in order:
+
+| Job | Where | What |
+| --- | --- | --- |
+| `check` | runner | Builds the images, starts the stack on plain HTTP, runs all three suites against it. Runs on pull requests too; touches nothing live. |
+| `deploy` | droplet | Resets `/srv/website` to the commit, rebuilds, waits for the app's healthcheck. Skipped for pull requests. |
+| `verify` | runner | Re-runs the two HTTP suites against production, proving this host and its certificate serve what was tested. |
+
+A pull request therefore runs `check` alone: a change that breaks the site is caught before
+anything reaches the droplet. Reasoning is in
 [ADR-0010](docs/adr/0010-continuous-deployment.md).
+
+**What a deploy does to the live site.** Compose builds first, with the current containers
+still serving, and replaces them only once the build succeeds — so a broken tree cannot take
+the site down. It is not blue-green: the swap itself is a restart, Caddy answers 502 for the
+seconds it takes, and when the new container is unhealthy the old one is already gone.
+Rolling back is `git revert` and push, which is a normal deploy through the same gate.
 
 **The droplet is a deploy target, not a workspace.** The deploy runs `git reset --hard`, so
 anything edited on the host is discarded. `.env` is untracked and survives, which is how the
@@ -254,6 +267,7 @@ Three places name the domain, and they have to agree:
 | What | Where | Default |
 | --- | --- | --- |
 | Certificate + virtual host | `SITE_ADDRESS` env var, read by `compose.yaml` → `Caddyfile` | `ivangetsitdone.com` |
+| The www redirect's own host | `WWW_ADDRESS`, same route | `www.ivangetsitdone.com` |
 | `<link rel="canonical">` and the `canonical` context value | `app/main.py`, in the `page()` route | `https://ivangetsitdone.com/...` |
 | Default target of all three test suites | `tests/smoke.py`, `tests/portfolio_http.py`, `tests/browser/playwright.config.js` | same |
 
@@ -265,7 +279,7 @@ the second one.
 For a **local HTTP-only preview** with no certificate at all:
 
 ```sh
-SITE_ADDRESS=:80 docker compose up -d
+SITE_ADDRESS=:80 WWW_ADDRESS=:8080 docker compose up -d
 ```
 
 ## 4. Verify, in order

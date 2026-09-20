@@ -27,7 +27,7 @@ inside the build.
 ```sh
 git clone https://github.com/ivangetsitdone/website.git
 cd website
-echo 'SITE_ADDRESS=:80' > .env      # plain HTTP on localhost; omit to use the real domain
+printf 'SITE_ADDRESS=:80\nWWW_ADDRESS=:8080\n' > .env   # plain HTTP; omit for the real domain
 docker compose up -d --build
 curl -s -o /dev/null -w '%{http_code}\n' http://localhost/     # 200
 ```
@@ -36,8 +36,9 @@ First build takes about five minutes: Vite bundles the frontend, then Pillow reg
 75 images from the tracked originals. `docker compose logs -f` to watch.
 
 Deploying to a server is [DEPLOY.md](DEPLOY.md) — one command on a fresh droplet.
-After that it is automatic: **every push to `main` redeploys the live site**, then runs
-all three suites against it. See [Automatic deploys](DEPLOY.md#2a-automatic-deploys).
+After that it is automatic: **every push to `main` is built and tested on a runner, then
+deployed**, and production is re-checked afterwards. Pull requests run the tests and stop
+there. See [Automatic deploys](DEPLOY.md#2a-automatic-deploys).
 The droplet is a deploy target, not a workspace — the deploy resets `/srv/website` to the
 pushed commit, so anything edited there is discarded.
 
