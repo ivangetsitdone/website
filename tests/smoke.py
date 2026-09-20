@@ -11,6 +11,7 @@ SITE = 'https://ivangetsitdone.com'
 # on" note and in the work-history pages, which describe past experience.
 LICENSE_NOTE_OPENING = 'Zip, LLC is not a CCB-licensed contractor.'
 SHORT_DISCLOSURE = 'Not a CCB-licensed contractor.'
+PIPELINE_PLACEHOLDER = 'Deployment pipeline validation — September 20, 2026.'
 REGULATED = ('remodel', 'sheetrock', 'drywall', 'tile', 'flooring', 'plumbing',
              'electrical', 'painting', 'shower', 'install', 'repair', 'retaining wall')
 
@@ -60,6 +61,7 @@ for path, label, heading in [('/', 'Home', 'Consider it done.'),
     assert 'href="tel:+19712883488"' in body and 'href="sms:+19712883488"' in body, path
     # The licensing fact is said once per page, in the footer, with the registration.
     assert 'Oregon business registry' in body and 'Not a CCB-licensed contractor.' in body, path
+    assert PIPELINE_PLACEHOLDER in body, path
     assert '#2249807-97' in body and 'sos.oregon.gov/business/Pages/find.aspx' in body, path
     # htmx must not try to boost an off-site link.
     assert 'hx-boost="false" target="_blank"' in body, path
