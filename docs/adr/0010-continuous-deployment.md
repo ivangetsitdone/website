@@ -60,6 +60,9 @@ Deliberately **not** chosen:
   | Container start → uvicorn serving | 5.11s | 2.83–3.05s |
   | Replacing the app container | 151 consecutive 502s over **8.4s** | **0 errors**, one request held 3.72s |
 
+  Confirmed against production through a real deploy, not only in rehearsal: 3,482
+  samples, zero non-200, slowest request 0.16s.
+
   The first is `python -m compileall` at build time: `PYTHONDONTWRITEBYTECODE` was set
   before `pip install` and the runtime filesystem is read-only, so 404 of 747 modules —
   all of FastAPI and Pydantic among them — were recompiled from source on every start. The

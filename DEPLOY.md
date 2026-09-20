@@ -200,7 +200,9 @@ still serving, and replaces them only once the build succeeds — so a broken tr
 the site down. The swap is still a restart, but nobody sees it: the app image is compiled at
 build time so it starts in about three seconds, and Caddy holds connections and retries
 across the gap rather than returning 502. Measured at 25 samples a second while the app
-container is replaced: **zero errors, one request held for 3.72 seconds**.
+container is replaced: **zero errors, one request held for 3.72 seconds**. Measured again
+against the live site through a real deploy: **3,482 samples, zero non-200, slowest request
+0.16s**.
 
 Replacing Caddy itself costs about **3.6 seconds of refused connections**, since nothing is
 left to absorb it. That happens only when `compose.yaml` changes — a `Caddyfile` change is a
@@ -265,6 +267,11 @@ its first step, before touching the droplet, if either secret is missing.
   Re-run the `ssh-keyscan` line above. This is the check working, not misfiring.
 - **`/srv/website: No such file or directory`** — the droplet's checkout is elsewhere. Move
   it, as above; the path is fixed on purpose.
+- **A run on `main` shows `cancelled`** — normal when pushes land faster than deploys. A
+  newly queued run cancels any run in its group that is still *pending*; `cancel-in-progress:
+  false` only protects the one actually running, so no deploy is ever interrupted part-way.
+  Nothing is lost either: the deploy resets to the commit that triggered it, so the later
+  run ships the skipped commit's content too, and the `HEAD` assertion proves it.
 - **`rolling back to <sha>`** — the new build never became healthy. The job prints
   `docker compose logs` first; that is where the reason is. The site is back on the previous
   commit by the time the job goes red.
