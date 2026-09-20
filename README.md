@@ -119,6 +119,12 @@ fallback, responsive layout at nine widths, and axe accessibility checks on ever
 page and the open viewer. It is not a substitute for real-device or Safari testing, which
 has never been done here.
 
+## Writing
+
+Build-in-public write-ups of problems solved in this repository are in
+[blog/](blog/README.md), newest first. They are not part of the site and are not copied
+into the image.
+
 ## Decisions
 
 Short records of why the non-obvious choices were made, in [docs/adr](docs/adr):
