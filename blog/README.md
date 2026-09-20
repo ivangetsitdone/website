@@ -12,6 +12,7 @@ runs the full pipeline, which is a pleasant way to test it.
 
 | Date | Namespace | Post |
 | --- | --- | --- |
+| 2026-09-20 | process | [The pull request nobody needed](2026-09-20-process-the-pull-request-nobody-needed.md) — what a pull request actually buys a one-person repo, and what changes when a second person arrives |
 | 2026-09-20 | deploy | [Eight seconds of 502](2026-09-20-deploy-eight-seconds-of-502.md) — giving a one-droplet site a real pipeline, and finding three defects in how it had been deploying all along |
 
 ## Conventions
