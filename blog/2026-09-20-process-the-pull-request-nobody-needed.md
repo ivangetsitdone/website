@@ -163,7 +163,37 @@ Predictions, written before the run:
 4. The live site never changes, because nothing deployed.
 5. Pushing a second commit to the branch cancels the first run rather than queueing it.
 
-*Results follow in the next commit on this branch, which is itself prediction 5.*
+### Results
+
+Run `35482433569`, event `pull_request`, two minutes end to end:
+
+```
+  check:  completed/success
+  deploy: completed/skipped
+  verify: completed/skipped
+```
+
+Predictions 1, 2 and 3 hold. Note the distinction in prediction 2: `deploy` is **skipped**,
+not failed. A failed deploy job on every pull request would be technically harmless and
+socially fatal — a pipeline that is always red teaches everyone to ignore it.
+
+Prediction 4, the one that matters most: the site's asset URLs are content-versioned, and
+those hashes change whenever the image is rebuilt and redeployed. Before the run and after
+it:
+
+```
+site.css?v=a6e1cfd09f
+site.js?v=ff0142b4a1
+```
+
+Byte-identical. Nothing deployed, and the droplet was never contacted.
+
+Prediction 5 turned out to be **untestable as written**, which is its own small lesson. The
+run finished in two minutes, so by the time there was a result to commit there was no
+in-flight run left to cancel. Testing it needs two pushes inside one run's window — which is
+exactly the real scenario it models: pushing a fixup while CI is still chewing on the commit
+before it. So that is what the next two commits on this branch do, deliberately and close
+together.
 
 ## Recap
 
