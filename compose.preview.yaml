@@ -1,0 +1,34 @@
+services:
+  preview-app:
+    # The candidate image is built and tested on a GitHub runner. The production host
+    # only loads that image; candidate Dockerfiles never execute on the live droplet.
+    image: ${PREVIEW_IMAGE:?PREVIEW_IMAGE must name the tested preview image}
+    restart: unless-stopped
+    mem_limit: 384m
+    cpus: 0.75
+    pids_limit: 128
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz')"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    networks:
+      website:
+        aliases: [preview-app]
+
+# The production Caddy container already lives on website_default. Joining that
+# network lets it proxy preview.ivangetsitdone.com without publishing another host port.
+networks:
+  website:
+    external: true
+    name: website_default

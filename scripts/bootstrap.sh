@@ -18,13 +18,22 @@ set -euo pipefail
 
 REPO=${REPO:-https://github.com/ivangetsitdone/website.git}
 DIR=${DIR:-/srv/website}
+if [ -z "${SITE_ADDRESS+x}" ] && [ -f "$DIR/.env" ]; then
+  SITE_ADDRESS=$(grep '^SITE_ADDRESS=' "$DIR/.env" | cut -d= -f2- || true)
+fi
 SITE_ADDRESS=${SITE_ADDRESS:-:80}
 # Caddy obtains a certificate for every *named* site it is given. When SITE_ADDRESS is a
 # bare address, DNS has not moved here yet and neither name can answer a challenge, so the
 # www redirect gets an address too rather than its real hostname.
 case "$SITE_ADDRESS" in
-  :*) WWW_ADDRESS=${WWW_ADDRESS:-:8080} ;;
-  *)  WWW_ADDRESS=${WWW_ADDRESS:-www.$SITE_ADDRESS} ;;
+  :*)
+    WWW_ADDRESS=${WWW_ADDRESS:-:8080}
+    PREVIEW_ADDRESS=${PREVIEW_ADDRESS:-:8081}
+    ;;
+  *)
+    WWW_ADDRESS=${WWW_ADDRESS:-www.$SITE_ADDRESS}
+    PREVIEW_ADDRESS=${PREVIEW_ADDRESS:-preview.$SITE_ADDRESS}
+    ;;
 esac
 INSTALL_CLAUDE=${INSTALL_CLAUDE:-no}
 
@@ -57,9 +66,12 @@ else
   git clone "$REPO" "$DIR"
 fi
 
-# compose.yaml reads SITE_ADDRESS; .env keeps it across restarts and reboots.
+# compose.yaml reads the addresses; .env keeps them across restarts and reboots.
 if ! grep -q '^SITE_ADDRESS=' "$DIR/.env" 2>/dev/null; then
-  printf 'SITE_ADDRESS=%s\nWWW_ADDRESS=%s\n' "$SITE_ADDRESS" "$WWW_ADDRESS" > "$DIR/.env"
+  printf 'SITE_ADDRESS=%s\nWWW_ADDRESS=%s\nPREVIEW_ADDRESS=%s\n' \
+    "$SITE_ADDRESS" "$WWW_ADDRESS" "$PREVIEW_ADDRESS" > "$DIR/.env"
+elif ! grep -q '^PREVIEW_ADDRESS=' "$DIR/.env"; then
+  printf 'PREVIEW_ADDRESS=%s\n' "$PREVIEW_ADDRESS" >> "$DIR/.env"
 fi
 
 log "building and starting"

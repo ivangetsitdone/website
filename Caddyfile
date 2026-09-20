@@ -15,6 +15,23 @@
 	}
 }
 
+# Work-in-progress branches deploy to a separate container and stay out of search indexes.
+# The preview container joins the production Compose network under the preview-app alias.
+{$PREVIEW_ADDRESS:preview.ivangetsitdone.com} {
+	encode zstd gzip
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		X-Frame-Options DENY
+		X-Robots-Tag "noindex, nofollow, noarchive"
+		-Server
+	}
+	reverse_proxy preview-app:8000 {
+		lb_try_duration 15s
+		lb_try_interval 250ms
+	}
+}
+
 # www redirects to the bare domain, which is what every canonical URL names.
 # Its own address rather than `www.{$SITE_ADDRESS}`, because SITE_ADDRESS is ":80"
 # during a pre-DNS first boot and "www.:80" is not a valid site address.

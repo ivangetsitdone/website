@@ -13,7 +13,6 @@ on:
   push:
     branches: [main]
   pull_request:
-  workflow_dispatch:
 
 # One run per branch. A superseded pull-request run is cancelled; a superseded main run is
 # not, because a half-applied deploy is worse than a queued one.
@@ -53,7 +52,7 @@ jobs:
           # Plain HTTP on the runner, and a port for the www redirect rather than its real
           # hostname: Caddy provisions a certificate for every named site it is given, and
           # this host can answer no challenge for either name.
-          printf 'SITE_ADDRESS=:80\nWWW_ADDRESS=:8080\n' > .env
+          printf 'SITE_ADDRESS=:80\nWWW_ADDRESS=:8080\nPREVIEW_ADDRESS=:8081\n' > .env
           docker compose up -d --build
           for _ in $(seq 60); do
             code=$(curl -s -o /dev/null -w '%{http_code}' http://localhost/healthz) || true
@@ -166,6 +165,11 @@ jobs:
           # Prove the host is on the commit this run deployed, rather than assuming it.
           head=$(git rev-parse HEAD)
           [ "$head" = "$sha" ] || { echo "::error::HEAD is $head, expected $sha"; exit 1; }
+
+          # Publish preview policy only after this production commit is healthy and active.
+          # The preview SSH key is forced to this root-owned script.
+          install -o root -g root -m 0755 scripts/deploy_preview.sh \
+            /usr/local/sbin/website-preview-deploy
 
           # The image the last deploy built is now untagged, and the build cache grows
           # without bound. Both matter on a 2 GB droplet with a small disk.

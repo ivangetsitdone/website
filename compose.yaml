@@ -29,6 +29,9 @@ services:
       # Caddy provisions a certificate for every named site, so a preview host that
       # cannot answer a challenge for www must be given an address, not the name.
       WWW_ADDRESS: ${WWW_ADDRESS:-www.ivangetsitdone.com}
+      # CI uses an internal HTTP address so Caddy does not request a certificate for
+      # the public preview host from a runner that cannot answer its ACME challenge.
+      PREVIEW_ADDRESS: ${PREVIEW_ADDRESS:-preview.ivangetsitdone.com}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
