@@ -1,4 +1,5 @@
-"""Every image pulled from a registry is pinned by digest.
+"""Every image pulled from a registry is pinned by digest, and the image that deploys
+is the one the gate tested.
 
 A tag is a moving target: the runner tests one image and the droplet can build against
 another, and a base image change reaches production without appearing in any diff.
@@ -51,6 +52,43 @@ class ImagePinningTests(unittest.TestCase):
         self.assertIn("images:", audit)
         self.assertIn("compose.yaml", audit)
         self.assertIn("imagetools inspect", audit)
+
+
+class ImageProvenanceTests(unittest.TestCase):
+    """What ships should be the artefact that passed, not a rebuild that ought to match it."""
+
+    COMPOSE = (ROOT / "compose.yaml").read_text()
+    DEPLOY = (ROOT / ".github/workflows/deploy.yml").read_text()
+
+    def test_the_app_service_can_be_built_or_supplied(self):
+        """`build` for local development, `image` so production can run --no-build."""
+        app = self.COMPOSE[self.COMPOSE.index("  app:"):self.COMPOSE.index("  caddy:")]
+        self.assertIn("build: .", app)
+        self.assertRegex(app, r"image: \$\{APP_IMAGE:-[^}]+\}")
+
+    def test_the_default_image_is_local(self):
+        """A checkout with no APP_IMAGE must never pull a deploy image."""
+        default = re.search(r"image: \$\{APP_IMAGE:-([^}]+)\}", self.COMPOSE).group(1)
+        self.assertNotIn("/", default, f"{default} looks like a registry reference")
+        self.assertNotIn(".", default.split(":")[0])
+
+    def test_the_gate_tags_what_it_builds(self):
+        self.assertIn("APP_IMAGE=%s", self.DEPLOY)
+        self.assertIn('"$IMAGE:$GITHUB_SHA"', self.DEPLOY)
+
+    def test_the_image_is_published_only_after_the_suites_pass(self):
+        publish = self.DEPLOY.index("Publish the tested image")
+        for suite in ("Browser suite, desktop and mobile", "portfolio_http.py", "smoke.py"):
+            with self.subTest(suite=suite):
+                self.assertLess(self.DEPLOY.index(suite), publish)
+
+    def test_pull_requests_do_not_publish(self):
+        publish = self.DEPLOY[self.DEPLOY.index("Publish the tested image"):]
+        self.assertIn("if: github.event_name != 'pull_request'", publish[:400])
+
+    def test_the_image_name_is_not_hardcoded(self):
+        """A fork or a whitelabel instance publishes under its own repository."""
+        self.assertIn("IMAGE: ghcr.io/${{ github.repository }}", self.DEPLOY)
 
 
 if __name__ == "__main__":
