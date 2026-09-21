@@ -160,6 +160,11 @@ cd website
 docker compose up -d --build
 ```
 
+That clone gets its own Compose project, `website-local`, named by ‘name:’ in
+`compose.yaml`. It is therefore safe to run on a host that is already serving the site: it
+cannot stop, rebuild or delete the live containers, which run under the project `website`.
+Only the deploy checkout claims that name, through `COMPOSE_PROJECT_NAME` in its `.env`.
+
 **If DNS still points at the old host**, start on plain HTTP first, or Caddy will sit there
 failing to get a certificate for a name that resolves elsewhere:
 
@@ -223,7 +228,8 @@ forward, push again. `git revert` and push is a normal deploy through the same g
 
 **The droplet is a deploy target, not a workspace.** The deploy runs `git reset --hard`, so
 anything edited on the host is discarded. `.env` is untracked and survives, which is how the
-`SITE_ADDRESS` pin stays put. Before the first automatic deploy, check there is nothing on
+`SITE_ADDRESS` pin and the `COMPOSE_PROJECT_NAME=website` that makes this checkout the
+live one stay put. Before the first automatic deploy, check there is nothing on
 the host worth keeping:
 
 ```sh

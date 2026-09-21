@@ -18,6 +18,7 @@ otherwise be re-litigated or accidentally undone.
 | [0011](0011-dependency-hygiene.md) | Dependencies audited weekly and pinned exactly |
 | [0012](0012-preview-deployment.md) | Preview deploys use trusted policy and a runner-built image |
 | [0013](0013-production-runtime-limits.md) | Production containers bounded, never tighter than preview |
+| [0014](0014-compose-project-isolation.md) | The Compose project name is an isolation boundary |
 
 Format: context, decision, consequences. Keep them short; if one needs reversing, add a
 new record that supersedes it rather than rewriting history.

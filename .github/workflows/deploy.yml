@@ -156,6 +156,17 @@ jobs:
             printf 'PREVIEW_ADDRESS=%s\n' "$preview_address" >> .env
           fi
 
+          # compose.yaml names its project `website-local`, so a clone of this repository
+          # elsewhere on the host cannot act on the live containers. This checkout is the
+          # one entitled to `website`, and it must keep that name: compose.preview.yaml
+          # joins the external network `website_default`, which is Compose's default
+          # network for a project of that name. Set before any compose command below runs.
+          if grep -q '^COMPOSE_PROJECT_NAME=' .env; then
+            sed -i "s|^COMPOSE_PROJECT_NAME=.*|COMPOSE_PROJECT_NAME=website|" .env
+          else
+            printf 'COMPOSE_PROJECT_NAME=%s\n' website >> .env
+          fi
+
           # Any failure rolls back the same way, because there is no reliable way to tell
           # from here whether the containers were replaced before it happened: caddy
           # depends_on app with condition: service_healthy, so `up` itself fails once the

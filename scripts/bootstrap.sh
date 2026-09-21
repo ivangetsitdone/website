@@ -46,6 +46,9 @@ case "$SITE_ADDRESS" in
 esac
 INSTALL_CLAUDE=${INSTALL_CLAUDE:-no}
 ALLOW_EXISTING_CHECKOUT=${ALLOW_EXISTING_CHECKOUT:-no}
+# The Compose project the live site runs under. compose.preview.yaml joins
+# "${COMPOSE_PROJECT}_default", so the two must agree.
+COMPOSE_PROJECT=${COMPOSE_PROJECT:-website}
 
 log() { echo "[bootstrap] $*"; }
 
@@ -96,6 +99,11 @@ if ! grep -q '^SITE_ADDRESS=' "$DIR/.env" 2>/dev/null; then
 elif ! grep -q '^PREVIEW_ADDRESS=' "$DIR/.env"; then
   printf 'PREVIEW_ADDRESS=%s\n' "$PREVIEW_ADDRESS" >> "$DIR/.env"
 fi
+
+# compose.yaml defaults to a project name that is not production's, so a stray clone
+# cannot act on the live stack. This is the host that is entitled to the real one.
+grep -q '^COMPOSE_PROJECT_NAME=' "$DIR/.env" ||
+  printf 'COMPOSE_PROJECT_NAME=%s\n' "$COMPOSE_PROJECT" >> "$DIR/.env"
 
 log "building and starting"
 cd "$DIR"
