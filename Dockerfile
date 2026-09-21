@@ -1,6 +1,6 @@
 # Digest-pinned so the runner and the droplet build the same image. The tag stays for
 # readability; the digest is what resolves. Dependabot's docker ecosystem bumps these.
-FROM node:22-alpine@sha256:b6f26b36c8ff49624cfdac716b8ea1138d606df02586a77d364bb5536a634f85 AS assets
+FROM node:26-alpine@sha256:dbaa92e5758cbbcf85d65d5403fdb530fe3442cbe8c6dbfb7ef23365450d5070 AS assets
 WORKDIR /build/frontend
 COPY frontend/package*.json ./
 RUN npm ci
