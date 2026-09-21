@@ -365,6 +365,17 @@
       "note": "Before and after: the deck, satellite dish, neighboring wall and fence align in both views."
     },
     {
+      "id": "shrub-removal-cleanup",
+      "title": "Shrub removal and cleanup",
+      "offer": "current",
+      "photos": [
+        "p55",
+        "p56",
+        "p57"
+      ],
+      "note": "Three views show the flowering shrub, the cut stump and root crown, and the cleared ground after raking."
+    },
+    {
       "id": "fence-posts",
       "title": "Replacing rotted fence posts",
       "offer": "licensed",
@@ -403,17 +414,6 @@
         "p24"
       ],
       "note": "Before and after: worn asphalt with no visible bays, then fresh white parking lines."
-    },
-    {
-      "id": "shrub-removal-cleanup",
-      "title": "Shrub removal and cleanup",
-      "offer": "licensed",
-      "photos": [
-        "p55",
-        "p56",
-        "p57"
-      ],
-      "note": "Three views show the flowering shrub, the cut stump and root crown, and the cleared ground after raking."
     },
     {
       "id": "shower-tile",
