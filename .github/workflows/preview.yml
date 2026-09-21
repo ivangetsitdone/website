@@ -89,7 +89,7 @@ jobs:
           docker save "$tag" | gzip -1 > recovery/preview-image.tar.gz
           sha256sum recovery/preview-image.tar.gz > recovery/preview-image.tar.gz.sha256
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: preview-image
           path: |
@@ -101,7 +101,7 @@ jobs:
       - name: What the stack said, if a check failed
         if: failure()
         run: docker compose logs --tail 120
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: preview-playwright-trace
