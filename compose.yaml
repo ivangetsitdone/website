@@ -9,6 +9,11 @@ name: website-local
 services:
   app:
     build: .
+    # `build` and `image` together: a local `docker compose up --build` builds and tags
+    # website-app:local, while production sets APP_IMAGE to the registry tag of the image
+    # the check job already built and tested, and runs --no-build. The default is
+    # deliberately a local tag, so a checkout without APP_IMAGE never pulls a deploy image.
+    image: ${APP_IMAGE:-website-app:local}
     restart: unless-stopped
     read_only: true
     # Measured on the live host: 39 MiB resident, 2 processes. The ceiling is not sized to

@@ -34,6 +34,13 @@ jobs:
   check:
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    # Only to publish the image this job tested. Pull requests skip that step, and a fork's
+    # token is read-only regardless.
+    permissions:
+      contents: read
+      packages: write
+    env:
+      IMAGE: ghcr.io/${{ github.repository }}
     steps:
       - uses: actions/checkout@v7
 
@@ -65,7 +72,8 @@ jobs:
           # Plain HTTP on the runner, and a port for the www redirect rather than its real
           # hostname: Caddy provisions a certificate for every named site it is given, and
           # this host can answer no challenge for either name.
-          printf 'SITE_ADDRESS=:80\nWWW_ADDRESS=:8080\nPREVIEW_ADDRESS=:8081\n' > .env
+          printf 'SITE_ADDRESS=:80\nWWW_ADDRESS=:8080\nPREVIEW_ADDRESS=:8081\nAPP_IMAGE=%s\n' \
+            "$IMAGE:$GITHUB_SHA" > .env
           docker compose up -d --build
           for _ in $(seq 60); do
             code=$(curl -s -o /dev/null -w '%{http_code}' http://localhost/healthz) || true
@@ -83,6 +91,18 @@ jobs:
         working-directory: tests/browser
         env:
           BASE_URL: http://localhost
+
+      # Only now, with every suite green against this exact image. The deploy job will
+      # pull this tag rather than rebuilding from source on the droplet, so what ships is
+      # the artefact that was tested rather than a rebuild that ought to match it.
+      - name: Publish the tested image
+        if: github.event_name != 'pull_request'
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" |
+            docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker push "$IMAGE:$GITHUB_SHA"
+          docker logout ghcr.io
+          echo "published $IMAGE:$GITHUB_SHA"
 
       - name: What the stack said, if any of that failed
         if: failure()
