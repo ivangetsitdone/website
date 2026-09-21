@@ -118,7 +118,7 @@ jobs:
     # Configure this environment to allow only main and to require review if desired.
     environment: preview
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: preview-image
           path: recovery
