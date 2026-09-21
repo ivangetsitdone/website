@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # Bring this site up on a fresh host. Installs Docker if it is missing, clones the
-# repository, and starts the stack. Safe to re-run: every step checks before acting.
+# repository, and starts the stack.
+#
+# This provisions a host; it does not update one. Once a checkout exists, the deploy
+# workflow owns it, and re-running here refuses rather than pulling. See ALLOW_EXISTING_
+# CHECKOUT below and DEPLOY.md, "Automatic deploys".
 #
 #   curl -fsSL https://raw.githubusercontent.com/ivangetsitdone/website/main/scripts/bootstrap.sh | bash
 #
@@ -14,6 +18,11 @@
 #                  since ivangetsitdone.com is the built-in default.
 #   INSTALL_CLAUDE "yes" also installs Claude Code. Default "no" — running the site
 #                  does not need it.
+#   ALLOW_EXISTING_CHECKOUT
+#                  "yes" lets this script update a checkout that already exists, which
+#                  it otherwise refuses to touch. For rebuilding a host whose checkout
+#                  survived, not for shipping changes: pushes to main deploy themselves.
+#                  Default "no".
 set -euo pipefail
 
 REPO=${REPO:-https://github.com/ivangetsitdone/website.git}
@@ -36,8 +45,21 @@ case "$SITE_ADDRESS" in
     ;;
 esac
 INSTALL_CLAUDE=${INSTALL_CLAUDE:-no}
+ALLOW_EXISTING_CHECKOUT=${ALLOW_EXISTING_CHECKOUT:-no}
 
 log() { echo "[bootstrap] $*"; }
+
+# $DIR is a deploy target, not a workspace. .github/workflows/deploy.yml resets it to the
+# commit it is shipping and rolls back if that commit is unhealthy. Pulling into it from
+# here would leave the host serving a commit no deploy run ever tested, outside that
+# rollback path and invisible from the repository — the next push would silently discard
+# it. Refuse before touching anything: provisioning a fresh host is this script's job.
+if [ -d "$DIR/.git" ] && [ "$ALLOW_EXISTING_CHECKOUT" != yes ]; then
+  log "$DIR already holds a checkout; the deploy workflow owns it from here."
+  log "To ship a change, push to main. To rebuild this host anyway, re-run with"
+  log "ALLOW_EXISTING_CHECKOUT=yes."
+  exit 1
+fi
 
 if ! command -v docker >/dev/null; then
   log "installing Docker"
@@ -59,7 +81,8 @@ command -v git >/dev/null || apt-get install -y git
 
 mkdir -p "$(dirname "$DIR")"
 if [ -d "$DIR/.git" ]; then
-  log "updating $DIR"
+  # Only reachable with ALLOW_EXISTING_CHECKOUT=yes, checked above.
+  log "updating $DIR (ALLOW_EXISTING_CHECKOUT=yes)"
   git -C "$DIR" pull --ff-only
 else
   log "cloning into $DIR"

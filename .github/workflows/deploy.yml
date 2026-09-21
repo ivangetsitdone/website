@@ -36,6 +36,12 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v7
+
+      # Needs no stack and no browsers, so it fails in seconds rather than after the
+      # build. Guards the rule that the droplet's checkout is the pipeline's alone.
+      - name: The bootstrap guard holds
+        run: python3 tests/test_bootstrap_guard.py
+
       - uses: actions/setup-node@v7
         with:
           node-version: 22
