@@ -81,6 +81,10 @@ class PreviewConfigTests(unittest.TestCase):
         self.assertIn("sed -i '/github-preview@ivangetsitdone$/d' /root/.ssh/authorized_keys", production)
         self.assertIn("openssl rand -base64 32", production)
         self.assertIn('no-port-forwarding,no-agent-forwarding,no-X11-forwarding,no-pty,command=\"/usr/local/sbin/website-preview-deploy\"', production)
+        self.assertIn(
+            "docker compose exec -T caddy caddy reload --config /etc/caddy/Caddyfile </dev/null",
+            production,
+        )
         preview_workflow = (ROOT / ".github/workflows/preview.yml").read_text()
         self.assertIn("PREVIEW_DEPLOY_USER || 'preview-deploy'", preview_workflow)
         self.assertTrue((ROOT / "deploy/preview_deploy.pub").read_text().startswith("ssh-ed25519 "))

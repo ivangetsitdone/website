@@ -192,7 +192,9 @@ jobs:
           # The Caddyfile is bind-mounted, so Compose does not recreate the proxy when it
           # changes and an edit would otherwise never reach the running config. Reloading
           # is graceful: measured at 482 requests straight through a reload, zero errors.
-          docker compose exec -T caddy caddy reload --config /etc/caddy/Caddyfile
+          # `docker compose exec` otherwise inherits the SSH here-document on stdin and can
+          # consume every deployment command that follows this reload.
+          docker compose exec -T caddy caddy reload --config /etc/caddy/Caddyfile </dev/null
 
           # Prove the host is on the commit this run deployed, rather than assuming it.
           head=$(git rev-parse HEAD)
