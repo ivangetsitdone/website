@@ -39,7 +39,10 @@ services:
       retries: 3
       start_period: 5s
   caddy:
-    image: caddy:2-alpine
+    # Digest-pinned like the Dockerfile's bases, but Dependabot does not see it: its
+    # docker ecosystem reads Dockerfiles and Kubernetes manifests, not Compose files.
+    # The images job in .github/workflows/audit.yml watches this one instead.
+    image: caddy:2-alpine@sha256:de23def33b17fb5d1290b0f6c2add1d70780e52341896c00a4c8a2a2fe9d355e
     restart: unless-stopped
     # 15 MiB resident, 6 processes. Generous headroom, but a ceiling: losing the proxy
     # takes the whole site off the internet, so it must not be the process the kernel

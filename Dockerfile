@@ -1,11 +1,13 @@
-FROM node:22-alpine AS assets
+# Digest-pinned so the runner and the droplet build the same image. The tag stays for
+# readability; the digest is what resolves. Dependabot's docker ecosystem bumps these.
+FROM node:22-alpine@sha256:b6f26b36c8ff49624cfdac716b8ea1138d606df02586a77d364bb5536a634f85 AS assets
 WORKDIR /build/frontend
 COPY frontend/package*.json ./
 RUN npm ci
 COPY frontend/ ./
 RUN npm run build
 
-FROM python:3.13-slim AS photos
+FROM python:3.13-slim@sha256:8d9d0b8bcf6506481eae4907c18f5e3e7902e629f5f6d684f9e7c32e85e3ddf0 AS photos
 WORKDIR /build
 RUN pip install --no-cache-dir Pillow==11.3.0
 COPY scripts/build_photos.py ./scripts/build_photos.py
@@ -15,7 +17,7 @@ COPY content/brand/ ./content/brand/
 COPY app/data/portfolio.json ./app/data/portfolio.json
 RUN python scripts/build_photos.py
 
-FROM python:3.13-slim
+FROM python:3.13-slim@sha256:8d9d0b8bcf6506481eae4907c18f5e3e7902e629f5f6d684f9e7c32e85e3ddf0
 ENV PYTHONUNBUFFERED=1
 WORKDIR /srv
 COPY requirements.txt ./

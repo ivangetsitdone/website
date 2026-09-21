@@ -57,6 +57,9 @@ jobs:
       - name: Production runtime policy
         run: python3 tests/test_production_runtime.py
 
+      - name: Base images are pinned by digest
+        run: python3 tests/test_image_pinning.py
+
       - name: Build the images and start the stack
         run: |
           # Plain HTTP on the runner, and a port for the www redirect rather than its real

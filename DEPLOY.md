@@ -177,7 +177,9 @@ Move the A record, then `docker compose down && docker compose up -d` to pick up
 hostname and issue the certificate.
 
 The build does three things in sequence, and fails loudly rather than quietly shipping
-something wrong:
+something wrong. All three base images are pinned by digest, so the runner and the droplet
+build against the same bytes and a base image change arrives as a reviewable diff — see
+[ADR-0015](docs/adr/0015-base-images-pinned-by-digest.md):
 
 1. **Assets stage** (`node:22-alpine`) — `npm ci` against the committed lockfile, then Vite
    bundles `frontend/` into `app/static/site.js` and `site.css`.
