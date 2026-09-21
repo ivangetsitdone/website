@@ -202,16 +202,17 @@ three jobs, in order:
 | Job | Where | What |
 | --- | --- | --- |
 | `check` | runner | Builds the images, starts the stack on plain HTTP, runs all three suites against it. Runs on pull requests too; touches nothing live. |
-| `deploy` | droplet | Resets `/srv/website` to the commit, rebuilds, waits for the app's healthcheck, reloads Caddy, asserts `HEAD`. Rolls back on any failure. Skipped for pull requests. |
+| `deploy` | droplet | Resets `/srv/website` to the commit, pulls the image `check` published, waits for the app's healthcheck, reloads Caddy, asserts `HEAD` **and** the running image. Rolls back on any failure. Skipped for pull requests. |
 | `verify` | runner | Re-runs the two HTTP suites against production, proving this host and its certificate serve what was tested. |
 
 A pull request therefore runs `check` alone: a change that breaks the site is caught before
 anything reaches the droplet. Reasoning is in
 [ADR-0010](docs/adr/0010-continuous-deployment.md).
 
-**What a deploy does to the live site.** Compose builds first, with the current containers
-still serving, and replaces them only once the build succeeds — so a broken tree cannot take
-the site down. The swap is still a restart, but nobody sees it: the app image is compiled at
+**What a deploy does to the live site.** The image was built and tested on the runner, so
+the droplet only pulls it — and the pull happens before anything is touched, with the current
+containers still serving, so a registry failure or a bad tag leaves the site exactly where it
+was. The containers are replaced only once that image is on the host. The swap is still a restart, but nobody sees it: the app image is compiled at
 build time so it starts in about three seconds, and Caddy holds connections and retries
 across the gap rather than returning 502. Measured at 25 samples a second while the app
 container is replaced: **zero errors, one request held for 3.72 seconds**. Measured again
@@ -222,8 +223,9 @@ Replacing Caddy itself costs about **3.6 seconds of refused connections**, since
 left to absorb it. That happens only when `compose.yaml` changes — a `Caddyfile` change is a
 graceful reload with no interruption at all.
 
-**If the new build will not serve**, the deploy puts the previous commit back, rebuilds it
-from cache and waits for it to become healthy, then fails the job. Rehearsed against a real
+**If the new image will not serve**, the deploy puts the previous commit back, restarts the
+image that was running minutes earlier — tagged aside before the swap, so nothing is built or
+fetched — waits for it to become healthy, then fails the job. Rehearsed against a real
 clone with a commit that builds cleanly and refuses to start: the site ends at HTTP 200 on
 the previous commit, and the run is red. A rollback is an incident — read the log, fix
 forward, push again. `git revert` and push is a normal deploy through the same gate.
@@ -290,8 +292,11 @@ its first step, before touching the droplet, if either secret is missing.
 - **`rolling back to <sha>`** — the new build never became healthy. The job prints
   `docker compose logs` first; that is where the reason is. The site is back on the previous
   commit by the time the job goes red.
-- **`the rollback is unhealthy too - the site is down`** — the rare bad one. The previous
-  commit no longer builds or starts either, which usually means the host, not the code:
+- **`could not pull <image>; the site is untouched on <sha>`** — the registry, a bad tag, or
+  a half-published image. Nothing was changed; the previous commit is still serving. Re-run
+  the job once the image is there.
+- **`the rollback is unhealthy too - the site is down`** — the rare bad one. The image that
+  was serving minutes ago no longer starts, which points at the host rather than the code:
   check `df -h /` in the same log, then `docker compose logs` on the droplet.
 - **A red `verify` or `browser` job** — the deploy happened and the live site broke. Fix
   forward, or `git revert` and push, which deploys the revert.

@@ -143,10 +143,13 @@ class ComposeProjectIsolationTests(unittest.TestCase):
     def test_the_deploy_pins_the_project_before_it_runs_compose(self):
         remote = self.DEPLOY[self.DEPLOY.index("<<'REMOTE'"):self.DEPLOY.index("          REMOTE")]
         pin = remote.index(f"COMPOSE_PROJECT_NAME={self.PRODUCTION_PROJECT}")
+        # Whatever the deploy runs, the project must already be pinned. Matching the first
+        # executed compose statement rather than a literal command keeps this honest when
+        # the deploy changes shape — as it did when the droplet stopped building.
         executed = min(
             remote.index(statement)
             for statement in (
-                "docker compose up -d --build || roll_back",
+                "docker compose up -d --no-build || roll_back",
                 "wait_healthy ||",
                 "docker compose exec -T caddy",
             )

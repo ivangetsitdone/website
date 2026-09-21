@@ -86,6 +86,38 @@ class ImageProvenanceTests(unittest.TestCase):
         publish = self.DEPLOY[self.DEPLOY.index("Publish the tested image"):]
         self.assertIn("if: github.event_name != 'pull_request'", publish[:400])
 
+    REMOTE = DEPLOY[DEPLOY.index("<<'REMOTE'"):DEPLOY.index("          REMOTE")]
+
+    def test_the_droplet_does_not_build(self):
+        """The whole point: ship the artefact that was tested, not a rebuild of it."""
+        builds = [
+            line.strip() for line in self.REMOTE.splitlines()
+            if line.strip().startswith("docker") and "--build" in line and "--no-build" not in line
+        ]
+        self.assertEqual(builds, [], f"the droplet still builds: {builds}")
+
+    def test_the_image_is_pulled_before_anything_changes(self):
+        """A registry failure must leave the site serving the previous commit."""
+        self.assertLess(
+            self.REMOTE.index("docker pull"),
+            self.REMOTE.index("docker compose up"),
+        )
+
+    def test_the_rollback_does_not_build(self):
+        rollback = self.REMOTE[self.REMOTE.index("roll_back() {"):]
+        rollback = rollback[:rollback.index("\n          }")]
+        self.assertIn("--no-build", rollback)
+        self.assertIn("set_app_image", rollback)
+
+    def test_the_host_validates_the_image_it_is_told_to_run(self):
+        self.assertIn("ghcr\\.io/[a-z0-9._/-]+:[0-9a-f]{40}", self.REMOTE)
+
+    def test_the_deploy_asserts_what_it_is_serving(self):
+        """HEAD alone no longer proves it: the image is a separate fact now."""
+        self.assertIn('running=$(docker inspect -f \'{{.Config.Image}}\'', self.REMOTE)
+        self.assertIn('[ "$running" = "$image" ]', self.REMOTE)
+
+
     def test_the_image_name_is_not_hardcoded(self):
         """A fork or a whitelabel instance publishes under its own repository."""
         self.assertIn("IMAGE: ghcr.io/${{ github.repository }}", self.DEPLOY)

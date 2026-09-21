@@ -26,6 +26,8 @@ concurrency:
 env:
   SITE: https://ivangetsitdone.com
   PREVIEW_ADDRESS: ${{ vars.PREVIEW_ADDRESS || ':8081' }}
+  # The check job publishes here; the deploy job tells the droplet to run exactly this.
+  IMAGE: ghcr.io/${{ github.repository }}
 
 jobs:
   # The gate. Stands the whole stack up on the runner and tests it there, so a change that
@@ -39,8 +41,6 @@ jobs:
     permissions:
       contents: read
       packages: write
-    env:
-      IMAGE: ghcr.io/${{ github.repository }}
     steps:
       - uses: actions/checkout@v7
 
@@ -137,22 +137,39 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
 
-      - name: Pull, rebuild and restart
+      - name: Deploy the tested image
         env:
           TARGET: ${{ vars.DEPLOY_USER || 'root' }}@${{ vars.DEPLOY_HOST || 'ivangetsitdone.com' }}
         run: |
-          ssh -o BatchMode=yes "$TARGET" 'bash -s --' "$GITHUB_SHA" "$PREVIEW_ADDRESS" <<'REMOTE'
+          ssh -o BatchMode=yes "$TARGET" 'bash -s --' "$GITHUB_SHA" "$PREVIEW_ADDRESS" "$IMAGE:$GITHUB_SHA" <<'REMOTE'
           set -euo pipefail
           sha=$1
           preview_address=$2
+          image=$3
           case "$preview_address" in
             :8081|preview.ivangetsitdone.com) ;;
             *) echo "::error::invalid PREVIEW_ADDRESS: $preview_address"; exit 1 ;;
           esac
+          # The host runs whatever this names, so it is checked rather than trusted.
+          [[ "$image" =~ ^ghcr\.io/[a-z0-9._/-]+:[0-9a-f]{40}$ ]] || {
+            echo "::error::refusing to deploy unrecognised image: $image"; exit 1; }
+          repository=${image%:*}
 
           cd /srv/website
           previous=$(git rev-parse HEAD)
           echo "deploying $sha over $previous"
+          echo "image $image"
+
+          # Keep whatever is serving now under a tag of its own, so a rollback is a restart
+          # rather than a rebuild. This also covers the first deploy after the switch, where
+          # the running image was built on this host and has no registry tag.
+          rollback_image=""
+          current_container=$(docker compose ps -q app 2>/dev/null || true)
+          if [ -n "$current_container" ]; then
+            rollback_image="$repository:$previous"
+            docker tag "$(docker inspect -f '{{.Image}}' "$current_container")" "$rollback_image"
+            echo "rollback image $rollback_image"
+          fi
 
           wait_healthy() {
             local state=starting
@@ -190,18 +207,46 @@ jobs:
             printf 'COMPOSE_PROJECT_NAME=%s\n' website >> .env
           fi
 
+          set_app_image() {
+            if grep -q '^APP_IMAGE=' .env; then
+              sed -i "s|^APP_IMAGE=.*|APP_IMAGE=$1|" .env
+            else
+              printf 'APP_IMAGE=%s\n' "$1" >> .env
+            fi
+          }
+          set_app_image "$image"
+
+          # Before anything is touched. A registry outage, a bad tag or a half-published
+          # image fails here, with the site still serving the previous commit and nothing
+          # to roll back. The checkout is already at $sha, which the rollback path resets.
+          docker pull "$image" || {
+            echo "::error::could not pull $image; the site is untouched on $previous"
+            git reset --hard "$previous"
+            set_app_image "${rollback_image:-$image}"
+            exit 1
+          }
+
           # Any failure rolls back the same way, because there is no reliable way to tell
           # from here whether the containers were replaced before it happened: caddy
           # depends_on app with condition: service_healthy, so `up` itself fails once the
           # new app container is in place and refusing to pass its healthcheck. Resetting
-          # the checkout without rebuilding would leave the host claiming a commit it is
-          # not serving. Rebuilding the previous commit is cheap — its layers are still in
-          # the build cache — and is a no-op when the containers really were untouched.
+          # the checkout without restoring the image would leave the host claiming a commit
+          # it is not serving.
+          #
+          # The rollback starts an image that was already running on this host minutes ago,
+          # so it cannot fail the way a rebuild can: no npm ci, no Pillow pass, no registry.
+          # That mattered — the previous version rebuilt here, on the box whose memory
+          # pressure is the most likely reason the deploy failed in the first place.
           roll_back() {
             echo "::error::$1"
-            echo "rolling back to $previous"
             git reset --hard "$previous"
-            if docker compose up -d --build && wait_healthy; then
+            if [ -z "$rollback_image" ]; then
+              echo "::error::nothing was running to roll back to - the site is down"
+              exit 1
+            fi
+            echo "rolling back to $previous on $rollback_image"
+            set_app_image "$rollback_image"
+            if docker compose up -d --no-build && wait_healthy; then
               echo "rolled back; the site is serving $previous"
             else
               echo "::error::the rollback is unhealthy too - the site is down"
@@ -209,7 +254,7 @@ jobs:
             exit 1
           }
 
-          docker compose up -d --build || roll_back "compose up failed for $sha"
+          docker compose up -d --no-build || roll_back "compose up failed for $sha"
           wait_healthy || { docker compose logs --tail 80 app; roll_back "$sha never became healthy"; }
 
           # The Caddyfile is bind-mounted, so Compose does not recreate the proxy when it
@@ -222,6 +267,13 @@ jobs:
           # Prove the host is on the commit this run deployed, rather than assuming it.
           head=$(git rev-parse HEAD)
           [ "$head" = "$sha" ] || { echo "::error::HEAD is $head, expected $sha"; exit 1; }
+
+          # And that it is serving the image the gate tested, not one left over from an
+          # earlier run. The checkout and the running container have to agree; before, the
+          # host rebuilt and the two could only be assumed to match.
+          running=$(docker inspect -f '{{.Config.Image}}' "$(docker compose ps -q app)")
+          [ "$running" = "$image" ] || {
+            echo "::error::serving $running, expected $image"; exit 1; }
 
           # Publish preview policy only after this production commit is healthy and active.
           # The helper is root-owned, but the preview key belongs to a dedicated system user.
@@ -267,8 +319,16 @@ jobs:
           /usr/sbin/sshd -T -C user=preview-deploy,host=ivangetsitdone.com,addr=127.0.0.1 | \
             awk '$1 ~ /^(allowusers|denyusers|authorizedkeysfile|pubkeyauthentication)$/ { print }'
 
-          # The image the last deploy built is now untagged, and the build cache grows
-          # without bound. Both matter on a 2 GB droplet with a small disk.
+          # Deployed images accumulate one tag per commit. Keep the one serving and the one
+          # a rollback would need; discard the rest. The build cache is pruned too: nothing
+          # builds here any more, but a hand-run `compose up --build` would still fill it.
+          docker image ls "$repository" --format '{{.Repository}}:{{.Tag}}' |
+            while read -r tag; do
+              case "$tag" in
+                "$image"|"$rollback_image") ;;
+                *) docker image rm "$tag" >/dev/null 2>&1 || true ;;
+              esac
+            done
           docker image prune -f >/dev/null
           docker builder prune -f --filter until=168h >/dev/null
           df -h / | tail -1
