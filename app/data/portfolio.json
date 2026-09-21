@@ -314,6 +314,33 @@
       "caption": "Textured landscape blocks form a low course against exposed soil, with the hollow block tops still visible.",
       "source": "photo_2026-09-17 13.03.25.jpeg",
       "sha256": "3319316854cdbbd49d1a076ccaa611546d25a9366fb95e2e0e28c88594cc5806"
+    },
+    {
+      "id": "p55",
+      "title": "Flowering shrub before removal",
+      "category": "Outdoor projects",
+      "stage": "Before",
+      "caption": "A flowering shrub stands among tall, dry grass before the area is cleared.",
+      "source": "img_0ccbdfbfeb5a.jpg",
+      "sha256": "036d65b90fdfcaab7853cdc32f19e372d65f51b2869764ecaa85563abce3cae7"
+    },
+    {
+      "id": "p56",
+      "title": "Exposed shrub root crown",
+      "category": "Outdoor projects",
+      "stage": "In progress",
+      "caption": "The cut shrub stump and root crown are exposed in disturbed soil.",
+      "source": "img_697bdac1b7bf.jpg",
+      "sha256": "08169b8548a0bcad772d78259d77d2715cef16fc10b3d5d0ed14e2b16071be6b"
+    },
+    {
+      "id": "p57",
+      "title": "Ground raked after removal",
+      "category": "Outdoor projects",
+      "stage": "After",
+      "caption": "The cleared patch is raked smooth, with loose soil surrounded by dry grass.",
+      "source": "img_0f5bbd5de722.jpg",
+      "sha256": "6a620f36ab6d016fa0014896229fdb4c2c5f16b55bc8d868d68463b968ffa3d0"
     }
   ],
   "pairs": [
@@ -376,6 +403,17 @@
         "p24"
       ],
       "note": "Before and after: worn asphalt with no visible bays, then fresh white parking lines."
+    },
+    {
+      "id": "shrub-removal-cleanup",
+      "title": "Shrub removal and cleanup",
+      "offer": "licensed",
+      "photos": [
+        "p55",
+        "p56",
+        "p57"
+      ],
+      "note": "Three views show the flowering shrub, the cut stump and root crown, and the cleared ground after raking."
     },
     {
       "id": "shower-tile",

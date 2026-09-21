@@ -33,7 +33,7 @@ curl -s -o /dev/null -w '%{http_code}\n' http://localhost/     # 200
 ```
 
 First build takes about five minutes: Vite bundles the frontend, then Pillow regenerates
-75 images from the tracked originals. `docker compose logs -f` to watch.
+81 images from the tracked originals. `docker compose logs -f` to watch.
 
 Deploying to a server is [DEPLOY.md](DEPLOY.md) — one command on a fresh droplet.
 After that it is automatic: **every push to `main` is built and tested on a runner, then
@@ -68,7 +68,7 @@ app/templates/           page.html is the layout; one partial per page, plus gal
 app/data/portfolio.json  Photo catalogue: captions, categories, stages, SHA-256 of every source
 app/print/               Hand-authored printable SVG, served from /print
 frontend/                style.css, gallery.css, gallery.js (the viewer), main.js (HTMX glue)
-content/photos/          35 original JPEGs — tracked, never served
+content/photos/          38 original JPEGs — tracked, never served
 content/portraits/       About-page portrait source
 content/brand/           Logo and business-card originals
 scripts/build_photos.py  Image pipeline; verifies hashes, strips metadata
@@ -104,7 +104,7 @@ test somewhere else.
 
 ```sh
 python3 tests/smoke.py                      # pages, headers, caching, licensing guardrails
-python3 tests/portfolio_http.py             # 35 sources, 75 generated assets, source isolation
+python3 tests/portfolio_http.py             # 38 sources, 81 generated assets, source isolation
 cd tests/browser && npm ci
 PLAYWRIGHT_BROWSERS_PATH=../../recovery/browsers npx playwright install chromium
 npm test                                    # 30 tests, desktop + mobile, axe WCAG 2 A/AA

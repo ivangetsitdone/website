@@ -2,17 +2,18 @@
 
 The owner uploaded 54 JPEGs and authorized a portfolio with captions and inferred before/after groupings in the project conversation. The supplied attribution is Ivan; the conversation contains both “Pineda” and “Pidena,” so confirm surname spelling before adding a personal credit. Public credit uses the registered business name, Zip, LLC. The words “handyman services” were removed from public copy on 2026-09-18 for licensing reasons; see the main README.
 
-35 source photos are preserved unchanged in `photos/` and local Git for reconstruction. These are original source material, not generated website assets. None of the imported JPEGs had EXIF metadata. Original upload filenames and SHA-256 checksums are recorded in `app/data/portfolio.json`; that file is the editable catalog used by the site. Unselected uploads remain in ignored `recovery/uploads/` and are not needed to rebuild.
+38 source photos are preserved unchanged in `photos/` and local Git for reconstruction. These are original source material, not generated website assets. None of the imported JPEGs had EXIF metadata. Original upload filenames and SHA-256 checksums are recorded in `app/data/portfolio.json`; that file is the editable catalog used by the site. Unselected uploads remain in ignored `recovery/uploads/` and are not needed to rebuild.
 
 ## Editorial approach
 
 - Captions describe visible features, not verified materials, compliance, dates, locations, or unseen work.
 - “Detail” means a project view whose overall completion status is unknown. It does not mean finished.
-- The owner has confirmed all seven project groupings, so the public notes state them plainly instead of hedging with “Likely.” Stage labels and captions for photos outside those groupings are still visual interpretations awaiting review; keep that caveat here rather than in site copy.
+- The owner has confirmed all eight project groupings, so the public notes state them plainly instead of hedging with “Likely.” Stage labels and captions for photos outside those groupings are still visual interpretations awaiting review; keep that caveat here rather than in site copy.
 - The side-yard pair has matching deck, dish, fence and neighboring wall.
 - Corrected by the owner on 2026-09-18: Ivan **built** the garden steps. The first curation read p42 as an existing path uncovered (“Garden steps revealed”), which was wrong and undersold the work; the captions now describe digging out the old path and setting the new flight. Treat this as the standing example of why inferred captions need owner review.
 - The shower project opens with two photos the owner confirmed as **before** shots of the original white tile shower (p15, p16); the rebuild photos that follow have matching niches/tub corner and are still **in progress**, not a finished installation.
 - The owner confirmed three further before/after pairs: the leaf-covered sidewalk strip (p43 → p44), the parking lot before and after restriping (p23 → p24), and the siding repair before and after finishing (p09 → p10). The owner also confirmed that p02 and p04 show rotted fence posts being replaced and the fence afterwards. Their stage labels, titles and captions were updated to match.
+- Added from owner-supplied Telegram JPEGs on 2026-09-21: p55–p57 show the confirmed shrub-removal sequence — flowering shrub, exposed stump/root crown, then the cleared ground raked smooth. The received files contain no EXIF metadata; their SHA-256 hashes are recorded in the catalogue.
 - Similar angles, blurry excavation close-ups and street scenery were omitted from the first curated selection. This is curation, not deletion of uploads.
 
 ## Using these photos

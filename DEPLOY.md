@@ -177,7 +177,7 @@ something wrong:
 3. **Runtime stage** — FastAPI and the generated assets, running as an unprivileged user in
    a read-only container with all capabilities dropped.
 
-First boot takes a few minutes, most of it Pillow regenerating 75 images. Watch it with
+First boot takes a few minutes, most of it Pillow regenerating 81 images. Watch it with
 `docker compose logs -f`.
 
 ## 2a. Automatic deploys
@@ -375,7 +375,7 @@ SITE_ADDRESS=:80 WWW_ADDRESS=:8080 PREVIEW_ADDRESS=:8081 docker compose up -d
 ```sh
 curl -fsS https://<your-domain>/healthz            # {"status":"ok"}
 python3 tests/smoke.py https://<your-domain>       # pages, headers, licensing guardrails
-python3 tests/portfolio_http.py https://<your-domain>   # 35 sources, 75 generated assets, isolation
+python3 tests/portfolio_http.py https://<your-domain>   # 38 sources, 81 generated assets, isolation
 cd tests/browser && npm ci && PLAYWRIGHT_BROWSERS_PATH=../../recovery/browsers npx playwright install chromium
 BASE_URL=https://<your-domain> npm test            # 30 tests, desktop + mobile, axe WCAG A/AA
 ```

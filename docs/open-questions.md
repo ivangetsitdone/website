@@ -20,7 +20,7 @@ owner agreeing to them.
 - "Contact" in the header navigation, where the page itself is titled "Contact me".
 - "All photos" as the first work-section tab.
 
-**Photo captions and stage labels.** The seven project groupings are owner-confirmed. The
+**Photo captions and stage labels.** The eight project groupings are owner-confirmed. The
 captions on individual photos outside those groupings are inferred from what is visible and
 deserve a read-through. The garden-steps entry is the cautionary example: it originally read
 as though Ivan had uncovered an existing flight of steps, when he had built them — back-

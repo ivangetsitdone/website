@@ -28,5 +28,5 @@ hand.
   `/content/...` paths 404 in production.
 - Re-running the one-time importer over the catalogue would overwrite editorial edits, so
   don't; edit the JSON directly.
-- 35 sources produce 70 project derivatives plus portrait, logo, icon and card — about
-  8.7 MiB served.
+- The current 38 sources produce 76 project derivatives plus portrait, logo, icon and card —
+  about 9.86 MiB served.
