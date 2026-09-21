@@ -414,9 +414,50 @@ rate appears in the cost panel. Run it after any copy change, not just after a d
   which would delete it and burn a rate-limited re-issue.
 - **`app/static` and `app/media`.** Generated during the build, git-ignored on purpose.
 - **`recovery/`.** Local diagnostics, screenshots and Playwright browsers. Disposable.
-- **Anything under `/root` outside this directory.** There is nothing: the project is
-  self-contained, and the only host-level changes were installing Docker and generating an
-  SSH key for pushing to this remote.
+- **The deployed image.** Since [ADR-0016](docs/adr/0016-deploy-the-tested-image.md) the
+  droplet runs `ghcr.io/ivangetsitdone/website:<sha>`, published by the `check` job. The host
+  builds nothing; it holds the tag it is serving and the one a rollback would need.
+
+### What the host carries beyond this repository
+
+Verified on the live droplet, 2026-09-21. This list used to say "there is nothing", which
+stopped being true when preview deployment landed:
+
+| On the host | What it is |
+| --- | --- |
+| `preview-deploy` (uid 1000) | System user in the **`docker` group**, which is root-equivalent. Created and maintained by every production deploy. |
+| `/usr/local/sbin/website-preview-deploy` | Root-owned forced command the preview key is restricted to. Installed from `scripts/deploy_preview.sh`. |
+| `/srv/website-preview` | The preview checkout, owned by `preview-deploy`. |
+| `/root/.ssh/authorized_keys` | 2 entries. One is the CI deploy key; confirm what the other is before handing the host over. |
+| `/home/preview-deploy/.ssh/authorized_keys` | 1 restricted entry, rewritten on every deploy. |
+| `website_caddy_data`, `website_caddy_config` | Docker volumes. The first holds the TLS certificate — see above. |
+| `/srv/website/.env` | Untracked, and load-bearing: `SITE_ADDRESS`, `PREVIEW_ADDRESS`, `COMPOSE_PROJECT_NAME`, `APP_IMAGE`. |
+| `PermitRootLogin yes` | Root SSH is enabled. §1a describes turning it off; it has not been done. |
+
+### Handing the site to someone else
+
+None of the following is in the repository, and none transfers by cloning it.
+
+**Rotate, in this order** — add the new credential before removing the old one, so there is
+never a window with no working key:
+
+1. New owner generates a deploy keypair; add the public half to the droplet's
+   `authorized_keys` **alongside** the existing one.
+2. Update `DEPLOY_KEY` and `DEPLOY_KNOWN_HOSTS`, push a trivial change, confirm a green deploy.
+3. Only now remove the outgoing key from `authorized_keys`.
+4. Rotate `PREVIEW_DEPLOY_KEY` the same way: new pair, `deploy/preview_deploy.pub` replaced
+   through a reviewed PR, environment secret updated, then a preview deploy to confirm.
+5. Revoke any personal access token used for repository automation.
+6. Re-run `ssh-keyscan` if the droplet is ever rebuilt.
+
+**Transfer or confirm ownership of:** the droplet and its billing account; the
+`ivangetsitdone.com` registration and DNS; the GitHub account owning this repository and the
+`ghcr.io` package published from it.
+
+**Note what the credentials actually grant.** `DEPLOY_KEY` is root SSH on the droplet.
+`PREVIEW_DEPLOY_KEY` is restricted to a forced command, but `preview-deploy` is in the
+`docker` group, and that group is root-equivalent — §1a is explicit about this. Both are
+full access to the host in practice.
 
 ## 6. Proof this works
 
