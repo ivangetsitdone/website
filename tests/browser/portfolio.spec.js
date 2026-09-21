@@ -107,8 +107,9 @@ test('projects run from what Ivan can take on today to the licensed work', async
   await expect(page.locator('.group-heading')).toHaveText(['Work I can take on today', 'Bigger projects, once my license lands']);
   const rendered = await page.locator('.project-sequence h3[id]').evaluateAll(headings => headings.map(h => h.id));
   expect(rendered).toEqual(catalog.pairs.map(pair => pair.id));
-  // The offered work comes first as one block, and the shower remodel closes the page.
-  expect(catalog.pairs.map(pair => pair.offer)).toEqual(['current', 'current', 'licensed', 'licensed', 'licensed', 'licensed', 'licensed', 'licensed']);
+  // The offered work comes first as one block, including shrub removal, and the shower remodel closes the page.
+  expect(catalog.pairs.map(pair => pair.offer)).toEqual(['current', 'current', 'current', 'licensed', 'licensed', 'licensed', 'licensed', 'licensed']);
+  expect(rendered.slice(0, 3)).toEqual(['sidewalk-clearing', 'side-yard', 'shrub-removal-cleanup']);
   expect(rendered.at(-1)).toBe('shower-tile');
 });
 
