@@ -16,15 +16,22 @@ starts the site — the droplet boots with the site already running, and nothing
 the host at all. First boot takes a few minutes while the images build;
 `/var/log/site-bootstrap.log` has the transcript.
 
-On a host that already exists, the same script does the same job:
+On a host that does not have a checkout yet, the same script does the same job:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/ivangetsitdone/website/main/scripts/bootstrap.sh | bash
 ```
 
-It is idempotent — re-running pulls and re-ups rather than breaking — and it does **not**
-install Claude Code: serving the site does not need it. Pass `INSTALL_CLAUDE=yes` if you
-want it on the box.
+It does **not** install Claude Code: serving the site does not need it. Pass
+`INSTALL_CLAUDE=yes` if you want it on the box.
+
+**It refuses to run against a checkout that already exists.** Once `/srv/website` is there,
+the deploy workflow owns it — it resets that checkout to the commit it is shipping and rolls
+back if the commit turns out unhealthy. Pulling into it from the host would leave the site
+serving a commit no run ever tested, outside that rollback path, until the next push
+silently discarded it. So: to ship a change, push to `main`. To rebuild a host whose
+checkout survived — disaster recovery, not deployment — re-run with
+`ALLOW_EXISTING_CHECKOUT=yes`.
 
 It comes up on plain HTTP so it does not depend on DNS having moved yet. Once the A record
 points at the droplet, set the hostname and restart:
