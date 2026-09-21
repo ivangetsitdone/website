@@ -12,3 +12,8 @@
   `main` is tested on a runner and then deployed via `.github/workflows/deploy.yml`, so treat
   `main` as production; pull requests run the same tests without deploying.
   The droplet's checkout is reset on each deploy; never keep work only on the host.
+- On the droplet, the live site and a development clone share one Docker daemon. `compose.yaml`
+  names its project `website-local` so a clone cannot act on the live containers, which run as
+  `website`. Do not add `COMPOSE_PROJECT_NAME=website` to a working clone's `.env`, and do not
+  "fix" the `name:` line: it is the only thing standing between `docker compose down -v` in a
+  checkout and the live site's TLS certificate.

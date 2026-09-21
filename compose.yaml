@@ -1,3 +1,11 @@
+# A clone of this repository gets its own Compose project, so `docker compose` in a
+# development checkout can never reach the live containers. Production opts back in to the
+# name `website` through COMPOSE_PROJECT_NAME in its untracked .env — written by
+# scripts/bootstrap.sh on a fresh host and ensured by deploy.yml on every deploy. That name
+# is load-bearing beyond this file: compose.preview.yaml joins `website_default`, which is
+# Compose's default network for the project called `website`.
+name: website-local
+
 services:
   app:
     build: .
