@@ -27,9 +27,9 @@ and arrow keys all move the same scroll position.
   When support arrives, the JS can be replaced by a `@supports` block and deleted — the
   snap track underneath is identical either way.
 - Opening a photo inside a project scopes the carousel to that project rather than all
-  seventeen photos on the page.
-- Only the current slide and its two neighbours get a `src`, so opening the 35-photo
-  gallery fetches three full images rather than thirty-five.
+  twenty photos on the page.
+- Only the current slide and its two neighbours get a `src`, so opening the 38-photo
+  gallery fetches three full images rather than thirty-eight.
 - An `IntersectionObserver` syncs caption, counter and dots when the user scrolls; a
   `settling` counter suppresses it while the carousel scrolls itself, so the two never
   fight.

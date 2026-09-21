@@ -96,6 +96,8 @@ test('all thumbnails decode and sequences preserve progress labels', async ({ pa
   await page.goto('/before-after');
   const shower = page.locator('.project-sequence').filter({ hasText: 'From the original shower to new tile' });
   await expect(shower.locator('.stage')).toHaveText(['Before', 'Before', 'In progress', 'In progress', 'In progress']);
+  const shrub = page.locator('.project-sequence').filter({ hasText: 'Shrub removal and cleanup' });
+  await expect(shrub.locator('.stage')).toHaveText(['Before', 'In progress', 'After']);
   await expect(page.locator('.sequence-grid').first().locator('.stage')).toHaveText(['Before', 'After']);
   await page.screenshot({ path: `../../recovery/sequences-${test.info().project.name}.png` });
 });
@@ -106,7 +108,7 @@ test('projects run from what Ivan can take on today to the licensed work', async
   const rendered = await page.locator('.project-sequence h3[id]').evaluateAll(headings => headings.map(h => h.id));
   expect(rendered).toEqual(catalog.pairs.map(pair => pair.id));
   // The offered work comes first as one block, and the shower remodel closes the page.
-  expect(catalog.pairs.map(pair => pair.offer)).toEqual(['current', 'current', 'licensed', 'licensed', 'licensed', 'licensed', 'licensed']);
+  expect(catalog.pairs.map(pair => pair.offer)).toEqual(['current', 'current', 'licensed', 'licensed', 'licensed', 'licensed', 'licensed', 'licensed']);
   expect(rendered.at(-1)).toBe('shower-tile');
 });
 

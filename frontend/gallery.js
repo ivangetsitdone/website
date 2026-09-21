@@ -3,7 +3,7 @@
 // the buttons, dots and keyboard shortcuts drive the same scroll position.
 const initialized = new WeakSet();
 const STAGE_CLASS = stage => `stage stage-${stage.toLowerCase().replace(/ /g, '-')}`;
-// Dots stop being useful long before the 35-photo portfolio; that set has the counter.
+// Dots stop being useful long before the 38-photo portfolio; that set has the counter.
 const MAX_DOTS = 10;
 
 export function mountGalleries() {
@@ -96,7 +96,7 @@ export function mountGalleries() {
       next.disabled = set.length < 2;
     }
 
-    // Only the neighbours are fetched: a 35-photo set must not pull 35 full images.
+    // Only the neighbours are fetched: a 38-photo set must not pull 38 full images.
     function load(position) {
       for (const near of [position, position - 1, position + 1]) {
         const image = track.children[near]?.firstElementChild;
