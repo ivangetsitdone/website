@@ -32,6 +32,21 @@ updates:
     commit-message:
       prefix: deps(frontend)
 
+  # The three base images in the Dockerfile, pinned by digest. Dependabot opens a PR when
+  # a tag moves, so a base image change arrives as a reviewable diff through the check gate
+  # rather than arriving silently the next time something rebuilds.
+  #
+  # This does NOT cover compose.yaml: the docker ecosystem reads Dockerfiles, Containerfiles
+  # and Kubernetes manifests, not Compose files. Caddy's pin is watched by the images job in
+  # .github/workflows/audit.yml.
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: deps(docker)
+
   # The Actions themselves. Pins actions/checkout, setup-node and friends, and bumps them
   # when a new SHA/tag lands - the supply-chain surface that is easiest to forget.
   - package-ecosystem: github-actions
