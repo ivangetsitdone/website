@@ -3,8 +3,21 @@ services:
     build: .
     restart: unless-stopped
     read_only: true
+    # Measured on the live host: 39 MiB resident, 2 processes. The ceiling is not sized to
+    # the app but to what else shares this 2 GB box — an image build during a deploy, and
+    # whatever else is running. Unbounded, a runaway here lets the kernel choose the victim,
+    # and it may well choose dockerd or caddy; bounded, the app alone dies and `restart:
+    # unless-stopped` plus the healthcheck bring it back.
+    mem_limit: 512m
+    pids_limit: 128
+    # No cpus cap, deliberately: this is the service that should win the single vCPU.
+    # compose.preview.yaml caps preview at 0.75 so a candidate cannot starve production.
     tmpfs:
-      - /tmp
+      - /tmp:size=64m,mode=1777
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
     cap_drop: [ALL]
     security_opt: [no-new-privileges:true]
     healthcheck:
@@ -20,6 +33,15 @@ services:
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped
+    # 15 MiB resident, 6 processes. Generous headroom, but a ceiling: losing the proxy
+    # takes the whole site off the internet, so it must not be the process the kernel
+    # reaches for when something else on the host misbehaves.
+    mem_limit: 128m
+    pids_limit: 64
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
     ports:
       - "80:80"
       - "443:443"
