@@ -1,10 +1,11 @@
-import hashlib
 import json
 from pathlib import Path
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+
+from app.assets import versioned_url
 
 ROOT = Path(__file__).parent
 app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
@@ -13,25 +14,15 @@ app.mount('/media', StaticFiles(directory=ROOT / 'media'), name='media')
 # Hand-authored, printable, and tracked in Git rather than generated at build time.
 app.mount('/print', StaticFiles(directory=ROOT / 'print'), name='print')
 templates = Jinja2Templates(directory=ROOT / 'templates')
-_asset_versions: dict[str, str] = {}
 
 
 def asset(url: str) -> str:
     """Return a generated asset URL with a content version, for safe long caching.
 
-    Filenames are stable across builds, so without this a browser can keep serving
-    an old stylesheet against fresh HTML.
+    Recomputed on every call, deliberately: app/assets.py explains why memoising this
+    becomes a trap the moment an asset directory can be written to.
     """
-    if url not in _asset_versions:
-        file = ROOT / url.lstrip('/')
-        if file.is_file():
-            stat = file.stat()
-            digest = hashlib.sha256(f'{stat.st_mtime_ns}:{stat.st_size}'.encode()).hexdigest()
-            _asset_versions[url] = digest[:10]
-        else:
-            _asset_versions[url] = ''
-    version = _asset_versions[url]
-    return f'{url}?v={version}' if version else url
+    return versioned_url(ROOT, url)
 
 
 templates.env.globals['asset'] = asset
