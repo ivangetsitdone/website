@@ -64,6 +64,18 @@ if [ -d "$DIR/.git" ] && [ "$ALLOW_EXISTING_CHECKOUT" != yes ]; then
   exit 1
 fi
 
+# A small droplet has no swap, and without it the kernel can only reclaim page cache:
+# under pressure it thrashes on executables rather than killing anything, and everything
+# stalls for seconds at a time. Measured on the production host before adding this, with
+# two agents and the site sharing 2 GB: /proc/pressure/memory reported some avg60=53.98,
+# full avg60=18.59 — eighteen per cent of the minute with every task stalled. Afterwards,
+# 8.09 and 2.78. Swap gives reclaim somewhere to go.
+if [ "$(awk '/MemTotal/ {print int($2/1024)}' /proc/meminfo)" -lt 2048 ] && [ -z "$(swapon --noheadings 2>/dev/null)" ]; then
+  log "adding a 2 GB swapfile (host has under 2 GB of RAM and no swap)"
+  fallocate -l 2G /swapfile && chmod 600 /swapfile && mkswap /swapfile >/dev/null && swapon /swapfile
+  grep -q '^/swapfile' /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab
+fi
+
 if ! command -v docker >/dev/null; then
   log "installing Docker"
   apt-get update
