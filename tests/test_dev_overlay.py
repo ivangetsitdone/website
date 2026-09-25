@@ -42,11 +42,23 @@ class DevStackTests(unittest.TestCase):
     def test_it_reloads_from_the_working_tree(self):
         self.assertIn("--reload", self.dev["command"])
 
-    def test_only_source_is_mounted(self):
+    def test_every_tracked_source_path_is_mounted(self):
+        """Derived from Git rather than listed, so a new source file cannot be forgotten.
+
+        Forgetting one is a quiet failure: the tree's main.py would import a module only
+        the image has, or worse, silently run the image's older copy.
+        """
+        tracked = subprocess.run(
+            ["git", "ls-files", "app/"], cwd=ROOT, text=True, capture_output=True, check=True
+        ).stdout.split()
+        expected = {path.split("/")[1] for path in tracked}
+        mounted = {v["source"].rsplit("/app/", 1)[-1] for v in self.dev["volumes"]}
+        self.assertEqual(mounted, expected)
+
+    def test_generated_directories_are_not_mounted(self):
         """app/static and app/media are generated and git-ignored: mounting the tree over
         them would serve a site with no stylesheet, no script and no photographs."""
         mounted = {v["source"].rsplit("/app/", 1)[-1] for v in self.dev["volumes"]}
-        self.assertEqual(mounted, {"main.py", "templates", "data", "print"})
         for generated in ("static", "media"):
             with self.subTest(directory=generated):
                 self.assertNotIn(generated, mounted)

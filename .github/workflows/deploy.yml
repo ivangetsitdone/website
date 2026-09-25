@@ -71,6 +71,9 @@ jobs:
       - name: The dev site stays out of production
         run: python3 tests/test_dev_overlay.py
 
+      - name: Asset versions follow their files
+        run: python3 tests/test_asset_versions.py
+
       - name: Build the images and start the stack
         run: |
           # Plain HTTP on the runner, and a port for the www redirect rather than its real
