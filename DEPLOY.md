@@ -415,6 +415,32 @@ docker compose up -d
 `DEV_ADDRESS` reaches production's Caddy through its `.env`, which the deploy maintains; the
 route exists from the next deploy onwards.
 
+**Hermes reads its skills from this checkout.** The four skills in `.hermes/skills/` load by
+reference, through Hermes' `skills.external_dirs` setting, so a `git pull` updates them and
+the assistant cannot edit them: the directory is root-owned, with no ACL. Two details matter.
+The gateway is the **system** unit `hermes-gateway.service`, whose `HERMES_HOME` is
+`/var/lib/hermes`; and the `hermes` command run as that user defaults to a second, unused
+profile at `/var/lib/hermes/.hermes`, so a setting written through the CLI without
+`HERMES_HOME` lands in the wrong file. Edit the live config directly (it is `hermes`-owned,
+mode 0600; keep it that way) and restart the gateway:
+
+```yaml
+# /var/lib/hermes/config.yaml
+skills:
+  external_dirs:
+    - /srv/website-dev/.hermes/skills
+```
+
+```sh
+systemctl restart hermes-gateway
+sudo -u hermes -H env HERMES_HOME=/var/lib/hermes hermes skills list | grep -Ew 'site|todo|recent|ship'
+```
+
+Hermes indexes an external directory by path, so each of the four appears under a category
+of its own name. The trusted-project mechanism (`hermes skills trust`) is not used: it keys
+off the session's working directory, which for the gateway is `/var/lib/hermes`, not the
+checkout.
+
 ### Keeping it current
 
 ```sh
@@ -477,7 +503,7 @@ rate appears in the cost panel. Run it after any copy change, not just after a d
 
 ### What the host carries beyond this repository
 
-Verified on the live droplet, 2026-09-21. This list used to say "there is nothing", which
+Verified on the live droplet, 2026-09-21; the three Hermes rows on 2026-09-25. This list used to say "there is nothing", which
 stopped being true when preview deployment landed:
 
 | On the host | What it is |
@@ -490,6 +516,9 @@ stopped being true when preview deployment landed:
 | `website_caddy_data`, `website_caddy_config` | Docker volumes. The first holds the TLS certificate — see above. |
 | `/srv/website/.env` | Untracked, and load-bearing: `SITE_ADDRESS`, `PREVIEW_ADDRESS`, `COMPOSE_PROJECT_NAME`, `APP_IMAGE`. |
 | `PermitRootLogin yes` | Root SSH is enabled. §1a describes turning it off; it has not been done. |
+| `hermes` (uid 997) | Unprivileged system user the owner's assistant runs as: no sudo, not in `docker`. ACLs on `/srv/website-dev/{app,frontend,.git}` are its only write access to the tree. |
+| `/var/lib/hermes` | Its home, and `HERMES_HOME` of the system unit `hermes-gateway.service` (the user unit of the same name under its `.config` is disabled and stale). `config.yaml` there is private and carries `skills.external_dirs` (§2c). |
+| `/srv/website-dev` | The development checkout, root-owned and served live (§2c). |
 
 ### Handing the site to someone else
 
