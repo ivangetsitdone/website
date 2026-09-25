@@ -380,6 +380,51 @@ browser suites against the HTTPS preview. A green preview is evidence for review
 to publish; approved work still goes through a pull request to `main` and the production
 workflow.
 
+## 2c. The development site
+
+`dev.ivangetsitdone.com` serves the checkout at `/srv/website-dev`, live: save a template and
+it is on that URL on the next request. Reasoning and its limits are in
+[ADR-0017](docs/adr/0017-development-site-on-one-host.md).
+
+It is one container — `compose.dev.yaml`, project `website-dev`, no Caddy and no published
+ports. Production's Caddy proxies it on the `dev-app` alias, the same arrangement preview
+uses, and adds `X-Robots-Tag: noindex`.
+
+**What is live, and what is not.** `app/main.py`, `app/templates`, `app/data` and `app/print`
+are mounted from the tree. `app/static`, `app/media` and everything built from `frontend/` are
+**not**: they are generated and git-ignored, and come from `APP_IMAGE`. So copy, markup and
+routing changes are instant; stylesheet, script and photograph changes appear after a deploy.
+
+### One-time setup on the host
+
+The tree is root-owned and shared with the assistant, which may write `app/` and `frontend/`
+only — the ACL is the boundary, and the skill that says so is worth nothing without it.
+
+```sh
+git clone https://github.com/ivangetsitdone/website.git /srv/website-dev
+cd /srv/website-dev
+printf 'COMPOSE_PROJECT_NAME=website-dev\nCOMPOSE_FILE=compose.dev.yaml\nAPP_IMAGE=%s\n' \
+  "$(ssh root@ivangetsitdone.com 'grep ^APP_IMAGE= /srv/website/.env | cut -d= -f2-')" > .env
+
+setfacl -m u:hermes:rx /srv/website-dev
+setfacl -R -m u:hermes:rwx -m d:u:hermes:rwx /srv/website-dev/app /srv/website-dev/frontend
+
+docker compose up -d
+```
+
+`DEV_ADDRESS` reaches production's Caddy through its `.env`, which the deploy maintains; the
+route exists from the next deploy onwards.
+
+### Keeping it current
+
+```sh
+cd /srv/website-dev && git pull --ff-only     # source
+docker compose pull && docker compose up -d   # dependencies, after a requirements change
+```
+
+A dependency change is the one case needing the second line: `APP_IMAGE` supplies the
+installed packages, and the tree only supplies the source.
+
 ## 3. Serving a different domain
 
 Three places name the domain, and they have to agree:

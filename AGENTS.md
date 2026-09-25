@@ -12,6 +12,13 @@
   `main` is tested on a runner and then deployed via `.github/workflows/deploy.yml`, so treat
   `main` as production; pull requests run the same tests without deploying.
   The droplet's checkout is reset on each deploy; never keep work only on the host.
+- **The development site is `/srv/website-dev`, live at <https://dev.ivangetsitdone.com>.**
+  A template, `app/main.py`, `app/data` or `app/print` edit there is on that URL within
+  seconds, with no commit — it is the place to look at work in progress, and the place to
+  show it to someone else. `app/static`, `app/media` and anything under `frontend/` are not
+  live there: they come from the image, so they appear after a deploy. The tree is shared, so
+  stage files by name rather than `git add -A`. See
+  [ADR-0017](docs/adr/0017-development-site-on-one-host.md).
 - On the droplet, the live site and a development clone share one Docker daemon. `compose.yaml`
   names its project `website-local` so a clone cannot act on the live containers, which run as
   `website`. Do not add `COMPOSE_PROJECT_NAME=website` to a working clone's `.env`, and do not

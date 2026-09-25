@@ -26,6 +26,7 @@ concurrency:
 env:
   SITE: https://ivangetsitdone.com
   PREVIEW_ADDRESS: ${{ vars.PREVIEW_ADDRESS || ':8081' }}
+  DEV_ADDRESS: ${{ vars.DEV_ADDRESS || 'dev.ivangetsitdone.com' }}
   # The check job publishes here; the deploy job tells the droplet to run exactly this.
   IMAGE: ghcr.io/${{ github.repository }}
 
@@ -67,12 +68,15 @@ jobs:
       - name: Base images are pinned by digest
         run: python3 tests/test_image_pinning.py
 
+      - name: The dev site stays out of production
+        run: python3 tests/test_dev_overlay.py
+
       - name: Build the images and start the stack
         run: |
           # Plain HTTP on the runner, and a port for the www redirect rather than its real
           # hostname: Caddy provisions a certificate for every named site it is given, and
           # this host can answer no challenge for either name.
-          printf 'SITE_ADDRESS=:80\nWWW_ADDRESS=:8080\nPREVIEW_ADDRESS=:8081\nAPP_IMAGE=%s\n' \
+          printf 'SITE_ADDRESS=:80\nWWW_ADDRESS=:8080\nPREVIEW_ADDRESS=:8081\nDEV_ADDRESS=:8083\nAPP_IMAGE=%s\n' \
             "$IMAGE:$GITHUB_SHA" > .env
           docker compose up -d --build
           for _ in $(seq 60); do
@@ -141,14 +145,19 @@ jobs:
         env:
           TARGET: ${{ vars.DEPLOY_USER || 'root' }}@${{ vars.DEPLOY_HOST || 'ivangetsitdone.com' }}
         run: |
-          ssh -o BatchMode=yes "$TARGET" 'bash -s --' "$GITHUB_SHA" "$PREVIEW_ADDRESS" "$IMAGE:$GITHUB_SHA" <<'REMOTE'
+          ssh -o BatchMode=yes "$TARGET" 'bash -s --' "$GITHUB_SHA" "$PREVIEW_ADDRESS" "$IMAGE:$GITHUB_SHA" "$DEV_ADDRESS" <<'REMOTE'
           set -euo pipefail
           sha=$1
           preview_address=$2
           image=$3
+          dev_address=$4
           case "$preview_address" in
             :8081|preview.ivangetsitdone.com) ;;
             *) echo "::error::invalid PREVIEW_ADDRESS: $preview_address"; exit 1 ;;
+          esac
+          case "$dev_address" in
+            :8083|dev.ivangetsitdone.com) ;;
+            *) echo "::error::invalid DEV_ADDRESS: $dev_address"; exit 1 ;;
           esac
           # The host runs whatever this names, so it is checked rather than trusted.
           [[ "$image" =~ ^ghcr\.io/[a-z0-9._/-]+:[0-9a-f]{40}$ ]] || {
@@ -206,6 +215,17 @@ jobs:
           else
             printf 'COMPOSE_PROJECT_NAME=%s\n' website >> .env
           fi
+
+          if grep -q '^DEV_ADDRESS=' .env; then
+            sed -i "s|^DEV_ADDRESS=.*|DEV_ADDRESS=$dev_address|" .env
+          else
+            printf 'DEV_ADDRESS=%s\n' "$dev_address" >> .env
+          fi
+
+          # Production runs compose.yaml alone. A COMPOSE_FILE line here would layer a dev
+          # overlay onto the live stack, so it is removed every run rather than trusted to
+          # be absent — the development host is the same machine.
+          sed -i '/^COMPOSE_FILE=/d' .env
 
           set_app_image() {
             if grep -q '^APP_IMAGE=' .env; then

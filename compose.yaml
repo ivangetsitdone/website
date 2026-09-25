@@ -70,6 +70,9 @@ services:
       # Preview stays on an unpublished internal address until DNS exists and the
       # PREVIEW_ADDRESS repository variable is set to preview.ivangetsitdone.com.
       PREVIEW_ADDRESS: ${PREVIEW_ADDRESS:-:8081}
+      # Same idea for the development site, whose DNS does exist: production's .env names
+      # the hostname, and anything else — a clone, a runner — gets an unpublished port.
+      DEV_ADDRESS: ${DEV_ADDRESS:-:8083}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data

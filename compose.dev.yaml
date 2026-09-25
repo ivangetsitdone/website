@@ -1,0 +1,60 @@
+# The development site: dev.ivangetsitdone.com serves this working tree.
+#
+# One host serves everything here, so this is a separate stack rather than the overlay the
+# whitelabel scaffold layers over compose.yaml — that design assumes a second machine with
+# its own 80/443. Production holds those ports, and its Caddy proxies this container on an
+# internal alias, exactly as it already does for preview.
+#
+# What is live, and what is not:
+#
+#   - app/main.py, app/templates, app/data and app/print are mounted from the tree. A
+#     template edit is live on the next request; a main.py edit restarts the worker.
+#   - app/static and app/media are deliberately NOT mounted. They are generated and
+#     git-ignored, so mounting the tree over them would serve an empty site. They come from
+#     APP_IMAGE, which is why a stylesheet or photo change is not live here yet.
+#
+# Nothing in this file is production's. The deploy strips COMPOSE_FILE from production's
+# .env and runs compose.yaml alone; tests/test_dev_overlay.py asserts the separation.
+services:
+  dev-app:
+    # The same image production runs, so dev's dependencies are production's. Only the
+    # source is local. Refresh it with `docker compose pull` after a dependency change.
+    image: ${APP_IMAGE:?APP_IMAGE must name the image whose dependencies dev runs on}
+    restart: unless-stopped
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000",
+              "--no-proxy-headers", "--reload", "--reload-dir", "/srv/app"]
+    volumes:
+      - ./app/main.py:/srv/app/main.py:ro
+      - ./app/templates:/srv/app/templates:ro
+      - ./app/data:/srv/app/data:ro
+      - ./app/print:/srv/app/print:ro
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    # Smaller than production's and capped on CPU: a reloading worker on a shared box must
+    # not be able to starve the live site. --reload costs a watcher process, hence the PIDs.
+    mem_limit: 256m
+    cpus: 0.5
+    pids_limit: 128
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz')"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    networks:
+      website:
+        aliases: [dev-app]
+
+# Production's Caddy already lives on website_default. Joining it lets that proxy serve
+# dev.ivangetsitdone.com without publishing another host port.
+networks:
+  website:
+    external: true
+    name: website_default
