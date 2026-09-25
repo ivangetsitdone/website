@@ -7,7 +7,7 @@ RUN npm ci
 COPY frontend/ ./
 RUN npm run build
 
-FROM python:3.13-slim@sha256:8d9d0b8bcf6506481eae4907c18f5e3e7902e629f5f6d684f9e7c32e85e3ddf0 AS photos
+FROM python:3.14-slim@sha256:caaf356f40667c496d405780745b9ac25771c189a51dfcc42430d531ea09f8a2 AS photos
 WORKDIR /build
 RUN pip install --no-cache-dir Pillow==11.3.0
 COPY scripts/build_photos.py ./scripts/build_photos.py
@@ -17,7 +17,7 @@ COPY content/brand/ ./content/brand/
 COPY app/data/portfolio.json ./app/data/portfolio.json
 RUN python scripts/build_photos.py
 
-FROM python:3.13-slim@sha256:8d9d0b8bcf6506481eae4907c18f5e3e7902e629f5f6d684f9e7c32e85e3ddf0
+FROM python:3.14-slim@sha256:caaf356f40667c496d405780745b9ac25771c189a51dfcc42430d531ea09f8a2
 ENV PYTHONUNBUFFERED=1
 WORKDIR /srv
 COPY requirements.txt ./
