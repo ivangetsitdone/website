@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# Publish what is on the development site to the live site.
+#
+#   bash .hermes/skills/ship/scripts/ship.sh "new home headline and phone number"
+#
+# Stages app/ and frontend/ by name, never everything: the tree is shared with the
+# developer's assistant, which may have work in progress in it.
+set -euo pipefail
+
+description=${1:-}
+[ -n "$description" ] || { echo "usage: ship.sh '<what is being published>'" >&2; exit 2; }
+
+cd "$(dirname "$0")/../../../.."
+
+git add app frontend
+if git diff --cached --quiet; then
+  echo "nothing to publish: app/ and frontend/ match what is already published" >&2
+  exit 1
+fi
+
+echo "publishing:"
+git diff --cached --stat
+
+branch="hermes/$(date -u +%Y%m%d-%H%M%S)"
+git switch -c "$branch"
+git commit -q -m "site: ${description}"
+git push -q -u origin "$branch"
+
+url=$(gh pr create --base main --title "site: ${description}" --body "Published from the development site by the owner's assistant.
+
+Copy, branding and photographs only — everything under \`app/\` and \`frontend/\`. The full \`check\` job runs before this can merge.")
+echo "opened $url"
+
+if gh pr merge --auto --squash "$url" >/dev/null 2>&1; then
+  echo "armed to merge itself once the tests pass"
+else
+  echo "could not arm auto-merge; the pull request is waiting for someone to merge it"
+fi
+
+git switch -q main
+echo
+echo "The tests take about two minutes and publishing about three more."
