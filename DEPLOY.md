@@ -54,6 +54,18 @@ The rest of this guide is the manual equivalent, for when something needs doing 
   for a certificate on boot; if the name does not resolve to this machine yet, that fails
   and retries, and the site is unreachable over HTTPS until it succeeds.
 - About 2 GB of RAM. The image builds comfortably on the 2 GB droplet this was developed on.
+- **Swap, on a host with under 2 GB.** `scripts/bootstrap.sh` adds a 2 GB swapfile when the
+  host has less than that and none already. Without it the kernel can only reclaim page
+  cache, so under pressure it thrashes on executables rather than killing anything: no OOM
+  line in the log, just everything stalling for seconds. Measured here, with two agents and
+  the site sharing 2 GB, `/proc/pressure/memory` went from `some avg60=53.98 full
+  avg60=18.59` to `8.09` and `2.78` once swap existed — while swap itself stayed at 0 B
+  used. The gain is that reclaim has somewhere to go, not that pages move.
+
+  ```sh
+  free -m                     # a Swap line with a non-zero total
+  cat /proc/pressure/memory   # `full avg60` in single digits
+  ```
 
 Host tools are only needed to run the *tests*: Python 3 for the two HTTP suites, and Node 22
 plus a Chromium download for the browser suite.
