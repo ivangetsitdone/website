@@ -31,6 +31,13 @@ updates:
     open-pull-requests-limit: 5
     commit-message:
       prefix: deps(frontend)
+    # htmx majors are deferred indefinitely - issue #16. 4.0.0 arrived as #50 and failed
+    # the gate, which is the argument: it is a migration, not a version bump. Without this
+    # the same PR returns every week until someone merges it on a quiet afternoon. 2.x
+    # patches and minors still arrive, so the shipped bundle stays current within its major.
+    ignore:
+      - dependency-name: htmx.org
+        update-types: ["version-update:semver-major"]
 
   # The three base images in the Dockerfile, pinned by digest. Dependabot opens a PR when
   # a tag moves, so a base image change arrives as a reviewable diff through the check gate
