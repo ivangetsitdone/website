@@ -51,6 +51,11 @@ dev. Templates, `app/main.py`, `app/data` and `app/print` are live on save.
 
 ## Entries
 
+- 2026-09-25 · Claude · Hermes is to load these skills by reference, through
+  `skills.external_dirs` in `/var/lib/hermes/config.yaml` (DEPLOY.md §2c), not by copy or
+  symlink. **Not yet applied:** writing the assistant's config is outside what the
+  developer's assistant may do unattended, so the developer does it by hand. Until then
+  `/site`, `/todo`, `/recent` and `/ship` do not exist in Hermes.
 - 2026-09-25 · Claude · Baseline skills added (`site`, `todo`, `recent`, `ship`), adapted from
   the `whitelabel-site-generator` scaffold. Photographs are **not** covered yet: the catalogue
   is hash-verified, so adding one is an entry plus a source file, not a file drop. A `photo`
