@@ -51,7 +51,9 @@ class DevStackTests(unittest.TestCase):
         tracked = subprocess.run(
             ["git", "ls-files", "app/"], cwd=ROOT, text=True, capture_output=True, check=True
         ).stdout.split()
-        expected = {path.split("/")[1] for path in tracked}
+        # Documentation under app/ is written for the assistants, not served or imported, so
+        # it has no business inside the container. Everything else the app reads is mounted.
+        expected = {path.split("/")[1] for path in tracked if not path.endswith(".md")}
         mounted = {v["source"].rsplit("/app/", 1)[-1] for v in self.dev["volumes"]}
         self.assertEqual(mounted, expected)
 
