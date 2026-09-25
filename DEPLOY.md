@@ -441,6 +441,15 @@ of its own name. The trusted-project mechanism (`hermes skills trust`) is not us
 off the session's working directory, which for the gateway is `/var/lib/hermes`, not the
 checkout.
 
+**The persona is in the repository too**, as `.hermes/SOUL.md`, but Hermes reads only the
+copy in its home, so a change there is copied into place by hand:
+
+```sh
+cp /srv/website-dev/.hermes/SOUL.md /var/lib/hermes/SOUL.md
+chown hermes:hermes /var/lib/hermes/SOUL.md
+systemctl restart hermes-gateway
+```
+
 ### Keeping it current
 
 ```sh
