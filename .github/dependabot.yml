@@ -46,6 +46,13 @@ updates:
     open-pull-requests-limit: 5
     commit-message:
       prefix: deps(docker)
+    # Node majors are chosen, not accepted. Dependabot offered 26 while it was still
+    # Current — the image that builds the shipped bundle should be on the active LTS.
+    # Digest and minor updates still arrive, so 24 stays patched.
+    # Revisit after 2026-10-28, when 26 becomes LTS and is the one to move to.
+    ignore:
+      - dependency-name: node
+        update-types: ["version-update:semver-major"]
 
   # The Actions themselves. Pins actions/checkout, setup-node and friends, and bumps them
   # when a new SHA/tag lands - the supply-chain surface that is easiest to forget.
