@@ -32,6 +32,24 @@
 	}
 }
 
+# The development site serves the working tree at /srv/website-dev, proxied on an internal
+# alias like preview. Unindexed for the same reason, and for the same caveat: noindex
+# discourages crawlers, it is not access control.
+{$DEV_ADDRESS::8083} {
+	encode zstd gzip
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		X-Frame-Options DENY
+		X-Robots-Tag "noindex, nofollow, noarchive"
+		-Server
+	}
+	reverse_proxy dev-app:8000 {
+		lb_try_duration 15s
+		lb_try_interval 250ms
+	}
+}
+
 # www redirects to the bare domain, which is what every canonical URL names.
 # Its own address rather than `www.{$SITE_ADDRESS}`, because SITE_ADDRESS is ":80"
 # during a pre-DNS first boot and "www.:80" is not a valid site address.

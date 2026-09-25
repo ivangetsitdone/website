@@ -21,6 +21,7 @@ otherwise be re-litigated or accidentally undone.
 | [0014](0014-compose-project-isolation.md) | The Compose project name is an isolation boundary |
 | [0015](0015-base-images-pinned-by-digest.md) | Base images pinned by digest, each with a watcher |
 | [0016](0016-deploy-the-tested-image.md) | Production runs the image the gate tested |
+| [0017](0017-development-site-on-one-host.md) | A development site serves the working tree, same host |
 
 Format: context, decision, consequences. Keep them short; if one needs reversing, add a
 new record that supersedes it rather than rewriting history.
