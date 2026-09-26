@@ -26,6 +26,9 @@ moment it is saved. Publishing is his `/ship`, which runs
 `.hermes/skills/ship/scripts/ship.sh`: it stages **`app/` and `frontend/` by name**, commits,
 pushes a `hermes/<timestamp>` branch, opens a pull request and arms auto-merge. The pull
 request runs the full `check` job and merges only if it passes; a merge to `main` deploys.
+The tree keeps showing the change meanwhile (local `main` is fast-forwarded onto it), and
+the deploy pulls `main` into the tree a few minutes later. Merges are merge commits, never
+squash, for exactly that reason ([ADR-0018](../docs/adr/0018-merge-commits-and-a-following-dev-tree.md)).
 
 **Consequence for the other assistant:** anything of yours left uncommitted under `app/` or
 `frontend/` goes out with Ivan's next `/ship`. Keep infrastructure work out of those

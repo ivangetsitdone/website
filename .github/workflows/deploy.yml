@@ -354,6 +354,14 @@ jobs:
             done
           docker image prune -f >/dev/null
           docker builder prune -f --filter until=168h >/dev/null
+          # The development checkout follows main too (ADR-0017, ADR-0018). Unshipped edits
+          # there are stashed around the pull and restored. Production is already live at
+          # this point, so a failure here is a warning, not a failed deploy.
+          if [ -d /srv/website-dev/.git ]; then
+            git -C /srv/website-dev pull -q --ff-only --autostash origin main ||
+              echo "::warning::/srv/website-dev could not follow main; pull it by hand"
+          fi
+
           df -h / | tail -1
           docker compose ps
           REMOTE
