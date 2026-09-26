@@ -43,6 +43,7 @@ echo "opened $url"
 # GitHub merges, origin/main is a fast-forward of this, which is what the deploy does.
 git switch -q main
 git merge -q --ff-only "$branch"
+git branch -q -d "$branch"    # main contains it now; the copy on origin is the pull request
 
 # The commit is pushed, so arming cannot merge anything the tests have not seen.
 if gh pr merge --auto --merge "$url" >/dev/null 2>&1; then
