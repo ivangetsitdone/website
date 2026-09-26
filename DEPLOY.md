@@ -288,6 +288,19 @@ Actions → New repository secret**. `DEPLOY_KEY` is the whole private key file 
 Then push anything, or run the workflow by hand from the **Actions** tab. The run fails on
 its first step, before touching the droplet, if either secret is missing.
 
+**One ruleset, in the web UI**, under Settings → Rules → Rulesets, is what makes a pull
+request merge itself when `check` is green ([ADR-0018](docs/adr/0018-merge-commits-and-a-following-dev-tree.md)):
+`require_pr_workflow`, target branch `main`, enforcement active, no bypass; rules: restrict
+deletions, block force pushes, require status checks with the one check `check` from
+GitHub Actions, "up to date before merging" off. "Allow auto-merge" under Settings →
+General must be on as well. The deploy token cannot set either; an owner does it once.
+Verify with:
+
+```sh
+gh api repos/ivangetsitdone/website -q .allow_auto_merge
+gh api repos/ivangetsitdone/website/rules/branches/main -q '.[].type'
+```
+
 ### When it goes wrong
 
 - **`Permission denied (publickey)`** — the public half is not in the droplet's
@@ -452,9 +465,13 @@ systemctl restart hermes-gateway
 
 ### Keeping it current
 
+The deploy does the first line itself, as its last step, so the tree follows `main`
+within minutes of a merge ([ADR-0018](docs/adr/0018-merge-commits-and-a-following-dev-tree.md)).
+By hand, when needed:
+
 ```sh
-cd /srv/website-dev && git pull --ff-only     # source
-docker compose pull && docker compose up -d   # dependencies, after a requirements change
+cd /srv/website-dev && git pull --ff-only --autostash   # source
+docker compose pull && docker compose up -d             # dependencies, after a requirements change
 ```
 
 A dependency change is the one case needing the second line: `APP_IMAGE` supplies the
