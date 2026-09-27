@@ -285,8 +285,11 @@ Without `gh`, the same two values go in by hand at **Settings → Secrets and va
 Actions → New repository secret**. `DEPLOY_KEY` is the whole private key file including its
 `-----BEGIN`/`-----END` lines; `DEPLOY_KNOWN_HOSTS` is the one-line output of `ssh-keyscan`.
 
-Then push anything, or run the workflow by hand from the **Actions** tab. The run fails on
-its first step, before touching the droplet, if either secret is missing.
+Then push to `main`. The run fails on its first deploy step, before touching the droplet,
+if either secret is missing. There is no manual run button, on purpose: a push to `main` is
+the only way into production, and `tests/test_preview_config.py` asserts that `deploy.yml`
+has no `workflow_dispatch` trigger. A redeploy of what is already on `main` is a new commit
+to `main`.
 
 **One ruleset, in the web UI**, under Settings → Rules → Rulesets, is what makes a pull
 request merge itself when `check` is green ([ADR-0018](docs/adr/0018-merge-commits-and-a-following-dev-tree.md)):
