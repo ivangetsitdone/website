@@ -63,3 +63,15 @@ None of this is legal advice, and the CCB answers these directly. Background is 
   form. Ask before adding either.
 - **Nothing imports from Nextdoor.** A profile URL was supplied but never fetched or
   republished.
+- **htmx 4 is a migration, not a bump.** htmx 4 renamed the event namespace, so every
+  listener in `frontend/` breaks. Dependabot's 4.0.0 PR (#50) failed the gate and was
+  closed; `.github/dependabot.yml` now ignores htmx majors, so it will not return on its
+  own. Moving to 4.x is a deliberate piece of work: update `frontend/site.js` listeners to
+  the new names, run the browser suite, and lift the ignore in the same PR. 2.x patches
+  still arrive. (Was issue #16.)
+- **Deploy credentials have not been rotated since the site was built.** `DEPLOY_KEY` is
+  root SSH on the droplet, and its private half exists on the maintainer's machine. The
+  procedure, in order and with no window without a working key, is DEPLOY.md §5 "Handing
+  the site to someone else"; the host inventory there is current as of 2026-09-27. Do it
+  when the project changes hands, or sooner if that machine is ever lost. The GitHub token
+  was rotated 2026-09-26. (Was issue #31.)
