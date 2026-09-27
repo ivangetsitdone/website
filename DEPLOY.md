@@ -244,8 +244,8 @@ forward, push again. `git revert` and push is a normal deploy through the same g
 
 **The droplet is a deploy target, not a workspace.** The deploy runs `git reset --hard`, so
 anything edited on the host is discarded. `.env` is untracked and survives, which is how the
-`SITE_ADDRESS` pin and the `COMPOSE_PROJECT_NAME=website` that makes this checkout the
-live one stay put. Before the first automatic deploy, check there is nothing on
+`COMPOSE_PROJECT_NAME=website` that makes this checkout the live one stays put, along with
+`APP_IMAGE`, `DEV_ADDRESS` and, on a host `bootstrap.sh` set up, the `SITE_ADDRESS` pin. Before the first automatic deploy, check there is nothing on
 the host worth keeping:
 
 ```sh
@@ -473,7 +473,7 @@ removed with the preview machinery on 2026-09-27 ([ADR-0019](docs/adr/0019-previ
 | --- | --- |
 | `/root/.ssh/authorized_keys` | 2 entries. One is the CI deploy key; confirm what the other is before handing the host over. |
 | `website_caddy_data`, `website_caddy_config` | Docker volumes. The first holds the TLS certificate — see above. |
-| `/srv/website/.env` | Untracked, and load-bearing: `SITE_ADDRESS`, `DEV_ADDRESS`, `COMPOSE_PROJECT_NAME`, `APP_IMAGE`. |
+| `/srv/website/.env` | Untracked, and load-bearing: `COMPOSE_PROJECT_NAME`, `APP_IMAGE`, `DEV_ADDRESS`, all maintained by the deploy. It carries no `SITE_ADDRESS` (verified 2026-09-27): the domain comes from `compose.yaml`'s default, and `scripts/bootstrap.sh` writes the line only on a host it set up. |
 | `PermitRootLogin yes` | Root SSH is enabled. §1a describes turning it off; it has not been done. |
 | `hermes` (uid 997) | Unprivileged system user the owner's assistant runs as: no sudo, not in `docker`. ACLs on `/srv/website-dev/{app,frontend,.git}` are its only write access to the tree. |
 | `/var/lib/hermes` | Its home, and `HERMES_HOME` of the system unit `hermes-gateway.service` (the user unit of the same name under its `.config` is disabled and stale). `config.yaml` there is private and carries `skills.external_dirs` (§2c). |
