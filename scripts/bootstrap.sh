@@ -37,16 +37,14 @@ SITE_ADDRESS=${SITE_ADDRESS:-:80}
 case "$SITE_ADDRESS" in
   :*)
     WWW_ADDRESS=${WWW_ADDRESS:-:8080}
-    PREVIEW_ADDRESS=${PREVIEW_ADDRESS:-:8081}
     ;;
   *)
     WWW_ADDRESS=${WWW_ADDRESS:-www.$SITE_ADDRESS}
-    PREVIEW_ADDRESS=${PREVIEW_ADDRESS:-preview.$SITE_ADDRESS}
     ;;
 esac
 INSTALL_CLAUDE=${INSTALL_CLAUDE:-no}
 ALLOW_EXISTING_CHECKOUT=${ALLOW_EXISTING_CHECKOUT:-no}
-# The Compose project the live site runs under. compose.preview.yaml joins
+# The Compose project the live site runs under. compose.dev.yaml joins
 # "${COMPOSE_PROJECT}_default", so the two must agree.
 COMPOSE_PROJECT=${COMPOSE_PROJECT:-website}
 
@@ -106,10 +104,7 @@ fi
 
 # compose.yaml reads the addresses; .env keeps them across restarts and reboots.
 if ! grep -q '^SITE_ADDRESS=' "$DIR/.env" 2>/dev/null; then
-  printf 'SITE_ADDRESS=%s\nWWW_ADDRESS=%s\nPREVIEW_ADDRESS=%s\n' \
-    "$SITE_ADDRESS" "$WWW_ADDRESS" "$PREVIEW_ADDRESS" > "$DIR/.env"
-elif ! grep -q '^PREVIEW_ADDRESS=' "$DIR/.env"; then
-  printf 'PREVIEW_ADDRESS=%s\n' "$PREVIEW_ADDRESS" >> "$DIR/.env"
+  printf 'SITE_ADDRESS=%s\nWWW_ADDRESS=%s\n' "$SITE_ADDRESS" "$WWW_ADDRESS" > "$DIR/.env"
 fi
 
 # compose.yaml defaults to a project name that is not production's, so a stray clone

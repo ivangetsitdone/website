@@ -1,4 +1,4 @@
-"""Dependency-free HTTP checks against the running Caddy preview."""
+"""Dependency-free HTTP checks against a running instance of the site."""
 import json
 import sys
 from urllib.error import HTTPError

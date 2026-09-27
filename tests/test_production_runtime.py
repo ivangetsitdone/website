@@ -1,5 +1,5 @@
 """Production runtime policy: the live services are bounded, bounded at least as well
-as the preview candidate they share a host with, and reachable as a Compose project only
+as the development site they share a host with, and reachable as a Compose project only
 from the checkout entitled to them.
 
 Numbers come from the rendered Compose config rather than the file text, so a change
@@ -45,7 +45,7 @@ class ProductionRuntimeTests(unittest.TestCase):
         self.assertEqual(self.app["tmpfs"], ["/tmp:size=64m,mode=1777"])
 
     def test_app_keeps_the_whole_cpu(self):
-        """Deliberate asymmetry: preview is capped so it cannot starve production."""
+        """Deliberate asymmetry: the dev site is capped so it cannot starve production."""
         self.assertIsNone(self.app.get("cpus"))
 
     def test_caddy_is_bounded_too(self):
@@ -69,18 +69,19 @@ class ProductionRuntimeTests(unittest.TestCase):
         self.assertEqual(self.app["restart"], "unless-stopped")
         self.assertEqual(self.caddy["restart"], "unless-stopped")
 
-    def test_production_is_not_tighter_than_preview(self):
-        """They share a host. The candidate must never out-resource the live site."""
-        preview = rendered(
-            "compose.preview.yaml",
-            PREVIEW_IMAGE="website-preview-candidate:" + "a" * 40,
-        )["services"]["preview-app"]
+    def test_production_is_not_tighter_than_the_dev_site(self):
+        """They share a host. The dev site must never out-resource the live site."""
+        dev = rendered(
+            "compose.dev.yaml",
+            APP_IMAGE="ghcr.io/ivangetsitdone/website:" + "a" * 40,
+        )["services"]["dev-app"]
         self.assertGreaterEqual(
             int(self.app["mem_limit"]),
-            int(preview["mem_limit"]),
-            "preview may not be given more memory than production",
+            int(dev["mem_limit"]),
+            "the dev site may not be given more memory than production",
         )
-        self.assertGreaterEqual(self.app["pids_limit"], preview["pids_limit"])
+        self.assertGreaterEqual(self.app["pids_limit"], dev["pids_limit"])
+        self.assertIsNotNone(dev.get("cpus"), "the dev site must be CPU-capped (ADR-0017)")
 
 
 class ComposeProjectIsolationTests(unittest.TestCase):
@@ -130,10 +131,10 @@ class ComposeProjectIsolationTests(unittest.TestCase):
             )
             self.assertEqual(self.rendered_from(tmp), self.PRODUCTION_PROJECT)
 
-    def test_the_preview_network_still_names_the_production_project(self):
-        """compose.preview.yaml joins `<project>_default`; rename one, break the other."""
-        preview = (ROOT / "compose.preview.yaml").read_text()
-        self.assertIn(f"name: {self.PRODUCTION_PROJECT}_default", preview)
+    def test_the_dev_network_still_names_the_production_project(self):
+        """compose.dev.yaml joins `<project>_default`; rename one, break the other."""
+        dev = (ROOT / "compose.dev.yaml").read_text()
+        self.assertIn(f"name: {self.PRODUCTION_PROJECT}_default", dev)
 
     def test_bootstrap_gives_a_fresh_host_the_production_project(self):
         bootstrap = (ROOT / "scripts/bootstrap.sh").read_text()

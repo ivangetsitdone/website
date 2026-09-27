@@ -16,13 +16,14 @@ otherwise be re-litigated or accidentally undone.
 | [0009](0009-brand-assets.md) | Brand artwork processed at build time |
 | [0010](0010-continuous-deployment.md) | Push to main deploys over SSH (build step superseded by 0016) |
 | [0011](0011-dependency-hygiene.md) | Dependencies audited weekly and pinned exactly |
-| [0012](0012-preview-deployment.md) | Preview deploys use trusted policy and a runner-built image |
+| [0012](0012-preview-deployment.md) | Preview deploys use trusted policy and a runner-built image (superseded by 0019) |
 | [0013](0013-production-runtime-limits.md) | Production containers bounded, never tighter than preview |
 | [0014](0014-compose-project-isolation.md) | The Compose project name is an isolation boundary |
 | [0015](0015-base-images-pinned-by-digest.md) | Base images pinned by digest, each with a watcher |
 | [0016](0016-deploy-the-tested-image.md) | Production runs the image the gate tested |
 | [0017](0017-development-site-on-one-host.md) | A development site serves the working tree, same host |
 | [0018](0018-merge-commits-and-a-following-dev-tree.md) | Merge commits, a required check, and a dev tree that follows main |
+| [0019](0019-preview-retired.md) | Preview deployment retired; the development site is the preview |
 
 Format: context, decision, consequences. Keep them short; if one needs reversing, add a
 new record that supersedes it rather than rewriting history.

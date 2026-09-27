@@ -25,8 +25,8 @@ class ImagePinningTests(unittest.TestCase):
                 self.assertRegex(line, DIGEST)
 
     def test_compose_images_are_pinned(self):
-        """compose.preview.yaml's image is built locally and interpolated, not pulled."""
-        for name in ("compose.yaml", "compose.preview.yaml"):
+        """compose.dev.yaml's image is interpolated from APP_IMAGE, never pulled by tag."""
+        for name in ("compose.yaml", "compose.dev.yaml"):
             for line in (ROOT / name).read_text().splitlines():
                 stripped = line.strip()
                 if not stripped.startswith("image:"):
