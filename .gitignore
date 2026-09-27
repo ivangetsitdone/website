@@ -9,3 +9,6 @@ __pycache__/
 *.py[cod]
 .venv/
 *.log
+
+# Per-machine Claude Code overrides stay local; .claude/settings.json is the shared policy.
+.claude/settings.local.json
