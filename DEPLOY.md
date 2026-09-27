@@ -181,7 +181,7 @@ Only the deploy checkout claims that name, through `COMPOSE_PROJECT_NAME` in its
 failing to get a certificate for a name that resolves elsewhere:
 
 ```sh
-SITE_ADDRESS=:80 WWW_ADDRESS=:8080 PREVIEW_ADDRESS=:8081 docker compose up -d --build
+SITE_ADDRESS=:80 WWW_ADDRESS=:8080 docker compose up -d --build
 curl -I http://<new-host-ip>/
 ```
 
@@ -285,8 +285,11 @@ Without `gh`, the same two values go in by hand at **Settings → Secrets and va
 Actions → New repository secret**. `DEPLOY_KEY` is the whole private key file including its
 `-----BEGIN`/`-----END` lines; `DEPLOY_KNOWN_HOSTS` is the one-line output of `ssh-keyscan`.
 
-Then push anything, or run the workflow by hand from the **Actions** tab. The run fails on
-its first step, before touching the droplet, if either secret is missing.
+Then push to `main`. The run fails on its first deploy step, before touching the droplet,
+if either secret is missing. There is no manual run button, on purpose: a push to `main` is
+the only way into production, and `tests/test_one_way_in.py` asserts that `deploy.yml` has
+no `workflow_dispatch` trigger. A redeploy of what is already on `main` is a new commit to
+`main`.
 
 **One ruleset, in the web UI**, under Settings → Rules → Rulesets, is what makes a pull
 request merge itself when `check` is green ([ADR-0018](docs/adr/0018-merge-commits-and-a-following-dev-tree.md)):
@@ -327,72 +330,6 @@ gh api repos/ivangetsitdone/website/rules/branches/main -q '.[].type'
   forward, or `git revert` and push, which deploys the revert.
 - Rebuilding the droplet resets all of this: re-add the public key and refresh the host key.
 
-## 2b. Preview deploys
-
-The mutable `preview` branch identifies a candidate for owner review at
-<https://preview.ivangetsitdone.com>, but it does **not** define or trigger its own deployment.
-The trusted Preview workflow is dispatched from `main` with the exact current preview SHA.
-Candidate tests run without deployment secrets.
-
-On the host, the separate preview key belongs to the dedicated `preview-deploy` system user and
-is restricted to a forced `/usr/local/sbin/website-preview-deploy` command. It cannot open an
-interactive shell or choose another command. The deployer is installed only after a trusted
-`main` production deploy is healthy. The candidate image is built and tested on an isolated
-GitHub runner, capped at 600 MB and streamed with a SHA-256 checksum. The host verifies the
-checksum and exact `origin/preview` SHA, loads the image, and applies the trusted
-`/srv/website/compose.preview.yaml`. Candidate Dockerfiles never execute on the production
-host, and the runtime has CPU, memory and PID limits in addition to its read-only filesystem.
-
-The preview app publishes no host port. It joins the existing `website_default` Docker network
-as `preview-app`; the production Caddy container proxies the preview hostname to that alias.
-Responses carry `X-Robots-Tag: noindex, nofollow, noarchive`. This discourages indexing but is
-not access control, so deploy only photos already authorized for public disclosure. Production
-continues to serve `main` from `/srv/website` and the `app` service.
-
-### One-time preview setup
-
-1. Create an **A** record for `preview.ivangetsitdone.com` pointing to the same droplet IP as
-   the bare domain. Keep it **DNS-only**, not Cloudflare-proxied, so Caddy can complete its
-   TLS-ALPN certificate challenge.
-2. Create a GitHub environment named `preview`, restrict its deployment branches to selected
-   branch `main`, and optionally add required reviewers. Store the private half of the dedicated
-   preview key as `PREVIEW_DEPLOY_KEY` in that environment. Its matching public half is tracked
-   at `deploy/preview_deploy.pub`.
-3. Merge the preview infrastructure through the normal production workflow. After production
-   is healthy, that deploy installs the root-owned forced command, provisions the dedicated
-   `preview-deploy` system user, and writes the reviewed public key to the AuthorizedKeysFile
-   paths reported by the live SSH configuration. Any earlier preview key under root is removed.
-4. Enable the public Caddy hostname only after DNS resolves:
-
-```sh
-gh variable set PREVIEW_ADDRESS -R ivangetsitdone/website \
-  --body preview.ivangetsitdone.com
-```
-
-The next `main` deployment writes that value to the host's `.env`. Until the variable is set,
-preview stays on unpublished internal address `:8081`, so a missing DNS record cannot trigger
-certificate attempts. The existing repository `DEPLOY_KNOWN_HOSTS` secret is reused only for
-host-key verification; the production private key is never exposed to the preview workflow.
-
-To rotate the preview key, generate a new pair, replace `deploy/preview_deploy.pub` through a
-reviewed production PR, and update the environment secret before deploying another preview.
-
-### Deploy a reviewed candidate
-
-```sh
-git push --force-with-lease origin HEAD:preview
-candidate=$(git rev-parse HEAD)
-gh workflow run Preview --repo ivangetsitdone/website --ref main -f candidate_sha="$candidate"
-gh run list --workflow Preview --limit 1
-```
-
-The workflow confirms the requested SHA is the current `preview` ref, runs all three suites and
-builds the capped candidate image on a runner, then asks the forced-command host deployer to
-verify and load that tested image under trusted runtime policy. It finally reruns the HTTP and
-browser suites against the HTTPS preview. A green preview is evidence for review, not permission
-to publish; approved work still goes through a pull request to `main` and the production
-workflow.
-
 ## 2c. The development site
 
 `dev.ivangetsitdone.com` serves the checkout at `/srv/website-dev`, live: save a template and
@@ -400,8 +337,8 @@ it is on that URL on the next request. Reasoning and its limits are in
 [ADR-0017](docs/adr/0017-development-site-on-one-host.md).
 
 It is one container — `compose.dev.yaml`, project `website-dev`, no Caddy and no published
-ports. Production's Caddy proxies it on the `dev-app` alias, the same arrangement preview
-uses, and adds `X-Robots-Tag: noindex`.
+ports. Production's Caddy proxies it on the `dev-app` alias and adds
+`X-Robots-Tag: noindex`.
 
 **What is live, and what is not.** `app/main.py`, `app/templates`, `app/data` and `app/print`
 are mounted from the tree. `app/static`, `app/media` and everything built from `frontend/` are
@@ -493,10 +430,10 @@ git-ignored) and edit the canonical string in `app/main.py`. Canonical URLs poin
 domain you no longer serve will quietly tell search engines the wrong thing, so do not skip
 the second one.
 
-For a **local HTTP-only preview** with no certificate at all:
+For a **local HTTP-only instance** with no certificate at all:
 
 ```sh
-SITE_ADDRESS=:80 WWW_ADDRESS=:8080 PREVIEW_ADDRESS=:8081 docker compose up -d
+SITE_ADDRESS=:80 WWW_ADDRESS=:8080 docker compose up -d
 ```
 
 ## 4. Verify, in order
@@ -529,18 +466,14 @@ rate appears in the cost panel. Run it after any copy change, not just after a d
 
 ### What the host carries beyond this repository
 
-Verified on the live droplet, 2026-09-21; the three Hermes rows on 2026-09-25. This list used to say "there is nothing", which
-stopped being true when preview deployment landed:
+Verified on the live droplet, 2026-09-21; the Hermes rows on 2026-09-25; the preview rows
+removed with the preview machinery on 2026-09-27 ([ADR-0019](docs/adr/0019-preview-retired.md)):
 
 | On the host | What it is |
 | --- | --- |
-| `preview-deploy` (uid 1000) | System user in the **`docker` group**, which is root-equivalent. Created and maintained by every production deploy. |
-| `/usr/local/sbin/website-preview-deploy` | Root-owned forced command the preview key is restricted to. Installed from `scripts/deploy_preview.sh`. |
-| `/srv/website-preview` | The preview checkout, owned by `preview-deploy`. |
 | `/root/.ssh/authorized_keys` | 2 entries. One is the CI deploy key; confirm what the other is before handing the host over. |
-| `/home/preview-deploy/.ssh/authorized_keys` | 1 restricted entry, rewritten on every deploy. |
 | `website_caddy_data`, `website_caddy_config` | Docker volumes. The first holds the TLS certificate — see above. |
-| `/srv/website/.env` | Untracked, and load-bearing: `SITE_ADDRESS`, `PREVIEW_ADDRESS`, `COMPOSE_PROJECT_NAME`, `APP_IMAGE`. |
+| `/srv/website/.env` | Untracked, and load-bearing: `SITE_ADDRESS`, `DEV_ADDRESS`, `COMPOSE_PROJECT_NAME`, `APP_IMAGE`. |
 | `PermitRootLogin yes` | Root SSH is enabled. §1a describes turning it off; it has not been done. |
 | `hermes` (uid 997) | Unprivileged system user the owner's assistant runs as: no sudo, not in `docker`. ACLs on `/srv/website-dev/{app,frontend,.git}` are its only write access to the tree. |
 | `/var/lib/hermes` | Its home, and `HERMES_HOME` of the system unit `hermes-gateway.service` (the user unit of the same name under its `.config` is disabled and stale). `config.yaml` there is private and carries `skills.external_dirs` (§2c). |
@@ -557,19 +490,15 @@ never a window with no working key:
    `authorized_keys` **alongside** the existing one.
 2. Update `DEPLOY_KEY` and `DEPLOY_KNOWN_HOSTS`, push a trivial change, confirm a green deploy.
 3. Only now remove the outgoing key from `authorized_keys`.
-4. Rotate `PREVIEW_DEPLOY_KEY` the same way: new pair, `deploy/preview_deploy.pub` replaced
-   through a reviewed PR, environment secret updated, then a preview deploy to confirm.
-5. Revoke any personal access token used for repository automation.
-6. Re-run `ssh-keyscan` if the droplet is ever rebuilt.
+4. Revoke any personal access token used for repository automation.
+5. Re-run `ssh-keyscan` if the droplet is ever rebuilt.
 
 **Transfer or confirm ownership of:** the droplet and its billing account; the
 `ivangetsitdone.com` registration and DNS; the GitHub account owning this repository and the
 `ghcr.io` package published from it.
 
-**Note what the credentials actually grant.** `DEPLOY_KEY` is root SSH on the droplet.
-`PREVIEW_DEPLOY_KEY` is restricted to a forced command, but `preview-deploy` is in the
-`docker` group, and that group is root-equivalent — §1a is explicit about this. Both are
-full access to the host in practice.
+**Note what the credential actually grants.** `DEPLOY_KEY` is root SSH on the droplet:
+full access to the host.
 
 ## 6. Proof this works
 

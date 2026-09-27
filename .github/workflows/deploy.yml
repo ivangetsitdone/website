@@ -25,7 +25,6 @@ concurrency:
 
 env:
   SITE: https://ivangetsitdone.com
-  PREVIEW_ADDRESS: ${{ vars.PREVIEW_ADDRESS || ':8081' }}
   DEV_ADDRESS: ${{ vars.DEV_ADDRESS || 'dev.ivangetsitdone.com' }}
   # The check job publishes here; the deploy job tells the droplet to run exactly this.
   IMAGE: ghcr.io/${{ github.repository }}
@@ -74,12 +73,15 @@ jobs:
       - name: Asset versions follow their files
         run: python3 tests/test_asset_versions.py
 
+      - name: Production has one way in
+        run: python3 tests/test_one_way_in.py
+
       - name: Build the images and start the stack
         run: |
           # Plain HTTP on the runner, and a port for the www redirect rather than its real
           # hostname: Caddy provisions a certificate for every named site it is given, and
           # this host can answer no challenge for either name.
-          printf 'SITE_ADDRESS=:80\nWWW_ADDRESS=:8080\nPREVIEW_ADDRESS=:8081\nDEV_ADDRESS=:8083\nAPP_IMAGE=%s\n' \
+          printf 'SITE_ADDRESS=:80\nWWW_ADDRESS=:8080\nDEV_ADDRESS=:8083\nAPP_IMAGE=%s\n' \
             "$IMAGE:$GITHUB_SHA" > .env
           docker compose up -d --build
           for _ in $(seq 60); do
@@ -148,16 +150,11 @@ jobs:
         env:
           TARGET: ${{ vars.DEPLOY_USER || 'root' }}@${{ vars.DEPLOY_HOST || 'ivangetsitdone.com' }}
         run: |
-          ssh -o BatchMode=yes "$TARGET" 'bash -s --' "$GITHUB_SHA" "$PREVIEW_ADDRESS" "$IMAGE:$GITHUB_SHA" "$DEV_ADDRESS" <<'REMOTE'
+          ssh -o BatchMode=yes "$TARGET" 'bash -s --' "$GITHUB_SHA" "$IMAGE:$GITHUB_SHA" "$DEV_ADDRESS" <<'REMOTE'
           set -euo pipefail
           sha=$1
-          preview_address=$2
-          image=$3
-          dev_address=$4
-          case "$preview_address" in
-            :8081|preview.ivangetsitdone.com) ;;
-            *) echo "::error::invalid PREVIEW_ADDRESS: $preview_address"; exit 1 ;;
-          esac
+          image=$2
+          dev_address=$3
           case "$dev_address" in
             :8083|dev.ivangetsitdone.com) ;;
             *) echo "::error::invalid DEV_ADDRESS: $dev_address"; exit 1 ;;
@@ -202,17 +199,15 @@ jobs:
           # .env is untracked and survives, which is how SITE_ADDRESS stays pinned.
           git reset --hard "$sha"
           touch .env
-          if grep -q '^PREVIEW_ADDRESS=' .env; then
-            sed -i "s|^PREVIEW_ADDRESS=.*|PREVIEW_ADDRESS=$preview_address|" .env
-          else
-            printf 'PREVIEW_ADDRESS=%s\n' "$preview_address" >> .env
-          fi
+          # The retired preview stack (ADR-0019) used to keep an address here; drop it so
+          # the Caddyfile stops receiving it.
+          sed -i '/^PREVIEW_ADDRESS=/d' .env
 
           # compose.yaml names its project `website-local`, so a clone of this repository
           # elsewhere on the host cannot act on the live containers. This checkout is the
-          # one entitled to `website`, and it must keep that name: compose.preview.yaml
-          # joins the external network `website_default`, which is Compose's default
-          # network for a project of that name. Set before any compose command below runs.
+          # one entitled to `website`, and it must keep that name: compose.dev.yaml joins
+          # the external network `website_default`, which is Compose's default network for
+          # a project of that name. Set before any compose command below runs.
           if grep -q '^COMPOSE_PROJECT_NAME=' .env; then
             sed -i "s|^COMPOSE_PROJECT_NAME=.*|COMPOSE_PROJECT_NAME=website|" .env
           else
@@ -297,50 +292,6 @@ jobs:
           running=$(docker inspect -f '{{.Config.Image}}' "$(docker compose ps -q app)")
           [ "$running" = "$image" ] || {
             echo "::error::serving $running, expected $image"; exit 1; }
-
-          # Publish preview policy only after this production commit is healthy and active.
-          # The helper is root-owned, but the preview key belongs to a dedicated system user.
-          install -o root -g root -m 0755 scripts/deploy_preview.sh \
-            /usr/local/sbin/website-preview-deploy
-
-          # Remove the short-lived preview key that was mistakenly added to root.
-          if [ -f /root/.ssh/authorized_keys ]; then
-            sed -i '/github-preview@ivangetsitdone$/d' /root/.ssh/authorized_keys
-          fi
-
-          id preview-deploy >/dev/null 2>&1 || useradd -m -s /bin/bash preview-deploy
-          # Keep password authentication unusable in practice while avoiding an account-lock
-          # state that makes sshd reject the user before public-key authentication.
-          preview_password=$(openssl rand -base64 32)
-          printf 'preview-deploy:%s\n' "$preview_password" | chpasswd
-          usermod -aG docker preview-deploy
-          preview_home=$(getent passwd preview-deploy | cut -d: -f6)
-          preview_uid=$(id -u preview-deploy)
-          preview_public_key=$(cat deploy/preview_deploy.pub)
-          preview_key_options='no-port-forwarding,no-agent-forwarding,no-X11-forwarding,no-pty,command="/usr/local/sbin/website-preview-deploy"'
-          authorized_key_files=$(/usr/sbin/sshd -T -C user=preview-deploy,host=ivangetsitdone.com,addr=127.0.0.1 | \
-            awk '$1 == "authorizedkeysfile" { for (i = 2; i <= NF; i++) print $i }')
-          [ -n "$authorized_key_files" ] || { echo "::error::sshd reports no AuthorizedKeysFile"; exit 1; }
-          while read -r template; do
-            key_file=${template//%h/$preview_home}
-            key_file=${key_file//%u/preview-deploy}
-            key_file=${key_file//%U/$preview_uid}
-            case "$key_file" in
-              /*) ;;
-              *) key_file="$preview_home/$key_file" ;;
-            esac
-            install -d -m 0700 -o preview-deploy -g preview-deploy "$(dirname "$key_file")"
-            touch "$key_file"
-            sed -i '/github-preview@ivangetsitdone$/d' "$key_file"
-            printf '%s %s\n' "$preview_key_options" "$preview_public_key" >> "$key_file"
-            chown preview-deploy:preview-deploy "$key_file"
-            chmod 0600 "$key_file"
-            echo "installed restricted preview key in $key_file"
-          done <<< "$authorized_key_files"
-          install -d -m 0755 -o preview-deploy -g preview-deploy /srv/website-preview
-          /usr/sbin/sshd -t
-          /usr/sbin/sshd -T -C user=preview-deploy,host=ivangetsitdone.com,addr=127.0.0.1 | \
-            awk '$1 ~ /^(allowusers|denyusers|authorizedkeysfile|pubkeyauthentication)$/ { print }'
 
           # Deployed images accumulate one tag per commit. Keep the one serving and the one
           # a rollback would need; discard the rest. The build cache is pruned too: nothing

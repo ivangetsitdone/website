@@ -1,6 +1,6 @@
 # 12. Preview deploys use a trusted workflow and host-owned policy
 
-Status: accepted
+Status: superseded by [ADR-0019](0019-preview-retired.md), 2026-09-27
 
 ## Context
 

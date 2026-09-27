@@ -27,7 +27,7 @@ inside the build.
 ```sh
 git clone https://github.com/ivangetsitdone/website.git
 cd website
-printf 'SITE_ADDRESS=:80\nWWW_ADDRESS=:8080\nPREVIEW_ADDRESS=:8081\n' > .env   # plain HTTP
+printf 'SITE_ADDRESS=:80\nWWW_ADDRESS=:8080\n' > .env   # plain HTTP
 docker compose up -d --build
 curl -s -o /dev/null -w '%{http_code}\n' http://localhost/     # 200
 ```
@@ -39,10 +39,9 @@ Deploying to a server is [DEPLOY.md](DEPLOY.md) — one command on a fresh dropl
 After that it is automatic: **every push to `main` is built and tested on a runner, then
 deployed**, and production is re-checked afterwards. Pull requests run the tests and stop
 there. See [Automatic deploys](DEPLOY.md#2a-automatic-deploys).
-The mutable `preview` branch can be deployed separately to
-<https://preview.ivangetsitdone.com> for human review. Deployment is manually dispatched from
-the trusted `main` workflow through a preview-only forced-command credential; it never replaces
-the production checkout or app. See [Preview deploys](DEPLOY.md#2b-preview-deploys).
+To look at a change before it ships, the development site at
+<https://dev.ivangetsitdone.com> serves the working tree at `/srv/website-dev` live. See
+[The development site](DEPLOY.md#2c-the-development-site).
 The droplet is a deploy target, not a workspace — the deploy resets `/srv/website` to the
 pushed commit, so anything edited there is discarded.
 
@@ -110,7 +109,7 @@ PLAYWRIGHT_BROWSERS_PATH=../../recovery/browsers npx playwright install chromium
 npm test                                    # 30 tests, desktop + mobile, axe WCAG 2 A/AA
 ```
 
-The Python suites need no dependencies at all. To point them at a local preview:
+The Python suites need no dependencies at all. To point them at a local instance:
 
 ```sh
 python3 tests/smoke.py http://localhost
@@ -146,7 +145,14 @@ Short records of why the non-obvious choices were made, in [docs/adr](docs/adr):
 | [0009](docs/adr/0009-brand-assets.md) | Brand artwork processed at build time, not by hand |
 | [0010](docs/adr/0010-continuous-deployment.md) | Push to main deploys over SSH, building on the droplet |
 | [0011](docs/adr/0011-dependency-hygiene.md) | Dependencies audited weekly and pinned exactly |
-| [0012](docs/adr/0012-preview-deployment.md) | Preview deploys use trusted policy and a runner-built image |
+| [0012](docs/adr/0012-preview-deployment.md) | Preview deploys use trusted policy and a runner-built image (superseded by 0019) |
+| [0013](docs/adr/0013-production-runtime-limits.md) | Production containers bounded, never tighter than the dev site |
+| [0014](docs/adr/0014-compose-project-isolation.md) | The Compose project name is an isolation boundary |
+| [0015](docs/adr/0015-base-images-pinned-by-digest.md) | Base images pinned by digest, each with a watcher |
+| [0016](docs/adr/0016-deploy-the-tested-image.md) | Production runs the image the gate tested |
+| [0017](docs/adr/0017-development-site-on-one-host.md) | A development site serves the working tree, same host |
+| [0018](docs/adr/0018-merge-commits-and-a-following-dev-tree.md) | Merge commits, a required check, and a dev tree that follows main |
+| [0019](docs/adr/0019-preview-retired.md) | Preview deployment retired; the development site is the preview |
 
 ## Business facts
 

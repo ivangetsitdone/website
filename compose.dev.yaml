@@ -3,7 +3,7 @@
 # One host serves everything here, so this is a separate stack rather than the overlay the
 # whitelabel scaffold layers over compose.yaml — that design assumes a second machine with
 # its own 80/443. Production holds those ports, and its Caddy proxies this container on an
-# internal alias, exactly as it already does for preview.
+# internal alias.
 #
 # What is live, and what is not:
 #
