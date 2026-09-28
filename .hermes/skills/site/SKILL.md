@@ -34,8 +34,9 @@ commit and nothing published.
 | Photographs | Not by hand. Photographs are catalogue entries with a hash the build checks; `/todo add (dev)` it. |
 
 **`app/static` and `app/media` are not live on the development site.** They are built from
-`frontend/` and from the photo sources during the build, so a colour change shows on the
-live site after `/ship`, not on dev. Say so rather than letting Ivan think it did not work.
+`frontend/` and from the photo sources during the build, so a colour change shows nowhere
+until `/ship`, and then on both sites a few minutes later. Say so rather than letting Ivan
+think it did not work.
 
 ## Procedure
 

@@ -343,7 +343,8 @@ ports. Production's Caddy proxies it on the `dev-app` alias and adds
 **What is live, and what is not.** `app/main.py`, `app/templates`, `app/data` and `app/print`
 are mounted from the tree. `app/static`, `app/media` and everything built from `frontend/` are
 **not**: they are generated and git-ignored, and come from `APP_IMAGE`. So copy, markup and
-routing changes are instant; stylesheet, script and photograph changes appear after a deploy.
+routing changes are instant; stylesheet, script and photograph changes appear on dev a few
+minutes after they merge, when the deploy moves the dev site onto the image it just tested.
 
 ### One-time setup on the host
 
@@ -402,13 +403,16 @@ systemctl restart hermes-gateway
 
 ### Keeping it current
 
-The deploy does the first line itself, as its last step, so the tree follows `main`
-within minutes of a merge ([ADR-0018](docs/adr/0018-merge-commits-and-a-following-dev-tree.md)).
-By hand, when needed:
+The deploy does both of these itself, as its last steps: the tree follows `main`
+([ADR-0018](docs/adr/0018-merge-commits-and-a-following-dev-tree.md)) and `APP_IMAGE` in
+the dev checkout's `.env` follows the image the run proved healthy, so dependencies, styles,
+scripts and photographs on dev match production within minutes of a merge. By hand, when
+needed:
 
 ```sh
 cd /srv/website-dev && git pull --ff-only --autostash   # source
-docker compose pull && docker compose up -d             # dependencies, after a requirements change
+sed -i "s|^APP_IMAGE=.*|APP_IMAGE=$(grep ^APP_IMAGE= /srv/website/.env | cut -d= -f2-)|" .env
+docker compose up -d                                    # dependencies and generated assets
 ```
 
 A dependency change is the one case needing the second line: `APP_IMAGE` supplies the

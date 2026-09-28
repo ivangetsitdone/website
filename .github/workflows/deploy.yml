@@ -313,6 +313,21 @@ jobs:
               echo "::warning::/srv/website-dev could not follow main; pull it by hand"
           fi
 
+          # The development site runs its source on production's image (ADR-0017), so its
+          # dependencies and generated assets should be the ones this run just proved
+          # healthy. Rewrite APP_IMAGE in its .env and let Compose recreate the container
+          # only if the image changed; a no-op otherwise. The image is already local. Same
+          # rule as the pull above: production is live, so this can only warn.
+          if [ -f /srv/website-dev/.env ] && grep -q '^COMPOSE_FILE=compose.dev.yaml' /srv/website-dev/.env; then
+            if grep -q '^APP_IMAGE=' /srv/website-dev/.env; then
+              sed -i "s|^APP_IMAGE=.*|APP_IMAGE=$image|" /srv/website-dev/.env
+            else
+              printf 'APP_IMAGE=%s\n' "$image" >> /srv/website-dev/.env
+            fi
+            (cd /srv/website-dev && docker compose up -d --no-build --quiet-pull) ||
+              echo "::warning::the development site did not move to $image; run compose up -d in /srv/website-dev"
+          fi
+
           df -h / | tail -1
           docker compose ps
           REMOTE

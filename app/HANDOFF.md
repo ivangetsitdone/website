@@ -49,8 +49,9 @@ label is how Hermes dispatches work to the developer, and the developer checks
 
 `app/static` and `app/media` are generated during the image build, so they come from
 `APP_IMAGE` rather than from the tree ([ADR-0017](../docs/adr/0017-development-site-on-one-host.md)).
-A colour change or a new photograph therefore shows on the live site after a deploy, not on
-dev. Templates, `app/main.py`, `app/data` and `app/print` are live on save.
+A colour change or a new photograph therefore shows only after it is shipped: the deploy
+moves the dev site onto the image it just tested, so both sites show it a few minutes after
+the merge. Templates, `app/main.py`, `app/data` and `app/print` are live on save.
 
 ## Entries
 
