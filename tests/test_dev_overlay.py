@@ -110,6 +110,15 @@ class ProductionIsNotDevTests(unittest.TestCase):
             "strip it before compose runs, not after",
         )
 
+    def test_the_deploy_moves_the_dev_site_onto_the_tested_image(self):
+        """ADR-0017: dev runs its source on production's image. After the run has proved
+        that image healthy, it becomes the dev site's APP_IMAGE too; never before."""
+        remote = self.DEPLOY[self.DEPLOY.index("<<'REMOTE'"):self.DEPLOY.index("          REMOTE")]
+        self.assertIn('sed -i "s|^APP_IMAGE=.*|APP_IMAGE=$image|" /srv/website-dev/.env', remote)
+        self.assertIn("grep -q '^COMPOSE_FILE=compose.dev.yaml' /srv/website-dev/.env", remote,
+                      "touch only a checkout that is configured as the dev stack")
+        self.assertGreater(remote.index("/srv/website-dev/.env"), remote.index("wait_healthy ||"))
+
     def test_the_deploy_validates_the_dev_address(self):
         remote = self.DEPLOY[self.DEPLOY.index("<<'REMOTE'"):self.DEPLOY.index("          REMOTE")]
         self.assertIn("invalid DEV_ADDRESS", remote)
