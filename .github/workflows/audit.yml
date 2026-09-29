@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
         with:
-          python-version: '3.13'
+          python-version: '3.14'
       - run: pipx run pip-audit -r requirements.txt --strict --progress-spinner off
 
   # Caddy's digest lives in compose.yaml, which Dependabot's docker ecosystem does not read.
