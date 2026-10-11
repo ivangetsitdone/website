@@ -53,6 +53,18 @@ updates:
     open-pull-requests-limit: 5
     commit-message:
       prefix: deps(docker)
+
+  # The Caddy digest is pinned in compose.yaml, which the docker ecosystem above does not
+  # read. Dependabot's docker-compose ecosystem does (version updates only; GitHub's docs
+  # do not say whether it follows digests, so audit.yml's images job stays as the backstop
+  # that failed twice in September when this pin went stale).
+  - package-ecosystem: docker-compose
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: deps(docker)
     # Node majors are chosen, not accepted. Dependabot offered 26 while it was still
     # Current — the image that builds the shipped bundle should be on the active LTS.
     # Digest and minor updates still arrive, so 24 stays patched.
